@@ -10,6 +10,7 @@ import {
   Cell,
 } from "recharts";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -478,9 +479,17 @@ export default function Home() {
         {/* ── 5. Trust section ── */}
         <section id="om-oss" className="border-t border-[#1E4976] pt-10 pb-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <span className="font-extrabold text-lg text-[#8fafc9]">
-              elpris<span className="text-[#00E5FF]">.ai</span>
-            </span>
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <span className="font-extrabold text-lg text-[#8fafc9]">
+                elpris<span className="text-[#00E5FF]">.ai</span>
+              </span>
+              <Link
+                href="/integritetspolicy"
+                className="text-xs text-[#8fafc9] hover:text-[#00E5FF] transition-colors"
+              >
+                Integritetspolicy
+              </Link>
+            </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm text-[#8fafc9]">
               <span className="flex items-center gap-2">
