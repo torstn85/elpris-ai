@@ -9,41 +9,19 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 
-// ─── Placeholder data ────────────────────────────────────────────────────────
-
-const hourlyData = [
-  { hour: "00", price: 28 },
-  { hour: "01", price: 22 },
-  { hour: "02", price: 19 },
-  { hour: "03", price: 17 },
-  { hour: "04", price: 18 },
-  { hour: "05", price: 24 },
-  { hour: "06", price: 38 },
-  { hour: "07", price: 55 },
-  { hour: "08", price: 72 },
-  { hour: "09", price: 68 },
-  { hour: "10", price: 61 },
-  { hour: "11", price: 54 },
-  { hour: "12", price: 49 },
-  { hour: "13", price: 45 },
-  { hour: "14", price: 42 },
-  { hour: "15", price: 47 },
-  { hour: "16", price: 58 },
-  { hour: "17", price: 78 },
-  { hour: "18", price: 91 },
-  { hour: "19", price: 85 },
-  { hour: "20", price: 74 },
-  { hour: "21", price: 62 },
-  { hour: "22", price: 48 },
-  { hour: "23", price: 35 },
-];
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getBarColor(price: number): string {
   if (price <= 30) return "#22C55E";
   if (price >= 70) return "#EF4444";
   return "#00E5FF";
+}
+
+function currentHour(): number {
+  return new Date().getHours();
 }
 
 // ─── Custom tooltip ──────────────────────────────────────────────────────────
@@ -98,10 +76,76 @@ function ValueCard({
   );
 }
 
+// ─── Derived stats from SE3 hourly data ──────────────────────────────────────
+
+function cheapestWindow(
+  hours: HourEntry[],
+  windowSize = 3
+): { label: string; avg: number } | null {
+  if (hours.length < windowSize) return null;
+  let best = Infinity;
+  let bestStart = 0;
+  for (let i = 0; i <= hours.length - windowSize; i++) {
+    const avg =
+      hours.slice(i, i + windowSize).reduce((s, h) => s + h.ore_per_kwh, 0) /
+      windowSize;
+    if (avg < best) {
+      best = avg;
+      bestStart = i;
+    }
+  }
+  const start = hours[bestStart].hour;
+  const end = hours[bestStart + windowSize - 1].hour + 1;
+  return {
+    label: `${String(start).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00`,
+    avg: Math.round(best * 10) / 10,
+  };
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [chatInput, setChatInput] = useState("");
+  const [prices, setPrices] = useState<PricesResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/prices/today")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<PricesResponse>;
+      })
+      .then((data) => {
+        setPrices(data);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
+  }, []);
+
+  const se3 = prices?.areas.SE3 ?? [];
+  const now = currentHour();
+  const currentEntry = se3.find((h) => h.hour === now);
+  const currentPrice = currentEntry?.ore_per_kwh ?? null;
+
+  const chartData = se3.map((h) => ({
+    hour: String(h.hour).padStart(2, "0"),
+    price: h.ore_per_kwh,
+  }));
+
+  const cheap = cheapestWindow(se3, 3);
+
+  // Format last-updated time from fetched_at
+  const updatedAt = prices
+    ? new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "Europe/Stockholm",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(prices.fetched_at))
+    : null;
 
   return (
     <main className="min-h-screen bg-[#0A2540] text-white">
@@ -133,7 +177,10 @@ export default function Home() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E5FF]" />
             </span>
             <span className="text-[#00E5FF] font-medium">LIVE</span>
-            <span className="text-[#8fafc9]">· SE3 · Uppdaterad 14:15</span>
+            <span className="text-[#8fafc9]">
+              · SE3
+              {updatedAt ? ` · Uppdaterad ${updatedAt}` : ""}
+            </span>
           </div>
 
           <h1 className="font-extrabold text-5xl md:text-7xl leading-none tracking-tight">
@@ -141,19 +188,37 @@ export default function Home() {
           </h1>
 
           {/* Big price */}
-          <div className="flex flex-col items-center gap-1">
-            <span
-              className="font-black text-8xl md:text-9xl leading-none"
-              style={{
-                color: "#00E5FF",
-                textShadow: "0 0 40px rgba(0,229,255,0.45)",
-              }}
-            >
-              42,3
-            </span>
-            <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
-              öre / kWh · SE3
-            </span>
+          <div className="flex flex-col items-center gap-1 min-h-[120px] justify-center">
+            {loading ? (
+              <div className="w-48 h-24 rounded-2xl bg-[#0F3460] animate-pulse" />
+            ) : error ? (
+              <p className="text-[#EF4444] text-lg">
+                Kunde inte hämta pris
+              </p>
+            ) : (
+              <>
+                <span
+                  className="font-black text-8xl md:text-9xl leading-none"
+                  style={{
+                    color:
+                      currentPrice !== null && currentPrice >= 70
+                        ? "#EF4444"
+                        : "#00E5FF",
+                    textShadow:
+                      currentPrice !== null && currentPrice >= 70
+                        ? "0 0 40px rgba(239,68,68,0.45)"
+                        : "0 0 40px rgba(0,229,255,0.45)",
+                  }}
+                >
+                  {currentPrice !== null
+                    ? currentPrice.toFixed(1).replace(".", ",")
+                    : "–"}
+                </span>
+                <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
+                  öre / kWh · SE3 · kl. {String(now).padStart(2, "0")}:xx
+                </span>
+              </>
+            )}
           </div>
 
           <p className="text-[#8fafc9] max-w-md text-base md:text-lg leading-relaxed">
@@ -174,7 +239,10 @@ export default function Home() {
                 Dagens timpriser
               </h2>
               <p className="text-[#8fafc9] text-sm mt-1">
-                Måndag 14 april · SE3 · öre/kWh
+                {prices?.date
+                  ? prices.date.replace("/", " ").replace("-", " ") + " · "
+                  : ""}
+                SE3 · öre/kWh
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
@@ -194,40 +262,54 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6">
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={hourlyData}
-                barCategoryGap="20%"
-                margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-              >
-                <XAxis
-                  dataKey="hour"
-                  tick={{ fill: "#8fafc9", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={2}
-                  tickFormatter={(v) => `${v}h`}
-                />
-                <YAxis
-                  tick={{ fill: "#8fafc9", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                  cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                />
-                <Bar dataKey="price" radius={[4, 4, 0, 0]}>
-                  {hourlyData.map((entry) => (
-                    <Cell
-                      key={entry.hour}
-                      fill={getBarColor(entry.price)}
-                      opacity={0.9}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <div className="h-[220px] flex items-center justify-center">
+                <div className="w-full h-full rounded-xl bg-[#0A2540] animate-pulse" />
+              </div>
+            ) : error || chartData.length === 0 ? (
+              <div className="h-[220px] flex items-center justify-center text-[#8fafc9] text-sm">
+                Prisdata ej tillgänglig
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart
+                  data={chartData}
+                  barCategoryGap="20%"
+                  margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="hour"
+                    tick={{ fill: "#8fafc9", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                    interval={2}
+                    tickFormatter={(v) => `${v}h`}
+                  />
+                  <YAxis
+                    tick={{ fill: "#8fafc9", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                  />
+                  <Bar dataKey="price" radius={[4, 4, 0, 0]}>
+                    {chartData.map((entry) => (
+                      <Cell
+                        key={entry.hour}
+                        fill={getBarColor(entry.price)}
+                        opacity={parseInt(entry.hour) === now ? 1 : 0.75}
+                        stroke={
+                          parseInt(entry.hour) === now ? "#ffffff" : "none"
+                        }
+                        strokeWidth={parseInt(entry.hour) === now ? 1 : 0}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </section>
 
@@ -257,12 +339,24 @@ export default function Home() {
                 <span className="text-[#22C55E] text-xs font-bold">AI</span>
               </div>
               <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-sm">
-                Priset är{" "}
-                <span className="text-[#00E5FF] font-semibold">
-                  42,3 öre/kWh
-                </span>{" "}
-                just nu i SE3. Billigaste perioden är kl. 02–05 (17–19 öre).
-                Vänta gärna till natten!
+                {currentPrice !== null && cheap ? (
+                  <>
+                    Priset är{" "}
+                    <span className="text-[#00E5FF] font-semibold">
+                      {currentPrice.toFixed(1).replace(".", ",")} öre/kWh
+                    </span>{" "}
+                    just nu i SE3. Billigaste 3-timmarsperioden är{" "}
+                    <span className="text-[#22C55E] font-semibold">
+                      {cheap.label}
+                    </span>{" "}
+                    ({cheap.avg.toFixed(1).replace(".", ",")} öre i snitt).
+                    {currentPrice > cheap.avg + 5
+                      ? " Vänta gärna!"
+                      : " Priset är bra nu!"}
+                  </>
+                ) : (
+                  "Hämtar prisdata..."
+                )}
               </div>
             </div>
 
@@ -291,23 +385,51 @@ export default function Home() {
             <ValueCard
               icon="🧺"
               title="Billigaste tvättid"
-              value="03:00–05:00"
-              detail="17–19 öre/kWh · Spara upp till 4 kr/tvätt"
+              value={cheap ? cheap.label : "–"}
+              detail={
+                cheap
+                  ? `${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh i snitt`
+                  : "Laddar..."
+              }
               accent="#22C55E"
             />
             <ValueCard
               icon="🚗"
               title="Ladda elbilen"
-              value="02:00–06:00"
-              detail="Nattpris 17–24 öre/kWh · Bäst just nu"
+              value={cheap ? cheap.label : "–"}
+              detail={
+                cheap
+                  ? `Snittpriser ${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh`
+                  : "Laddar..."
+              }
               accent="#00E5FF"
             />
             <ValueCard
-              icon="🌅"
-              title="Morgondagens pris"
-              value="38,1 öre"
-              detail="Prognos SE3 · 6% lägre än idag"
-              accent="#f59e0b"
+              icon="📊"
+              title="Dyrt just nu"
+              value={
+                currentPrice !== null
+                  ? `${currentPrice.toFixed(1).replace(".", ",")} öre`
+                  : "–"
+              }
+              detail={
+                currentPrice !== null
+                  ? currentPrice >= 70
+                    ? "Högt pris – skjut upp förbrukning"
+                    : currentPrice <= 30
+                    ? "Lågt pris – bra tid att förbruka"
+                    : "Normalt prisnivå just nu"
+                  : "Laddar..."
+              }
+              accent={
+                currentPrice !== null
+                  ? currentPrice >= 70
+                    ? "#EF4444"
+                    : currentPrice <= 30
+                    ? "#22C55E"
+                    : "#00E5FF"
+                  : "#8fafc9"
+              }
             />
           </div>
         </section>
