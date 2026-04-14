@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,6 +15,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv">
+      <head>
+        <Script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          data-cbid="025f3725-ecd4-457b-80e9-d7f2ae4d5e96"
+          data-blockingmode="auto"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className="antialiased bg-bg text-white min-h-screen">
         {children}
       </body>
