@@ -1,0 +1,15 @@
+name: Fetch electricity prices
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: # allow manual trigger from GitHub UI
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call fetch-prices API
+        run: |
+          curl --fail --silent --show-error \
+            -X GET "${{ secrets.PRODUCTION_URL }}/api/cron/fetch-prices"
