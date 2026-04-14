@@ -23,6 +23,18 @@ export default function RootLayout({
           data-blockingmode="auto"
           strategy="beforeInteractive"
         />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-CY788GRNLW"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-CY788GRNLW');
+          `}
+        </Script>
       </head>
       <body className="antialiased bg-bg text-white min-h-screen">
         {children}
