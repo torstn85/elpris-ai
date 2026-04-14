@@ -102,6 +102,20 @@ function cheapestWindow(
   };
 }
 
+// ─── Region → elområde mapping ───────────────────────────────────────────────
+
+const SE1_REGIONS = ["norrbotten", "västerbotten"];
+const SE2_REGIONS = ["jämtland", "västernorrland"];
+const SE4_REGIONS = ["skåne", "blekinge", "kronoberg"];
+
+function regionToArea(region: string): "SE1" | "SE2" | "SE3" | "SE4" {
+  const r = region.toLowerCase();
+  if (SE1_REGIONS.some((s) => r.includes(s))) return "SE1";
+  if (SE2_REGIONS.some((s) => r.includes(s))) return "SE2";
+  if (SE4_REGIONS.some((s) => r.includes(s))) return "SE4";
+  return "SE3";
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -109,6 +123,21 @@ export default function Home() {
   const [prices, setPrices] = useState<PricesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<"SE1" | "SE2" | "SE3" | "SE4">("SE3");
+
+  // Geolocation: detect user's Swedish region and pre-select area
+  useEffect(() => {
+    fetch("https://api.ipapi.is")
+      .then((r) => r.json())
+      .then((data) => {
+        const region: string = data?.location?.region ?? "";
+        const area = regionToArea(region);
+        setSelectedArea(area);
+      })
+      .catch(() => {
+        // Fallback SE3 already set as default
+      });
+  }, []);
 
   useEffect(() => {
     fetch("/api/prices/today")
@@ -126,26 +155,17 @@ export default function Home() {
       });
   }, []);
 
-  const se3 = prices?.areas.SE3 ?? [];
   const now = currentHour();
-  const currentEntry = se3.find((h) => h.hour === now);
+  const areaData = prices?.areas[selectedArea] ?? [];
+  const currentEntry = areaData.find((h) => h.hour === now);
   const currentPrice = currentEntry?.ore_per_kwh ?? null;
 
-  // Build "kl. 17–18" from the entry's time_start hour
-  const currentPeriodLabel = currentEntry
-    ? (() => {
-        const start = new Date(currentEntry.time_start);
-        const startH = start.getHours();
-        return `kl. ${String(startH).padStart(2, "0")}–${String(startH + 1).padStart(2, "0")}`;
-      })()
-    : `kl. ${String(now).padStart(2, "0")}–${String(now + 1).padStart(2, "0")}`;
-
-  const chartData = se3.map((h) => ({
+  const chartData = areaData.map((h) => ({
     hour: String(h.hour).padStart(2, "0"),
     price: h.ore_per_kwh,
   }));
 
-  const cheap = cheapestWindow(se3, 3);
+  const cheap = cheapestWindow(areaData, 3);
 
   // Format last-updated time from fetched_at
   const updatedAt = prices
@@ -187,7 +207,7 @@ export default function Home() {
             </span>
             <span className="text-[#00E5FF] font-medium">LIVE</span>
             <span className="text-[#8fafc9]">
-              · SE3
+              · {selectedArea}
               {updatedAt ? ` · Uppdaterad ${updatedAt}` : ""}
             </span>
           </div>
@@ -224,7 +244,7 @@ export default function Home() {
                     : "–"}
                 </span>
                 <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
-                  öre / kWh · SE3 · {currentPeriodLabel}
+                  öre / kWh · {selectedArea}
                 </span>
               </>
             )}
@@ -235,12 +255,21 @@ export default function Home() {
             att använda el.
           </p>
 
-          <a
-            href="#elomraden"
-            className="mt-2 inline-block bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-base px-8 py-3.5 rounded-xl transition-colors duration-150 shadow-lg shadow-[#22C55E]/20"
-          >
-            Se alla elområden
-          </a>
+          <div className="mt-2 flex gap-2">
+            {(["SE1", "SE2", "SE3", "SE4"] as const).map((area) => (
+              <button
+                key={area}
+                onClick={() => setSelectedArea(area)}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 ${
+                  selectedArea === area
+                    ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
+                    : "bg-[#0F3460] border border-[#1E4976] text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white"
+                }`}
+              >
+                {area}
+              </button>
+            ))}
+          </div>
         </section>
 
         {/* ── 2. Price chart ── */}
@@ -254,7 +283,7 @@ export default function Home() {
                 {prices?.date
                   ? prices.date.replace("/", " ").replace("-", " ") + " · "
                   : ""}
-                SE3 · öre/kWh
+                {selectedArea} · öre/kWh
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
