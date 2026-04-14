@@ -131,6 +131,15 @@ export default function Home() {
   const currentEntry = se3.find((h) => h.hour === now);
   const currentPrice = currentEntry?.ore_per_kwh ?? null;
 
+  // Build "kl. 17–18" from the entry's time_start hour
+  const currentPeriodLabel = currentEntry
+    ? (() => {
+        const start = new Date(currentEntry.time_start);
+        const startH = start.getHours();
+        return `kl. ${String(startH).padStart(2, "0")}–${String(startH + 1).padStart(2, "0")}`;
+      })()
+    : `kl. ${String(now).padStart(2, "0")}–${String(now + 1).padStart(2, "0")}`;
+
   const chartData = se3.map((h) => ({
     hour: String(h.hour).padStart(2, "0"),
     price: h.ore_per_kwh,
@@ -155,13 +164,13 @@ export default function Home() {
           elpris<span className="text-[#00E5FF]">.ai</span>
         </span>
         <div className="flex items-center gap-6 text-sm text-[#8fafc9]">
-          <a href="#" className="hover:text-white transition-colors">
+          <a href="#elomraden" className="hover:text-white transition-colors">
             Elområden
           </a>
-          <a href="#" className="hover:text-white transition-colors">
+          <a href="#rekommendationer" className="hover:text-white transition-colors">
             Prognos
           </a>
-          <a href="#" className="hover:text-white transition-colors">
+          <a href="#om-oss" className="hover:text-white transition-colors">
             Om oss
           </a>
         </div>
@@ -215,7 +224,7 @@ export default function Home() {
                     : "–"}
                 </span>
                 <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
-                  öre / kWh · SE3 · kl. {String(now).padStart(2, "0")}:xx
+                  öre / kWh · SE3 · {currentPeriodLabel}
                 </span>
               </>
             )}
@@ -226,13 +235,16 @@ export default function Home() {
             att använda el.
           </p>
 
-          <button className="mt-2 bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-base px-8 py-3.5 rounded-xl transition-colors duration-150 shadow-lg shadow-[#22C55E]/20">
+          <a
+            href="#elomraden"
+            className="mt-2 inline-block bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-base px-8 py-3.5 rounded-xl transition-colors duration-150 shadow-lg shadow-[#22C55E]/20"
+          >
             Se alla elområden
-          </button>
+          </a>
         </section>
 
         {/* ── 2. Price chart ── */}
-        <section className="flex flex-col gap-6">
+        <section id="elomraden" className="flex flex-col gap-6">
           <div className="flex items-end justify-between">
             <div>
               <h2 className="font-bold text-2xl md:text-3xl">
@@ -377,7 +389,7 @@ export default function Home() {
         </section>
 
         {/* ── 4. Value blocks ── */}
-        <section className="flex flex-col gap-6">
+        <section id="rekommendationer" className="flex flex-col gap-6">
           <h2 className="font-bold text-2xl md:text-3xl">
             Smarta rekommendationer
           </h2>
@@ -435,7 +447,7 @@ export default function Home() {
         </section>
 
         {/* ── 5. Trust section ── */}
-        <section className="border-t border-[#1E4976] pt-10 pb-4">
+        <section id="om-oss" className="border-t border-[#1E4976] pt-10 pb-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <span className="font-extrabold text-lg text-[#8fafc9]">
               elpris<span className="text-[#00E5FF]">.ai</span>
