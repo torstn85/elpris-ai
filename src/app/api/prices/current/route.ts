@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { stockholmHour, stockholmDateString, stockholmISODate, parseStockholmHour } from "@/lib/time";
+import { stockholmHour, stockholmDateString, parseStockholmHour, currentSlotStartISO } from "@/lib/time";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -17,44 +17,36 @@ export interface CurrentPriceResponse {
 // ─── Supabase: latest started slot per area ───────────────────────────────────
 
 async function fromSupabase(): Promise<CurrentPriceResponse | null> {
-  const isoDate = stockholmISODate();
-  // Use UTC ISO string so the comparison is correct against the UTC-stored
-  // timestamptz values in Supabase (time_start from elprisetjustnu is e.g.
-  // "2026-04-15T15:00:00+02:00", stored in DB as UTC "2026-04-15T13:00:00Z").
-  const nowUTC = new Date().toISOString();
+  // Round down to the current 15-min slot before querying so we never pick a
+  // future slot. Stored timestamps are UTC timestamptz, so compare in UTC.
+  const slotStart = currentSlotStartISO();
+  // Lower bound: start of today in Stockholm time (naive, matches DB format)
+  const todayPrefix = slotStart.slice(0, 10); // "YYYY-MM-DD" from UTC — close enough for a daily lower bound
 
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", `${isoDate}T00:00:00`)
-    .lte("delivery_period_start", nowUTC)
+    .gte("delivery_period_start", `${todayPrefix}T00:00:00`)
+    .lte("delivery_period_start", slotStart)
     .order("delivery_period_start", { ascending: false });
 
   if (error || !data || data.length === 0) return null;
 
   // Pick the latest slot per area (data is DESC so first hit per area wins)
-  const latest: Partial<Record<Area, { price: number; slot_start: string }>> = {};
+  const latest: Partial<Record<Area, number>> = {};
   for (const row of data) {
     const area = row.area as Area;
-    if (!latest[area]) {
-      latest[area] = {
-        price: row.ore_per_kwh,
-        slot_start: row.delivery_period_start,
-      };
-    }
+    if (!latest[area]) latest[area] = row.ore_per_kwh;
   }
 
-  if (!AREAS.every((a) => latest[a])) return null;
-
-  // All areas share the same slot_start (prices are published together)
-  const slot_start = latest["SE3"]!.slot_start;
+  if (!AREAS.every((a) => latest[a] !== undefined)) return null;
 
   return {
-    SE1: latest["SE1"]!.price,
-    SE2: latest["SE2"]!.price,
-    SE3: latest["SE3"]!.price,
-    SE4: latest["SE4"]!.price,
-    slot_start,
+    SE1: latest["SE1"]!,
+    SE2: latest["SE2"]!,
+    SE3: latest["SE3"]!,
+    SE4: latest["SE4"]!,
+    slot_start: slotStart,
     fetched_at: new Date().toISOString(),
   };
 }
@@ -83,21 +75,18 @@ async function fetchAreaHour(area: Area, dateStr: string): Promise<number> {
 }
 
 async function fromElprisetjustnu(): Promise<CurrentPriceResponse> {
-  const isoDate = stockholmISODate();
   const dateStr = stockholmDateString();
 
   const [SE1, SE2, SE3, SE4] = await Promise.all(
     AREAS.map((area) => fetchAreaHour(area, dateStr))
   );
 
-  const slot_start = `${isoDate}T${String(stockholmHour()).padStart(2, "0")}:00:00`;
-
   return {
     SE1,
     SE2,
     SE3,
     SE4,
-    slot_start,
+    slot_start: currentSlotStartISO(),
     fetched_at: new Date().toISOString(),
   };
 }

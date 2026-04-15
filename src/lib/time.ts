@@ -35,6 +35,15 @@ export function stockholmDateString(): string {
 }
 
 /**
+ * Current 15-minute slot start as a UTC ISO string, rounded down.
+ * e.g. at 15:11 Stockholm → "...T13:00:00.000Z" (UTC 13:00 = Stockholm 15:00 in CEST)
+ */
+export function currentSlotStartISO(): string {
+  const SLOT_MS = 15 * 60 * 1000;
+  return new Date(Math.floor(Date.now() / SLOT_MS) * SLOT_MS).toISOString();
+}
+
+/**
  * Extract the hour (0–23) in Europe/Stockholm from any ISO timestamp string.
  * Works correctly regardless of the offset embedded in the source string.
  */

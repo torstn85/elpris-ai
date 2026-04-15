@@ -183,13 +183,13 @@ export default function Home() {
 
   const cheap = cheapestWindow(areaData, 3);
 
-  // Format last-updated time from fetched_at
-  const updatedAt = prices
+  // Show the slot start time (rounded-down quarter) rather than wall-clock time
+  const updatedAt = currentPriceData
     ? new Intl.DateTimeFormat("sv-SE", {
         timeZone: "Europe/Stockholm",
         hour: "2-digit",
         minute: "2-digit",
-      }).format(new Date(prices.fetched_at))
+      }).format(new Date(currentPriceData.slot_start))
     : null;
 
   return (
