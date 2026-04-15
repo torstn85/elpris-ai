@@ -52,7 +52,14 @@ interface RawSlot {
 function aggregateToHourly(slots: RawSlot[]): HourEntry[] {
   const buckets = new Map<number, RawSlot[]>();
   for (const slot of slots) {
-    const hour = new Date(slot.time_start).getHours();
+    const hour = parseInt(
+      new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "Europe/Stockholm",
+        hour: "numeric",
+        hour12: false,
+      }).format(new Date(slot.time_start)),
+      10
+    );
     if (!buckets.has(hour)) buckets.set(hour, []);
     buckets.get(hour)!.push(slot);
   }

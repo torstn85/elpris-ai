@@ -22,7 +22,14 @@ function getBarColor(price: number): string {
 }
 
 function currentHour(): number {
-  return new Date().getHours();
+  return parseInt(
+    new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "Europe/Stockholm",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date()),
+    10
+  );
 }
 
 // ─── Custom tooltip ──────────────────────────────────────────────────────────
