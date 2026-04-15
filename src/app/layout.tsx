@@ -35,6 +35,11 @@ export default function RootLayout({
             gtag('config', 'G-CY788GRNLW');
           `}
         </Script>
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7126610035053617"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="antialiased bg-bg text-white min-h-screen">
         {children}
