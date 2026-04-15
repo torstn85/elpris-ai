@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase, type SpotPriceRow } from "@/lib/supabase";
+import { stockholmDateString } from "@/lib/time";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -8,18 +9,6 @@ interface RawEntry {
   SEK_per_kWh: number;
   time_start: string;
   time_end: string;
-}
-
-function todayDateString(): string {
-  const now = new Date();
-  const swe = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(now);
-  const [year, month, day] = swe.split("-");
-  return `${year}/${month}-${day}`;
 }
 
 async function fetchRawArea(area: Area, dateStr: string): Promise<RawEntry[]> {
@@ -31,7 +20,7 @@ async function fetchRawArea(area: Area, dateStr: string): Promise<RawEntry[]> {
 
 export async function GET() {
   try {
-    const dateStr = todayDateString();
+    const dateStr = stockholmDateString();
 
     // Fetch all four areas in parallel
     const rawResults = await Promise.all(

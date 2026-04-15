@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { stockholmDateString, stockholmISODate, parseStockholmHour } from "@/lib/time";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -19,29 +20,6 @@ export interface PricesResponse {
   fetched_at: string;
 }
 
-// ─── Date helper ─────────────────────────────────────────────────────────────
-
-function todayDateString(): string {
-  const swe = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-  const [year, month, day] = swe.split("-");
-  return `${year}/${month}-${day}`;
-}
-
-// Returns "YYYY-MM-DD" in Stockholm time — used for Supabase date filtering
-function todayISODate(): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
 // ─── Aggregate 15-min slots → hourly ─────────────────────────────────────────
 
 interface RawSlot {
@@ -52,14 +30,7 @@ interface RawSlot {
 function aggregateToHourly(slots: RawSlot[]): HourEntry[] {
   const buckets = new Map<number, RawSlot[]>();
   for (const slot of slots) {
-    const hour = parseInt(
-      new Intl.DateTimeFormat("sv-SE", {
-        timeZone: "Europe/Stockholm",
-        hour: "numeric",
-        hour12: false,
-      }).format(new Date(slot.time_start)),
-      10
-    );
+    const hour = parseStockholmHour(slot.time_start);
     if (!buckets.has(hour)) buckets.set(hour, []);
     buckets.get(hour)!.push(slot);
   }
@@ -78,7 +49,7 @@ function aggregateToHourly(slots: RawSlot[]): HourEntry[] {
 // ─── Supabase read ────────────────────────────────────────────────────────────
 
 async function fromSupabase(): Promise<Record<Area, HourEntry[]> | null> {
-  const isoDate = todayISODate(); // e.g. "2026-04-14"
+  const isoDate = stockholmISODate();
 
   const { data, error } = await supabase
     .from("spot_prices")
@@ -131,7 +102,7 @@ async function fetchArea(area: Area, dateStr: string): Promise<HourEntry[]> {
 }
 
 async function fromElprisetjustnu(): Promise<Record<Area, HourEntry[]>> {
-  const dateStr = todayDateString();
+  const dateStr = stockholmDateString();
   const [SE1, SE2, SE3, SE4] = await Promise.all(
     AREAS.map((area) => fetchArea(area, dateStr))
   );
@@ -151,7 +122,7 @@ export async function GET() {
     }
 
     const body: PricesResponse = {
-      date: todayDateString(),
+      date: stockholmDateString(),
       source,
       areas,
       fetched_at: new Date().toISOString(),

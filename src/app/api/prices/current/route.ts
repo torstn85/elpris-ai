@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { stockholmHour, stockholmDateString, stockholmISODate, parseStockholmHour } from "@/lib/time";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -13,56 +14,20 @@ export interface CurrentPriceResponse {
   fetched_at: string;
 }
 
-// ─── Stockholm time helpers ───────────────────────────────────────────────────
-
-function stockholmDateISO(): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
-function stockholmNowISO(): string {
-  const parts = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).formatToParts(new Date());
-
-  const get = (type: string) =>
-    parts.find((p) => p.type === type)?.value ?? "00";
-  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}:${get("second")}`;
-}
-
-function stockholmHour(): number {
-  return parseInt(
-    new Intl.DateTimeFormat("sv-SE", {
-      timeZone: "Europe/Stockholm",
-      hour: "numeric",
-      hour12: false,
-    }).format(new Date()),
-    10
-  );
-}
-
 // ─── Supabase: latest started slot per area ───────────────────────────────────
 
 async function fromSupabase(): Promise<CurrentPriceResponse | null> {
-  const isoDate = stockholmDateISO();
-  const nowISO = stockholmNowISO();
+  const isoDate = stockholmISODate();
+  // Use UTC ISO string so the comparison is correct against the UTC-stored
+  // timestamptz values in Supabase (time_start from elprisetjustnu is e.g.
+  // "2026-04-15T15:00:00+02:00", stored in DB as UTC "2026-04-15T13:00:00Z").
+  const nowUTC = new Date().toISOString();
 
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
     .gte("delivery_period_start", `${isoDate}T00:00:00`)
-    .lte("delivery_period_start", nowISO)
+    .lte("delivery_period_start", nowUTC)
     .order("delivery_period_start", { ascending: false });
 
   if (error || !data || data.length === 0) return null;
@@ -111,35 +76,15 @@ async function fetchAreaHour(area: Area, dateStr: string): Promise<number> {
   const hour = stockholmHour();
 
   // Find the entry whose time_start corresponds to the current Stockholm hour
-  const entry = data.find((e) => {
-    const entryHour = parseInt(
-      new Intl.DateTimeFormat("sv-SE", {
-        timeZone: "Europe/Stockholm",
-        hour: "numeric",
-        hour12: false,
-      }).format(new Date(e.time_start)),
-      10
-    );
-    return entryHour === hour;
-  });
+  const entry = data.find((e) => parseStockholmHour(e.time_start) === hour);
 
   if (!entry) throw new Error(`No entry for hour ${hour} in ${area}`);
   return Math.round(entry.SEK_per_kWh * 10000) / 100;
 }
 
 async function fromElprisetjustnu(): Promise<CurrentPriceResponse> {
-  const isoDate = stockholmDateISO();
-  // elprisetjustnu uses YYYY/MM-DD format
-  const [year, monthDay] = isoDate.split("-").reduce<string[]>(
-    (acc, part, i) => {
-      if (i === 0) acc.push(part);
-      else if (i === 1) acc[1] = (acc[1] ? acc[1] + "-" : "") + part;
-      else acc[1] += "-" + part;
-      return acc;
-    },
-    ["", ""]
-  );
-  const dateStr = `${year}/${monthDay}`;
+  const isoDate = stockholmISODate();
+  const dateStr = stockholmDateString();
 
   const [SE1, SE2, SE3, SE4] = await Promise.all(
     AREAS.map((area) => fetchAreaHour(area, dateStr))

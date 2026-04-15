@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
+import { stockholmHour } from "@/lib/time";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -22,16 +23,6 @@ function getBarColor(price: number): string {
   return "#00E5FF";
 }
 
-function currentHour(): number {
-  return parseInt(
-    new Intl.DateTimeFormat("sv-SE", {
-      timeZone: "Europe/Stockholm",
-      hour: "numeric",
-      hour12: false,
-    }).format(new Date()),
-    10
-  );
-}
 
 // ─── Custom tooltip ──────────────────────────────────────────────────────────
 
@@ -181,7 +172,7 @@ export default function Home() {
       });
   }, []);
 
-  const now = currentHour();
+  const now = stockholmHour();
   const areaData = prices?.areas[selectedArea] ?? [];
   const currentPrice = currentPriceData?.[selectedArea] ?? null;
 
