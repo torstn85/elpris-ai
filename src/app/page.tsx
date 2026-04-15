@@ -16,8 +16,8 @@ import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getBarColor(price: number): string {
-  if (price <= 30) return "#22C55E";
-  if (price >= 70) return "#EF4444";
+  if (price <= 50) return "#22C55E";
+  if (price >= 100) return "#EF4444";
   return "#00E5FF";
 }
 
@@ -231,15 +231,15 @@ export default function Home() {
                   className="font-black text-8xl md:text-9xl leading-none"
                   style={{
                     color:
-                      currentPrice !== null && currentPrice >= 70
+                      currentPrice !== null && currentPrice >= 100
                         ? "#EF4444"
-                        : currentPrice !== null && currentPrice <= 30
+                        : currentPrice !== null && currentPrice <= 50
                         ? "#22C55E"
                         : "#00E5FF",
                     textShadow:
-                      currentPrice !== null && currentPrice >= 70
+                      currentPrice !== null && currentPrice >= 100
                         ? "0 0 40px rgba(239,68,68,0.45)"
-                        : currentPrice !== null && currentPrice <= 30
+                        : currentPrice !== null && currentPrice <= 50
                         ? "0 0 40px rgba(34,197,94,0.45)"
                         : "0 0 40px rgba(0,229,255,0.45)",
                   }}
@@ -294,7 +294,7 @@ export default function Home() {
             <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#22C55E]" />
-                Billigt (&le;30)
+                Billigt (&le;50)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#00E5FF]" />
@@ -302,7 +302,7 @@ export default function Home() {
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444]" />
-                Dyrt (&ge;70)
+                Dyrt (&ge;100)
               </span>
             </div>
           </div>
@@ -460,18 +460,18 @@ export default function Home() {
               }
               detail={
                 currentPrice !== null
-                  ? currentPrice >= 70
+                  ? currentPrice >= 100
                     ? "Högt pris – skjut upp förbrukning"
-                    : currentPrice <= 30
+                    : currentPrice <= 50
                     ? "Lågt pris – bra tid att förbruka"
                     : "Normalt prisnivå just nu"
                   : "Laddar..."
               }
               accent={
                 currentPrice !== null
-                  ? currentPrice >= 70
+                  ? currentPrice >= 100
                     ? "#EF4444"
-                    : currentPrice <= 30
+                    : currentPrice <= 50
                     ? "#22C55E"
                     : "#00E5FF"
                   : "#8fafc9"
