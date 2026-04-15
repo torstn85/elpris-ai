@@ -233,10 +233,14 @@ export default function Home() {
                     color:
                       currentPrice !== null && currentPrice >= 70
                         ? "#EF4444"
+                        : currentPrice !== null && currentPrice <= 30
+                        ? "#22C55E"
                         : "#00E5FF",
                     textShadow:
                       currentPrice !== null && currentPrice >= 70
                         ? "0 0 40px rgba(239,68,68,0.45)"
+                        : currentPrice !== null && currentPrice <= 30
+                        ? "0 0 40px rgba(34,197,94,0.45)"
                         : "0 0 40px rgba(0,229,255,0.45)",
                   }}
                 >
