@@ -12,6 +12,7 @@ import {
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
+import type { CurrentPriceResponse } from "./api/prices/current/route";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -131,6 +132,8 @@ export default function Home() {
   const [prices, setPrices] = useState<PricesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPriceData, setCurrentPriceData] = useState<CurrentPriceResponse | null>(null);
+  const [currentLoading, setCurrentLoading] = useState(true);
   const [selectedArea, setSelectedArea] = useState<"SE1" | "SE2" | "SE3" | "SE4">("SE3");
 
   // Geolocation: detect user's Swedish region and pre-select area
@@ -163,10 +166,24 @@ export default function Home() {
       });
   }, []);
 
+  useEffect(() => {
+    fetch("/api/prices/current")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<CurrentPriceResponse>;
+      })
+      .then((data) => {
+        setCurrentPriceData(data);
+        setCurrentLoading(false);
+      })
+      .catch(() => {
+        setCurrentLoading(false);
+      });
+  }, []);
+
   const now = currentHour();
   const areaData = prices?.areas[selectedArea] ?? [];
-  const currentEntry = areaData.find((h) => h.hour === now);
-  const currentPrice = currentEntry?.ore_per_kwh ?? null;
+  const currentPrice = currentPriceData?.[selectedArea] ?? null;
 
   const chartData = areaData.map((h) => ({
     hour: String(h.hour).padStart(2, "0"),
@@ -226,7 +243,7 @@ export default function Home() {
 
           {/* Big price */}
           <div className="flex flex-col items-center gap-1 min-h-[120px] justify-center">
-            {loading ? (
+            {currentLoading ? (
               <div className="w-48 h-24 rounded-2xl bg-[#0F3460] animate-pulse" />
             ) : error ? (
               <p className="text-[#EF4444] text-lg">
@@ -296,6 +313,9 @@ export default function Home() {
                   ? prices.date.replace("/", " ").replace("-", " ") + " · "
                   : ""}
                 {selectedArea} · öre/kWh
+              </p>
+              <p className="text-[#8fafc9] text-xs mt-0.5">
+                Staplarna visar snittpris per timme
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
