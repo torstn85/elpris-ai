@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
-import { stockholmISODate, stockholmHour } from "@/lib/time";
+import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,12 +24,13 @@ export const metadata: Metadata = {
 
 async function fetchTodayPrices(): Promise<Record<Area, HourEntry[]> | null> {
   const isoDate = stockholmISODate();
+  const { from, to } = stockholmDayUTCRange(isoDate);
 
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", `${isoDate}T00:00:00`)
-    .lt("delivery_period_start", `${isoDate}T24:00:00`)
+    .gte("delivery_period_start", from)
+    .lte("delivery_period_start", to)
     .order("delivery_period_start");
 
   if (error || !data || data.length === 0) return null;

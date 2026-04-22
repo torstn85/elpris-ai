@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { stockholmDateString, stockholmISODate, parseStockholmHour } from "@/lib/time";
+import { stockholmDateString, stockholmISODate, parseStockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -51,11 +51,12 @@ function aggregateToHourly(slots: RawSlot[]): HourEntry[] {
 async function fromSupabase(): Promise<Record<Area, HourEntry[]> | null> {
   const isoDate = stockholmISODate();
 
+  const { from, to } = stockholmDayUTCRange(isoDate);
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", `${isoDate}T00:00:00`)
-    .lt("delivery_period_start", `${isoDate}T24:00:00`)
+    .gte("delivery_period_start", from)
+    .lte("delivery_period_start", to)
     .order("delivery_period_start");
 
   if (error || !data || data.length === 0) return null;

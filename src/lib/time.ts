@@ -57,3 +57,18 @@ export function parseStockholmHour(isoString: string): number {
     10
   );
 }
+
+/**
+ * Returns the UTC start and end timestamps for a full Swedish calendar day.
+ * Accounts for CEST (UTC+2) and CET (UTC+1) by always going 3 hours before
+ * midnight to guarantee we cover 00:00 Stockholm time.
+ * Returns ISO strings suitable for Supabase queries.
+ */
+export function stockholmDayUTCRange(isoDate?: string): { from: string; to: string } {
+  const date = isoDate ?? stockholmISODate();
+  // Start: previous day 21:00 UTC = covers midnight Stockholm in both CET and CEST
+  const from = new Date(`${date}T00:00:00+02:00`).toISOString();
+  // End: current day 22:00 UTC = covers 23:59 Stockholm in both CET and CEST
+  const to = new Date(`${date}T23:59:59+01:00`).toISOString();
+  return { from, to };
+}
