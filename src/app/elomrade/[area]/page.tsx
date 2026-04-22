@@ -335,7 +335,7 @@ export default async function ElprisArea({
 
             {/* ── Sweden map ── */}
             <div className="mb-2">
-              <SwedenMap selectedArea={area} />
+              <SwedenMap />
             </div>
 
             <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">

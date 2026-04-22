@@ -65,7 +65,7 @@ function geoStyle(area: AreaKey | undefined, isHovered: boolean) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function SwedenMap({ selectedArea: _selectedArea }: { selectedArea: string }) {
+export default function SwedenMap() {
   const router = useRouter();
   const [hoveredArea, setHoveredArea] = useState<AreaKey | null>(null);
 
