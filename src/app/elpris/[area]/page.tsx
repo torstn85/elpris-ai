@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
+import SwedenMap from "@/components/SwedenMap";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -313,6 +315,29 @@ export default async function ElprisArea({
                 {meta.name} – {meta.city}
               </span>
             </div>
+
+            {/* ── Area selector ── */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {Object.entries(AREA_META).map(([key, m]) => (
+                <Link
+                  key={key}
+                  href={`/elpris/${key}`}
+                  className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 ${
+                    key === area
+                      ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
+                      : "bg-[#0F3460] border border-[#1E4976] text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white"
+                  }`}
+                >
+                  {m.name} – {m.city}
+                </Link>
+              ))}
+            </div>
+
+            {/* ── Sweden map ── */}
+            <div className="mb-2">
+              <SwedenMap selectedArea={area} />
+            </div>
+
             <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">
               Elpris {meta.name} – {meta.city}
             </h1>
