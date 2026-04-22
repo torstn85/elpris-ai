@@ -1,5 +1,6 @@
-// Server component — no "use client" needed.
-// SVG <a> elements handle navigation; no JS required.
+"use client";
+
+// SVG <a> elements handle navigation; onMouseOver/Out handlers require client.
 
 type AreaKey = "se1" | "se2" | "se3" | "se4";
 
