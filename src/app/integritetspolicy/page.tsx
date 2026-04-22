@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import NavBar from "@/components/NavBar";
 
 export const metadata: Metadata = {
   title: "Integritetspolicy – elpris.ai",
@@ -70,17 +71,7 @@ export default function Integritetspolicy() {
   return (
     <main className="min-h-screen bg-[#0A2540] text-white">
       {/* Nav */}
-      <nav className="border-b border-[#1E4976] px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="font-extrabold text-xl tracking-tight">
-          elpris<span className="text-[#00E5FF]">.ai</span>
-        </Link>
-        <Link
-          href="/"
-          className="text-sm text-[#8fafc9] hover:text-white transition-colors"
-        >
-          ← Tillbaka
-        </Link>
-      </nav>
+      <NavBar />
 
       <div className="max-w-4xl mx-auto px-6 py-14 flex flex-col gap-12">
         {/* Header */}

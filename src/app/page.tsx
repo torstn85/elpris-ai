@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import NavBar from "@/components/NavBar";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
 import { stockholmHour } from "@/lib/time";
@@ -197,28 +198,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#0A2540] text-white">
       {/* ── Nav ── */}
-      <nav className="border-b border-[#1E4976] px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <span className="font-extrabold text-xl tracking-tight">
-          elpris<span className="text-[#00E5FF]">.ai</span>
-        </span>
-        <div className="flex items-center gap-6 text-sm text-[#8fafc9]">
-          <Link href="/elpris-idag" className="hover:text-white transition-colors">
-            Elpris idag
-          </Link>
-          <Link href="/elpris-imorgon" className="hover:text-white transition-colors">
-            Elpris imorgon
-          </Link>
-          <Link href="/elomrade/se3" className="hover:text-white transition-colors">
-            Elområden
-          </Link>
-          <a href="#rekommendationer" className="hover:text-white transition-colors">
-            Prognos
-          </a>
-          <a href="#om-oss" className="hover:text-white transition-colors">
-            Om oss
-          </a>
-        </div>
-      </nav>
+      <NavBar />
 
       <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-20">
         {/* ── 1. Hero ── */}
@@ -311,17 +291,6 @@ export default function Home() {
           <Link href="/elpris-idag" className="text-sm text-[#00E5FF] hover:underline mt-1">
             → Se timtabell för alla elområden
           </Link>
-          <div className="flex flex-wrap justify-center gap-2 mt-2">
-            {(["se1", "se2", "se3", "se4"] as const).map((area) => (
-              <Link
-                key={area}
-                href={`/elomrade/${area}`}
-                className="px-4 py-2 bg-[#0F3460] border border-[#1E4976] rounded-xl text-sm text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white transition-colors"
-              >
-                {area.toUpperCase()} →
-              </Link>
-            ))}
-          </div>
           {cheap && (
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">

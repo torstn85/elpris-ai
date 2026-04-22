@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NavBar from "@/components/NavBar";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
@@ -129,22 +130,7 @@ export default async function ElprisIdag() {
 
       <main className="min-h-screen bg-[#0A2540] text-white">
         {/* ── Nav ── */}
-        <nav className="border-b border-[#1E4976] px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-          <a href="/" className="font-extrabold text-xl tracking-tight">
-            elpris<span className="text-[#00E5FF]">.ai</span>
-          </a>
-          <div className="flex items-center gap-6 text-sm text-[#8fafc9]">
-            <a href="/#elomraden" className="hover:text-white transition-colors">
-              Elområden
-            </a>
-            <a href="/#rekommendationer" className="hover:text-white transition-colors">
-              Prognos
-            </a>
-            <a href="/#om-oss" className="hover:text-white transition-colors">
-              Om oss
-            </a>
-          </div>
-        </nav>
+        <NavBar />
 
         <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
           {/* ── Header ── */}
