@@ -14,38 +14,37 @@ interface AreaDef {
 }
 
 const AREA_DEFS: AreaDef[] = [
-  { key: "se1", name: "SE1", city: "Luleå",    labelX: 490, labelY: 210 },
-  { key: "se2", name: "SE2", city: "Sundsvall", labelX: 478, labelY: 500 },
-  { key: "se3", name: "SE3", city: "Stockholm", labelX: 478, labelY: 700 },
-  { key: "se4", name: "SE4", city: "Malmö",     labelX: 478, labelY: 840 },
+  { key: "se1", name: "SE1", city: "Luleå",    labelX: 279, labelY: 82  },
+  { key: "se2", name: "SE2", city: "Sundsvall", labelX: 290, labelY: 172 },
+  { key: "se3", name: "SE3", city: "Stockholm", labelX: 294, labelY: 216 },
+  { key: "se4", name: "SE4", city: "Malmö",     labelX: 307, labelY: 258 },
 ];
 
 const PATHS: Record<AreaKey, string[]> = {
   se1: [
-    "M 480,10 L 580,20 L 650,60 L 700,120 L 720,200 L 700,280 L 660,340 L 600,380 L 540,400 L 480,410 L 420,400 L 360,370 L 310,330 L 280,270 L 270,200 L 280,130 L 320,70 L 380,30 Z",
+    "M243,3 L258,8 L271,6 L282,12 L290,8 L305,14 L318,11 L328,18 L340,16 L348,24 L358,22 L365,30 L372,28 L378,38 L384,36 L388,46 L392,58 L388,68 L394,76 L390,88 L396,98 L392,108 L396,120 L388,130 L382,128 L376,138 L368,136 L360,146 L350,144 L342,154 L330,152 L320,158 L308,154 L298,160 L286,156 L276,162 L264,156 L252,160 L240,154 L228,158 L216,150 L206,154 L196,144 L188,146 L180,136 L174,138 L168,126 L164,114 L168,102 L162,90 L166,78 L172,68 L168,56 L174,44 L182,36 L190,28 L200,22 L212,18 L224,12 L234,8 Z",
   ],
   se2: [
-    "M 280,270 L 310,330 L 360,370 L 420,400 L 480,410 L 540,400 L 600,380 L 660,340 L 680,420 L 670,500 L 640,560 L 590,600 L 530,620 L 470,625 L 410,610 L 360,575 L 320,530 L 295,470 L 282,400 L 278,340 Z",
+    "M168,126 L174,138 L180,136 L188,146 L196,144 L206,154 L216,150 L228,158 L240,154 L252,160 L264,156 L276,162 L286,156 L298,160 L308,154 L320,158 L330,152 L342,154 L350,144 L360,146 L368,136 L376,138 L382,128 L388,130 L392,148 L388,162 L382,172 L376,182 L370,192 L362,200 L352,206 L340,210 L326,212 L312,214 L298,212 L284,210 L270,208 L256,204 L244,198 L234,190 L226,180 L220,168 L216,156 L212,144 L208,132 Z",
   ],
   se3: [
-    // Mainland
-    "M 282,400 L 295,470 L 320,530 L 360,575 L 410,610 L 470,625 L 530,620 L 590,600 L 640,560 L 660,620 L 655,690 L 625,750 L 575,790 L 515,810 L 455,808 L 400,785 L 355,745 L 328,695 L 315,640 L 312,570 Z",
+    "M208,132 L212,144 L216,156 L220,168 L226,180 L234,190 L244,198 L256,204 L270,208 L284,210 L298,212 L312,214 L326,212 L340,210 L352,206 L362,200 L370,192 L376,200 L378,214 L374,228 L366,240 L354,250 L340,258 L324,262 L308,264 L292,262 L276,258 L262,250 L250,240 L242,228 L236,216 L230,204 L224,192 L218,178 L214,164 L210,150 Z",
     // Gotland
-    "M 720,580 L 745,572 L 762,585 L 765,615 L 752,638 L 730,645 L 712,632 L 708,605 Z",
+    "M382,196 L390,192 L396,198 L394,208 L386,212 L378,206 Z",
   ],
   se4: [
-    "M 315,640 L 328,695 L 355,745 L 400,785 L 455,808 L 515,810 L 575,790 L 625,750 L 645,800 L 635,860 L 600,910 L 545,945 L 480,958 L 415,945 L 362,908 L 330,858 L 318,800 L 312,740 Z",
+    "M236,216 L242,228 L250,240 L262,250 L276,258 L292,262 L308,264 L324,262 L340,258 L354,250 L366,240 L374,228 L378,242 L376,256 L368,268 L356,278 L340,284 L322,288 L304,288 L286,284 L270,276 L256,264 L246,252 L238,238 Z",
   ],
 };
 
 function areaStyle(isSelected: boolean, isHovered: boolean) {
   if (isSelected) {
-    return { fill: "#00E5FF", fillOpacity: 0.25, stroke: "#00E5FF", strokeWidth: 3 };
+    return { fill: "#00E5FF", fillOpacity: 0.25, stroke: "#00E5FF", strokeWidth: 1.5 };
   }
   if (isHovered) {
-    return { fill: "#1E4976", fillOpacity: 0.9, stroke: "#00E5FF", strokeWidth: 2 };
+    return { fill: "#1E4976", fillOpacity: 0.9, stroke: "#00E5FF", strokeWidth: 1 };
   }
-  return { fill: "#0F3460", fillOpacity: 1, stroke: "#4a9aba", strokeWidth: 1.5 };
+  return { fill: "#0F3460", fillOpacity: 1, stroke: "#4a9aba", strokeWidth: 0.75 };
 }
 
 export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
@@ -54,8 +53,8 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
   return (
     <div className="flex justify-center">
       <svg
-        viewBox="0 0 1000 1000"
-        width="220"
+        viewBox="0 0 500 300"
+        width="260"
         aria-label="Karta över Sveriges elområden"
         className="overflow-visible"
       >
@@ -90,7 +89,7 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
                   x={labelX}
                   y={labelY}
                   textAnchor="middle"
-                  fontSize="28"
+                  fontSize="10"
                   fontWeight="700"
                   fill={isSelected ? "#00E5FF" : isHovered ? "#ffffff" : "#e2eaf4"}
                   style={{ pointerEvents: "none", userSelect: "none" }}
@@ -101,9 +100,9 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
                 {/* City name */}
                 <text
                   x={labelX}
-                  y={labelY + 22}
+                  y={labelY + 9}
                   textAnchor="middle"
-                  fontSize="18"
+                  fontSize="7"
                   fill={isSelected ? "#00E5FFaa" : isHovered ? "#ffffffaa" : "#8fafc9"}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
