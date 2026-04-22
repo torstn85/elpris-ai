@@ -321,7 +321,7 @@ export default async function ElprisArea({
               {Object.entries(AREA_META).map(([key, m]) => (
                 <Link
                   key={key}
-                  href={`/elpris/${key}`}
+                  href={`/elomrade/${key}`}
                   className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 ${
                     key === area
                       ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
@@ -448,7 +448,7 @@ export default async function ElprisArea({
                 return (
                   <a
                     key={a}
-                    href={`/elpris/${a}`}
+                    href={`/elomrade/${a}`}
                     className="bg-[#0F3460] border border-[#1E4976] hover:border-[#00E5FF]/40 hover:text-white text-[#8fafc9] rounded-xl px-4 py-2.5 text-sm transition-colors"
                   >
                     <span className="font-semibold text-white">{m.name}</span>

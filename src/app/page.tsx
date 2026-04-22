@@ -208,7 +208,7 @@ export default function Home() {
           <Link href="/elpris-imorgon" className="hover:text-white transition-colors">
             Elpris imorgon
           </Link>
-          <Link href="/elpris/se3" className="hover:text-white transition-colors">
+          <Link href="/elomrade/se3" className="hover:text-white transition-colors">
             Elområden
           </Link>
           <a href="#rekommendationer" className="hover:text-white transition-colors">
@@ -315,7 +315,7 @@ export default function Home() {
             {(["se1", "se2", "se3", "se4"] as const).map((area) => (
               <Link
                 key={area}
-                href={`/elpris/${area}`}
+                href={`/elomrade/${area}`}
                 className="px-4 py-2 bg-[#0F3460] border border-[#1E4976] rounded-xl text-sm text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white transition-colors"
               >
                 {area.toUpperCase()} →

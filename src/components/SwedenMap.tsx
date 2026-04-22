@@ -53,29 +53,19 @@ const AREA_COLOR: Record<AreaKey, string> = {
   se4: "#0a5c92",
 };
 
-function geoStyle(
-  area: AreaKey | undefined,
-  isSelected: boolean,
-  isHovered: boolean
-) {
+function geoStyle(area: AreaKey | undefined, isHovered: boolean) {
   if (!area) {
-    return { fill: "#0F3460", stroke: "#1E4976", strokeWidth: 0.5, outline: "none" };
-  }
-  if (isSelected && isHovered) {
-    return { fill: "#00E5FF", fillOpacity: 0.45, stroke: "#00E5FF", strokeWidth: 1, outline: "none" };
-  }
-  if (isSelected) {
-    return { fill: "#00E5FF", fillOpacity: 0.25, stroke: "#00E5FF", strokeWidth: 1, outline: "none" };
+    return { fill: "#0F3460", stroke: "#1E4976", strokeWidth: 0.5 };
   }
   if (isHovered) {
-    return { fill: "#1E4976", stroke: "#00E5FF", strokeWidth: 0.75, outline: "none" };
+    return { fill: "#1E4976", stroke: "#00E5FF", strokeWidth: 0.75 };
   }
-  return { fill: AREA_COLOR[area], stroke: "#1E4976", strokeWidth: 0.5, outline: "none" };
+  return { fill: AREA_COLOR[area], stroke: "#1E4976", strokeWidth: 0.5 };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
+export default function SwedenMap({ selectedArea: _selectedArea }: { selectedArea: string }) {
   const router = useRouter();
   const [hoveredArea, setHoveredArea] = useState<AreaKey | null>(null);
 
@@ -83,10 +73,10 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
     <div className="flex justify-center">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [18, 63], scale: 900 }}
-        width={220}
-        height={420}
-        style={{ width: "220px", height: "auto" }}
+        projectionConfig={{ center: [17, 65], scale: 700 }}
+        width={400}
+        height={600}
+        style={{ width: "100%", height: "auto" }}
       >
         <Geographies geography="/sweden-counties.geo.json">
           {({ geographies }: { geographies: unknown[] }) =>
@@ -94,9 +84,8 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
               const g = geo as { properties?: { iso?: string; name?: string }; rsmKey?: string };
               const iso: string = g.properties?.iso ?? "";
               const area = COUNTY_TO_AREA[iso] as AreaKey | undefined;
-              const isSelected = area === selectedArea;
               const isHovered = area !== undefined && area === hoveredArea;
-              const style = geoStyle(area, isSelected, isHovered);
+              const style = geoStyle(area, isHovered);
 
               return (
                 <Geography
@@ -106,13 +95,13 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
                   stroke={style.stroke}
                   strokeWidth={style.strokeWidth}
                   style={{
-                    default: { outline: "none", fillOpacity: (style as { fillOpacity?: number }).fillOpacity ?? 1 },
+                    default: { outline: "none" },
                     hover:   { outline: "none", cursor: area ? "pointer" : "default" },
                     pressed: { outline: "none" },
                   }}
                   onMouseEnter={() => area && setHoveredArea(area)}
                   onMouseLeave={() => setHoveredArea(null)}
-                  onClick={() => area && router.push(`/elpris/${area}`)}
+                  onClick={() => area && router.push(`/elomrade/${area}`)}
                 />
               );
             })
