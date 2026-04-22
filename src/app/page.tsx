@@ -487,30 +487,48 @@ export default function Home() {
               accent="#00E5FF"
             />
             <ValueCard
-              icon="📊"
-              title="Dyrt just nu"
+              icon={
+                currentPrice !== null && currentPrice <= 0
+                  ? "⚡"
+                  : "📊"
+              }
+              title={
+                currentPrice === null
+                  ? "PRIS JUST NU"
+                  : currentPrice <= 0
+                  ? "GRATIS JUST NU"
+                  : currentPrice <= 50
+                  ? "BILLIGT JUST NU"
+                  : currentPrice >= 100
+                  ? "DYRT JUST NU"
+                  : "NORMALT JUST NU"
+              }
               value={
                 currentPrice !== null
                   ? `${currentPrice.toFixed(1).replace(".", ",")} öre`
                   : "–"
               }
               detail={
-                currentPrice !== null
-                  ? currentPrice >= 100
-                    ? "Högt pris – skjut upp förbrukning"
-                    : currentPrice <= 50
-                    ? "Lågt pris – bra tid att förbruka"
-                    : "Normalt prisnivå just nu"
-                  : "Laddar..."
+                currentPrice === null
+                  ? "Laddar..."
+                  : currentPrice <= 0
+                  ? "Negativt pris – kör allt nu!"
+                  : currentPrice <= 50
+                  ? "Lågt pris – bra tid att förbruka"
+                  : currentPrice >= 100
+                  ? "Högt pris – undvik onödig förbrukning"
+                  : "Normalt pris just nu"
               }
               accent={
-                currentPrice !== null
-                  ? currentPrice >= 100
-                    ? "#EF4444"
-                    : currentPrice <= 50
-                    ? "#22C55E"
-                    : "#00E5FF"
-                  : "#8fafc9"
+                currentPrice === null
+                  ? "#8fafc9"
+                  : currentPrice <= 0
+                  ? "#22C55E"
+                  : currentPrice <= 50
+                  ? "#22C55E"
+                  : currentPrice >= 100
+                  ? "#EF4444"
+                  : "#00E5FF"
               }
             />
           </div>
