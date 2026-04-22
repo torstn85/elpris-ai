@@ -188,10 +188,6 @@ export default async function ElprisArea({
     );
   }
 
-  const otherAreas = (["se1", "se2", "se3", "se4"] as AreaKey[]).filter(
-    (a) => a !== area
-  );
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -322,26 +318,6 @@ export default async function ElprisArea({
               </Link>
             </div>
 
-            {/* See also */}
-            <div className="flex flex-col gap-3">
-              <p className="text-[#8fafc9] text-sm font-medium">Se även:</p>
-              <div className="flex flex-wrap gap-3">
-                {otherAreas.map((a) => {
-                  const m = AREA_META[a];
-                  return (
-                    <a
-                      key={a}
-                      href={`/elomrade/${a}`}
-                      className="bg-[#0F3460] border border-[#1E4976] hover:border-[#00E5FF]/40 hover:text-white text-[#8fafc9] rounded-xl px-4 py-2.5 text-sm transition-colors"
-                    >
-                      <span className="font-semibold text-white">{m.name}</span>
-                      <span className="mx-1.5 text-[#1E4976]">·</span>
-                      {m.city}, {m.region}
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
           </div>
 
           {/* ── Footer ── */}

@@ -13,7 +13,7 @@ export default function NavBar() {
         <Link href="/elpris-imorgon" className="hover:text-white transition-colors">
           Elpris imorgon
         </Link>
-        <Link href="/elomrade/se3" className="hover:text-white transition-colors">
+        <Link href="/elomrade" className="hover:text-white transition-colors">
           Elområden
         </Link>
         <Link href="/#rekommendationer" className="hover:text-white transition-colors">
