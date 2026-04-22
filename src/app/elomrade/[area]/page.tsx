@@ -335,7 +335,9 @@ export default async function ElprisArea({
 
             {/* ── Sweden map ── */}
             <div className="mb-2">
-              <SwedenMap />
+              <div className="w-full max-w-[280px]">
+                <SwedenMap />
+              </div>
             </div>
 
             <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">

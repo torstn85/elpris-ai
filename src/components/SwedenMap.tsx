@@ -74,8 +74,8 @@ export default function SwedenMap() {
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ center: [17, 65], scale: 700 }}
-        width={400}
-        height={600}
+        width={300}
+        height={450}
         style={{ width: "100%", height: "auto" }}
       >
         <Geographies geography="/sweden-counties.geo.json">
