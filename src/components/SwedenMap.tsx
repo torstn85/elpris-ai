@@ -89,9 +89,10 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
         style={{ width: "220px", height: "auto" }}
       >
         <Geographies geography="/sweden-counties.geo.json">
-          {({ geographies }: { geographies: any[] }) =>
-            geographies.map((geo) => {
-              const iso: string = geo.properties?.iso ?? "";
+          {({ geographies }: { geographies: unknown[] }) =>
+            geographies.map((geo: unknown) => {
+              const g = geo as { properties?: { iso?: string; name?: string }; rsmKey?: string };
+              const iso: string = g.properties?.iso ?? "";
               const area = COUNTY_TO_AREA[iso] as AreaKey | undefined;
               const isSelected = area === selectedArea;
               const isHovered = area !== undefined && area === hoveredArea;
@@ -99,8 +100,8 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
 
               return (
                 <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
+                  key={g.rsmKey}
+                  geography={g}
                   fill={style.fill}
                   stroke={style.stroke}
                   strokeWidth={style.strokeWidth}
