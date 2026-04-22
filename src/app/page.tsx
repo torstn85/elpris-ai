@@ -202,6 +202,12 @@ export default function Home() {
           elpris<span className="text-[#00E5FF]">.ai</span>
         </span>
         <div className="flex items-center gap-6 text-sm text-[#8fafc9]">
+          <Link href="/elpris-idag" className="hover:text-white transition-colors">
+            Elpris idag
+          </Link>
+          <Link href="/elpris-imorgon" className="hover:text-white transition-colors">
+            Elpris imorgon
+          </Link>
           <a href="#elomraden" className="hover:text-white transition-colors">
             Elområden
           </a>
@@ -302,6 +308,9 @@ export default function Home() {
               </button>
             ))}
           </div>
+          <Link href="/elpris-idag" className="text-sm text-[#00E5FF] hover:underline mt-1">
+            → Se timtabell för alla elområden
+          </Link>
           {cheap && (
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
