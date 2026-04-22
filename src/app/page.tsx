@@ -237,9 +237,13 @@ export default function Home() {
             {currentLoading ? (
               <div className="w-48 h-24 rounded-2xl bg-[#0F3460] animate-pulse" />
             ) : error ? (
-              <p className="text-[#EF4444] text-lg">
-                Kunde inte hämta pris
-              </p>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-[#EF4444] text-lg">Kunde inte hämta live-pris</p>
+                <p className="text-[#8fafc9] text-sm">Försök ladda om sidan</p>
+                <button onClick={() => window.location.reload()} className="mt-1 px-4 py-2 bg-[#0F3460] border border-[#1E4976] rounded-xl text-sm text-[#8fafc9] hover:text-white hover:border-[#00E5FF]/40 transition-colors">
+                  Ladda om ↺
+                </button>
+              </div>
             ) : (
               <>
                 <span
@@ -266,6 +270,7 @@ export default function Home() {
                 <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
                   öre / kWh · {selectedArea}
                 </span>
+                <span className="text-[#8fafc9] text-xs mt-1">Spotpris exkl. moms & nätavgift</span>
               </>
             )}
           </div>
@@ -290,6 +295,22 @@ export default function Home() {
               </button>
             ))}
           </div>
+          {cheap && (
+            <div className="flex flex-wrap justify-center gap-3 mt-2">
+              <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
+                <span>🧺</span>
+                <span className="text-[#8fafc9]">Tvätt/disk billigast:</span>
+                <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
+                <span className="text-[#8fafc9]">({cheap.avg} öre)</span>
+              </div>
+              <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
+                <span>🚗</span>
+                <span className="text-[#8fafc9]">Ladda elbil billigast:</span>
+                <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
+                <span className="text-[#8fafc9]">({cheap.avg} öre)</span>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── 2. Price chart ── */}
