@@ -1,5 +1,7 @@
 "use client";
 
+declare module 'react-simple-maps';
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
