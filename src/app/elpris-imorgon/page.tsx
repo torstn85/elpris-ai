@@ -23,9 +23,12 @@ export const metadata: Metadata = {
 // ─── Data fetching ────────────────────────────────────────────────────────────
 
 async function fetchTomorrowPrices(): Promise<Record<Area, HourEntry[]> | null> {
-  const todayDate = new Date(stockholmISODate());
-  todayDate.setDate(todayDate.getDate() + 1);
-  const tomorrow = todayDate.toISOString().slice(0, 10);
+  const tomorrow = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
   const { from, to } = stockholmDayUTCRange(tomorrow);
 
   const { data, error } = await supabase
@@ -35,6 +38,7 @@ async function fetchTomorrowPrices(): Promise<Record<Area, HourEntry[]> | null> 
     .lte("delivery_period_start", to)
     .order("delivery_period_start");
 
+  console.log("Tomorrow query:", { tomorrow, from, to, rowCount: data?.length, error });
   if (error || !data || data.length === 0) return null;
 
   // Group by area, then average 15-min slots into hourly buckets
