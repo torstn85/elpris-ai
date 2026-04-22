@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  ReferenceLine,
 } from "recharts";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import { stockholmHour } from "@/lib/time";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getBarColor(price: number): string {
+  if (price <= 0) return "#22C55E";
   if (price <= 50) return "#22C55E";
   if (price >= 100) return "#EF4444";
   return "#00E5FF";
@@ -271,6 +273,11 @@ export default function Home() {
                   öre / kWh · {selectedArea}
                 </span>
                 <span className="text-[#8fafc9] text-xs mt-1">Spotpris exkl. moms & nätavgift</span>
+                {currentPrice !== null && currentPrice <= 0 && (
+                  <div className="flex items-center gap-2 bg-[#22C55E]/10 border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm text-[#22C55E] font-medium">
+                    ⚡ Negativt spotpris – elen är gratis just nu!
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -301,13 +308,13 @@ export default function Home() {
                 <span>🧺</span>
                 <span className="text-[#8fafc9]">Tvätt/disk billigast:</span>
                 <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
-                <span className="text-[#8fafc9]">({cheap.avg} öre)</span>
+                <span className="text-[#8fafc9]">{cheap.avg <= 0 ? "⚡ Gratis!" : `(${cheap.avg} öre)`}</span>
               </div>
               <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
                 <span>🚗</span>
                 <span className="text-[#8fafc9]">Ladda elbil billigast:</span>
                 <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
-                <span className="text-[#8fafc9]">({cheap.avg} öre)</span>
+                <span className="text-[#8fafc9]">{cheap.avg <= 0 ? "⚡ Gratis!" : `(${cheap.avg} öre)`}</span>
               </div>
             </div>
           )}
@@ -379,6 +386,7 @@ export default function Home() {
                     content={<CustomTooltip />}
                     cursor={{ fill: "rgba(255,255,255,0.04)" }}
                   />
+                  <ReferenceLine y={0} stroke="#ffffff30" strokeDasharray="3 3" />
                   <Bar dataKey="price" radius={[4, 4, 0, 0]}>
                     {chartData.map((entry) => (
                       <Cell
