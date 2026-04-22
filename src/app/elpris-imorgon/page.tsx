@@ -38,8 +38,7 @@ async function fetchTomorrowPrices(): Promise<Record<Area, HourEntry[]> | null> 
     .lte("delivery_period_start", to)
     .order("delivery_period_start");
 
-  console.log("Tomorrow query:", { tomorrow, from, to, rowCount: data?.length, error });
-  if (error || !data || data.length === 0) return null;
+if (error || !data || data.length === 0) return null;
 
   // Group by area, then average 15-min slots into hourly buckets
   const grouped: Record<string, { sum: number; count: number }[]> = {};
