@@ -5,6 +5,17 @@ import { stockholmDateString } from "@/lib/time";
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
 
+function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(tomorrow).replace(/-/g, "/").replace(/(\d{4})\/(\d{2})\/(\d{2})/, "$1/$2-$3");
+}
+
 interface RawEntry {
   SEK_per_kWh: number;
   time_start: string;
@@ -18,42 +29,69 @@ async function fetchRawArea(area: Area, dateStr: string): Promise<RawEntry[]> {
   return res.json() as Promise<RawEntry[]>;
 }
 
+async function upsertRows(rows: SpotPriceRow[]): Promise<number> {
+  const { error, count } = await supabase
+    .from("spot_prices")
+    .upsert(rows, {
+      onConflict: "area,delivery_period_start",
+      count: "exact",
+    });
+  if (error) throw new Error(error.message);
+  return count ?? rows.length;
+}
+
+function toRows(area: Area, entries: RawEntry[]): SpotPriceRow[] {
+  return entries.map((e) => ({
+    area,
+    delivery_period_start: e.time_start,
+    delivery_period_end: e.time_end,
+    sek_per_kwh: e.SEK_per_kWh,
+    ore_per_kwh: Math.round(e.SEK_per_kWh * 10000) / 100,
+  }));
+}
+
 export async function GET() {
   try {
-    const dateStr = stockholmDateString();
+    const now = new Date();
+    const fmt = (opts: Intl.DateTimeFormatOptions) =>
+      parseInt(new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", ...opts }).format(now), 10);
+    const stockholmHour = fmt({ hour: "numeric", hour12: false });
+    const stockholmMinute = fmt({ minute: "numeric" });
+    const afterDayAhead = stockholmHour > 13 || (stockholmHour === 13 && stockholmMinute >= 15);
 
-    // Fetch all four areas in parallel
-    const rawResults = await Promise.all(
+    // ── Today ──────────────────────────────────────────────────────────────────
+    const dateStr = stockholmDateString();
+    const todayResults = await Promise.all(
       AREAS.map((area) =>
         fetchRawArea(area, dateStr).then((entries) => ({ area, entries }))
       )
     );
-
-    // Build upsert rows — one row per 15-min slot per area
-    const rows: SpotPriceRow[] = rawResults.flatMap(({ area, entries }) =>
-      entries.map((e) => ({
-        area,
-        delivery_period_start: e.time_start,
-        delivery_period_end: e.time_end,
-        sek_per_kwh: e.SEK_per_kWh,
-        ore_per_kwh: Math.round(e.SEK_per_kWh * 10000) / 100, // 2 decimals
-      }))
+    const todayRows: SpotPriceRow[] = todayResults.flatMap(({ area, entries }) =>
+      toRows(area, entries)
     );
+    const todayUpserted = await upsertRows(todayRows);
 
-    // Upsert — conflict on (area, delivery_period_start) updates price columns
-    const { error, count } = await supabase
-      .from("spot_prices")
-      .upsert(rows, {
-        onConflict: "area,delivery_period_start",
-        count: "exact",
-      });
-
-    if (error) throw new Error(error.message);
+    // ── Tomorrow (only after 13:15 Stockholm time) ─────────────────────────────
+    let tomorrowUpserted: number | null = null;
+    if (afterDayAhead) {
+      const tomorrowStr = getTomorrowDateString();
+      const tomorrowResults = await Promise.all(
+        AREAS.map((area) =>
+          fetchRawArea(area, tomorrowStr).then((entries) => ({ area, entries }))
+        )
+      );
+      const tomorrowRows: SpotPriceRow[] = tomorrowResults.flatMap(({ area, entries }) =>
+        toRows(area, entries)
+      );
+      tomorrowUpserted = await upsertRows(tomorrowRows);
+    }
 
     return NextResponse.json({
       ok: true,
-      date: dateStr,
-      rows_upserted: count ?? rows.length,
+      today: { date: dateStr, rows_upserted: todayUpserted },
+      tomorrow: afterDayAhead
+        ? { date: getTomorrowDateString(), rows_upserted: tomorrowUpserted }
+        : null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
