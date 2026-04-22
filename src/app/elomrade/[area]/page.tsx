@@ -299,7 +299,7 @@ export default async function ElprisArea({
           </div>
         </nav>
 
-        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
+        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col items-center">
           {/* ── Header ── */}
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-xs text-[#8fafc9]">
@@ -317,7 +317,7 @@ export default async function ElprisArea({
             </div>
 
             {/* ── Area selector ── */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-row flex-wrap justify-center gap-2 mb-6">
               {Object.entries(AREA_META).map(([key, m]) => (
                 <Link
                   key={key}
@@ -348,6 +348,9 @@ export default async function ElprisArea({
             </p>
             <p className="text-[#8fafc9] text-sm capitalize">{dateLabel}</p>
           </section>
+
+          {/* ── Price tables section ── */}
+          <div className="w-full flex flex-col gap-12">
 
           {/* ── Legend ── */}
           <div className="flex flex-wrap gap-5 text-xs text-[#8fafc9]">
@@ -461,6 +464,8 @@ export default async function ElprisArea({
               })}
             </div>
           </div>
+
+          </div>{/* end w-full price tables section */}
 
           {/* ── Footer ── */}
           <section className="border-t border-[#1E4976] pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8fafc9]">
