@@ -217,7 +217,7 @@ export default async function ElprisArea({
             <div className="flex items-center gap-2 text-xs text-[#8fafc9]">
               <a href="/" className="hover:text-[#00E5FF] transition-colors">Hem</a>
               <span>/</span>
-              <a href="/elomrade/se3" className="hover:text-[#00E5FF] transition-colors">Elområden</a>
+              <a href="/elomrade" className="hover:text-[#00E5FF] transition-colors">Elområden</a>
               <span>/</span>
               <span className="text-white">{meta.name} – {meta.city}</span>
             </div>
