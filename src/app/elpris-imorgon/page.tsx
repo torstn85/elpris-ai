@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
-import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
+import { stockholmISODate, stockholmDayUTCRange } from "@/lib/time";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -106,8 +106,6 @@ export default async function ElprisImorgon() {
     month: "long",
     day: "numeric",
   }).format(new Date(`${tomorrow}T12:00:00`));
-
-  const now = stockholmHour();
 
   const jsonLd = {
     "@context": "https://schema.org",
