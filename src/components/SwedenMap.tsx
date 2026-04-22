@@ -47,10 +47,10 @@ const COUNTY_TO_AREA: Record<string, AreaKey> = {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const AREA_COLOR: Record<AreaKey, string> = {
-  se1: "#1a3f5c",
-  se2: "#15496e",
-  se3: "#0f5280",
-  se4: "#0a5c92",
+  se1: "#1a4a6b",
+  se2: "#1a5c5c",
+  se3: "#1a3f6b",
+  se4: "#2d4a8a",
 };
 
 function geoStyle(area: AreaKey | undefined, isHovered: boolean) {
@@ -58,7 +58,7 @@ function geoStyle(area: AreaKey | undefined, isHovered: boolean) {
     return { fill: "#0F3460", stroke: "#1E4976", strokeWidth: 0.5 };
   }
   if (isHovered) {
-    return { fill: "#1E4976", stroke: "#00E5FF", strokeWidth: 0.75 };
+    return { fill: "#00E5FF", fillOpacity: 0.4, stroke: "#00E5FF", strokeWidth: 0.75 };
   }
   return { fill: AREA_COLOR[area], stroke: "#1E4976", strokeWidth: 0.5 };
 }
@@ -73,10 +73,10 @@ export default function SwedenMap() {
     <div className="flex justify-center">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [17, 65], scale: 700 }}
+        projectionConfig={{ center: [17, 62], scale: 780 }}
         width={300}
         height={450}
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", height: "auto", display: "block" }}
       >
         <Geographies geography="/sweden-counties.geo.json">
           {({ geographies }: { geographies: unknown[] }) =>
