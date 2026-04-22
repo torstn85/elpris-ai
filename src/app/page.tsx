@@ -208,9 +208,9 @@ export default function Home() {
           <Link href="/elpris-imorgon" className="hover:text-white transition-colors">
             Elpris imorgon
           </Link>
-          <a href="#elomraden" className="hover:text-white transition-colors">
+          <Link href="/elpris/se3" className="hover:text-white transition-colors">
             Elområden
-          </a>
+          </Link>
           <a href="#rekommendationer" className="hover:text-white transition-colors">
             Prognos
           </a>
@@ -311,6 +311,17 @@ export default function Home() {
           <Link href="/elpris-idag" className="text-sm text-[#00E5FF] hover:underline mt-1">
             → Se timtabell för alla elområden
           </Link>
+          <div className="flex flex-wrap justify-center gap-2 mt-2">
+            {(["se1", "se2", "se3", "se4"] as const).map((area) => (
+              <Link
+                key={area}
+                href={`/elpris/${area}`}
+                className="px-4 py-2 bg-[#0F3460] border border-[#1E4976] rounded-xl text-sm text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white transition-colors"
+              >
+                {area.toUpperCase()} →
+              </Link>
+            ))}
+          </div>
           {cheap && (
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
