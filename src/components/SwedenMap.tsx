@@ -89,7 +89,7 @@ export default function SwedenMap({ selectedArea }: { selectedArea: string }) {
         style={{ width: "220px", height: "auto" }}
       >
         <Geographies geography="/sweden-counties.geo.json">
-          {({ geographies }) =>
+          {({ geographies }: { geographies: any[] }) =>
             geographies.map((geo) => {
               const iso: string = geo.properties?.iso ?? "";
               const area = COUNTY_TO_AREA[iso] as AreaKey | undefined;
