@@ -99,6 +99,7 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
       "Södermanlands län",
       "Östergötlands län",
       "Värmlands län",
+      "Jönköpings län",
       "Gotlands län",
     ],
     faq: [
