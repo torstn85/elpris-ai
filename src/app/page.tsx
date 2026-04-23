@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import Chatbot from "@/components/dynamic/Chatbot";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
 import { stockholmHour } from "@/lib/time";
@@ -122,7 +123,6 @@ function regionToArea(region: string): "SE1" | "SE2" | "SE3" | "SE4" {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [chatInput, setChatInput] = useState("");
   const [prices, setPrices] = useState<PricesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -404,58 +404,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 flex flex-col gap-4">
-            {/* User message */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[#00E5FF] text-sm">⚡</span>
-              </div>
-              <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-md">
-                Ska jag ladda bilen nu?
-              </div>
-            </div>
-
-            {/* AI response */}
-            <div className="flex items-start gap-3 flex-row-reverse">
-              <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[#22C55E] text-xs font-bold">AI</span>
-              </div>
-              <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-sm">
-                {currentPrice !== null && cheap ? (
-                  <>
-                    Priset är{" "}
-                    <span className="text-[#00E5FF] font-semibold">
-                      {currentPrice.toFixed(1).replace(".", ",")} öre/kWh
-                    </span>{" "}
-                    just nu i SE3. Billigaste 3-timmarsperioden är{" "}
-                    <span className="text-[#22C55E] font-semibold">
-                      {cheap.label}
-                    </span>{" "}
-                    ({cheap.avg.toFixed(1).replace(".", ",")} öre i snitt).
-                    {currentPrice > cheap.avg + 5
-                      ? " Vänta gärna!"
-                      : " Priset är bra nu!"}
-                  </>
-                ) : (
-                  "Hämtar prisdata..."
-                )}
-              </div>
-            </div>
-
-            {/* Input */}
-            <div className="mt-2 flex gap-3">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ställ en fråga om elpriset..."
-                className="flex-1 bg-[#0A2540] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-[#4a6b8a] transition-colors duration-150"
-              />
-              <button className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 flex-shrink-0">
-                Fråga
-              </button>
-            </div>
-          </div>
+          <Chatbot />
         </section>
 
         {/* ── 4. Value blocks ── */}
