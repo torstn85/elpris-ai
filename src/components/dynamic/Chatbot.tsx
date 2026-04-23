@@ -182,16 +182,39 @@ export default function Chatbot() {
       {/* ── MOBIL: preview + fullscreen popup (md:hidden) ─────────────────── */}
       <div className="md:hidden">
         {!isMobileOpen ? (
-          <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 flex flex-col gap-4">
-            <p className="text-sm text-[#8fafc9]">
-              Fråga AI:n om elpriset. T.ex. &quot;Är det billigt att tvätta nu?&quot;
-            </p>
-            <button
-              onClick={() => setIsMobileOpen(true)}
-              className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-base px-6 py-4 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 w-full"
-            >
-              💬 Öppna chatten
-            </button>
+          <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl overflow-hidden">
+            {/* Senaste 3 meddelanden som preview — ingen scroll */}
+            <div className="flex flex-col gap-4 p-5 max-h-64 overflow-hidden">
+              {messages.slice(-3).map((msg, i) =>
+                msg.role === 'user' ? (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#00E5FF] text-sm">⚡</span>
+                    </div>
+                    <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
+                      {msg.content}
+                    </div>
+                  </div>
+                ) : (
+                  <div key={i} className="flex items-start gap-3 flex-row-reverse">
+                    <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-[#22C55E] text-xs font-bold">AI</span>
+                    </div>
+                    <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
+                      {msg.content}
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+            <div className="border-t border-[#1E4976] p-4">
+              <button
+                onClick={() => setIsMobileOpen(true)}
+                className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold font-sans text-base px-6 py-4 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 w-full"
+              >
+                💬 Öppna chatten för att fråga
+              </button>
+            </div>
           </div>
         ) : (
           <div className="fixed inset-0 z-50 bg-[#0A2540] flex flex-col">
