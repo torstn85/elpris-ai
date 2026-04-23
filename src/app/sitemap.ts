@@ -1,6 +1,42 @@
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 import type { MetadataRoute } from "next";
 
 const BASE_URL = "https://elpris.ai";
+const CONTENT_DIR = path.join(process.cwd(), "src/content/guider");
+
+function getGuideEntries(): MetadataRoute.Sitemap {
+  if (!fs.existsSync(CONTENT_DIR)) return [];
+
+  const entries: MetadataRoute.Sitemap = [];
+
+  for (const kategori of fs.readdirSync(CONTENT_DIR)) {
+    const catPath = path.join(CONTENT_DIR, kategori);
+    if (!fs.statSync(catPath).isDirectory()) continue;
+
+    entries.push({
+      url: `${BASE_URL}/guider/${kategori}`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+
+    for (const file of fs.readdirSync(catPath)) {
+      if (!file.endsWith(".mdx")) continue;
+      const source = fs.readFileSync(path.join(catPath, file), "utf8");
+      const { data } = matter(source);
+      const lastmod = data.updatedAt || data.publishedAt;
+      entries.push({
+        url: `${BASE_URL}/guider/${kategori}/${data.slug}`,
+        lastModified: lastmod ? new Date(lastmod) : undefined,
+        changeFrequency: "monthly",
+        priority: 0.7,
+      });
+    }
+  }
+
+  return entries;
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -60,5 +96,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: `${BASE_URL}/guider`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...getGuideEntries(),
   ];
 }
