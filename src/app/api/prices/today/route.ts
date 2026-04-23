@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { stockholmDateString, stockholmISODate, parseStockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
 
