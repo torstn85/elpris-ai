@@ -253,7 +253,7 @@ export default function Chatbot() {
                 onClick={() => setIsMobileOpen(true)}
                 className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold font-sans text-base px-6 py-4 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 w-full"
               >
-                💬 Öppna chatten för att fråga
+                ⚡ Öppna chatten för att fråga
               </button>
             </div>
           </div>

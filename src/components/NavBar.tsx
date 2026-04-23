@@ -54,7 +54,7 @@ export default function NavBar() {
             className="flex items-center rounded-full bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-sm px-4 py-2 shadow-md shadow-[#22C55E]/30 transition-colors duration-150"
           >
             <span className="w-2 h-2 rounded-full bg-white animate-pulse mr-2" />
-            ⚡ Chatbot
+            ⚡ Fråga AI
           </Link>
         </div>
 
@@ -65,7 +65,7 @@ export default function NavBar() {
             className="flex items-center rounded-full bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-xs px-3 py-1.5 shadow-md shadow-[#22C55E]/30 transition-colors duration-150"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse mr-1.5" />
-            ⚡ Chatbot
+            ⚡ Fråga AI
           </Link>
           <button
             className="w-11 h-11 flex items-center justify-center text-slate-300 hover:text-cyan-400 transition-colors"
