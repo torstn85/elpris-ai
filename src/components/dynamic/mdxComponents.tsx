@@ -8,6 +8,7 @@ import PriceGraph from './PriceGraph';
 import CheapestHoursToday from './CheapestHoursToday';
 import MostExpensiveHoursToday from './MostExpensiveHoursToday';
 import PriceComparisonByArea from './PriceComparisonByArea';
+import AdSlot from './AdSlot';
 
 export const mdxComponents = {
   LivePriceWidget,
@@ -15,12 +16,12 @@ export const mdxComponents = {
   CheapestHoursToday,
   MostExpensiveHoursToday,
   PriceComparisonByArea,
+  AdSlot,
   // Lägg till nya komponenter här när de skapas:
   // SevenDayPriceTrend,
   // TomorrowPriceTeaser,
   // SavingsCalculator,
   // NegativePriceAlert,
-  // AdSlot,
 };
 
 export type MDXComponents = typeof mdxComponents;
