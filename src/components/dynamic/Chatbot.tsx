@@ -73,7 +73,11 @@ export default function Chatbot() {
   return (
     <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl flex flex-col gap-0 overflow-hidden">
       {/* Message list */}
-      <div ref={containerRef} className="flex flex-col gap-4 p-5 sm:p-6 overflow-y-auto max-h-80">
+      <div
+        ref={containerRef}
+        className="flex flex-col gap-4 p-5 sm:p-6 overflow-y-auto max-h-80 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#1E4976] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-[#2a5a8a]"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E4976 transparent' }}
+      >
         {messages.map((msg, i) =>
           msg.role === 'user' ? (
             <div key={i} className="flex items-start gap-3">
