@@ -7,7 +7,8 @@ interface Message {
   content: string;
 }
 
-const MAX_USER_MESSAGES = 10;
+const SOFT_LIMIT = 10;
+const HARD_LIMIT = 20;
 const MAX_CHARS = 200;
 
 const WELCOME: Message = {
@@ -20,10 +21,12 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [extendedSession, setExtendedSession] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const userMessageCount = messages.filter((m) => m.role === 'user').length;
-  const limitReached = userMessageCount >= MAX_USER_MESSAGES;
+  const hardLimitReached = userMessageCount >= HARD_LIMIT;
+  const softLimitReached = userMessageCount >= SOFT_LIMIT && !extendedSession;
 
   useEffect(() => {
     // Skip initial render — only scroll when a new message is added
@@ -34,7 +37,7 @@ export default function Chatbot() {
 
   async function send() {
     const text = input.trim();
-    if (!text || isLoading || limitReached) return;
+    if (!text || isLoading || hardLimitReached || softLimitReached) return;
 
     const userMsg: Message = { role: 'user', content: text };
     const next = [...messages, userMsg];
@@ -120,10 +123,22 @@ export default function Chatbot() {
 
       {/* Input area */}
       <div className="border-t border-[#1E4976] p-4 sm:p-5 flex flex-col gap-2">
-        {limitReached ? (
+        {hardLimitReached ? (
           <p className="text-xs text-[#8fafc9] text-center py-2">
-            Max antal frågor nådd för denna session. Ladda om sidan för att fortsätta.
+            Du har nått maxgränsen på 20 frågor för denna session. Ladda om sidan för att börja om.
           </p>
+        ) : softLimitReached ? (
+          <div className="flex flex-col items-center gap-3 py-2">
+            <p className="text-sm text-[#8fafc9] text-center">
+              Du har ställt 10 frågor. Vill du fortsätta? Du kan ställa 10 frågor till.
+            </p>
+            <button
+              onClick={() => setExtendedSession(true)}
+              className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20"
+            >
+              Fortsätt chatta
+            </button>
+          </div>
         ) : (
           <>
             <div className="flex gap-3">
