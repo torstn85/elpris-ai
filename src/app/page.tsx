@@ -404,7 +404,7 @@ export default function Home() {
         </section>
 
         {/* ── 3. AI chatbot ── */}
-        <section className="flex flex-col gap-6">
+        <section id="chat" className="flex flex-col gap-6">
           <div>
             <h2 className="font-bold text-2xl md:text-3xl">Fråga elpris.ai</h2>
             <p className="text-[#8fafc9] text-sm mt-1">
