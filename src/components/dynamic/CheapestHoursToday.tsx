@@ -43,7 +43,6 @@ export default function CheapestHoursToday({
         }));
 
         const sorted = [...all].sort((a, b) => a.price - b.price).slice(0, count);
-        sorted.sort((a, b) => a.hour - b.hour);
 
         if (!cancelled) {
           setHours(sorted);

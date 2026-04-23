@@ -16,6 +16,9 @@ export default function NavBar() {
         <Link href="/elomrade" className="hover:text-white transition-colors">
           Elområden
         </Link>
+        <Link href="/guider" className="hover:text-white transition-colors">
+          Guider
+        </Link>
         <Link href="/#rekommendationer" className="hover:text-white transition-colors">
           Prognos
         </Link>

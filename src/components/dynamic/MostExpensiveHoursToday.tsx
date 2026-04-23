@@ -41,7 +41,6 @@ export default function MostExpensiveHoursToday({
         }));
 
         const sorted = [...all].sort((a, b) => b.price - a.price).slice(0, count);
-        sorted.sort((a, b) => a.hour - b.hour);
 
         if (!cancelled) {
           setHours(sorted);

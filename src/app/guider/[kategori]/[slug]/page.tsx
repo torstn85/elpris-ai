@@ -8,6 +8,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 import type { Metadata } from 'next';
 import { mdxComponents } from '@/components/dynamic/mdxComponents';
 import NavBar from '@/components/NavBar';
@@ -169,7 +170,11 @@ export default function ArticlePage({ params }: PageProps) {
             prose-th:text-white prose-th:bg-slate-800 prose-th:font-semibold
             prose-td:border-slate-700
             prose-li:text-slate-300">
-            <MDXRemote source={content} components={mdxComponents} />
+            <MDXRemote
+              source={content}
+              components={mdxComponents}
+              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+            />
           </div>
 
           <div className="mt-16 pt-8 border-t border-slate-800">
