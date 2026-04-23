@@ -20,13 +20,16 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const userMessageCount = messages.filter((m) => m.role === 'user').length;
   const limitReached = userMessageCount >= MAX_USER_MESSAGES;
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Skip initial render — only scroll when a new message is added
+    if (messages.length <= 1 && !isLoading) return;
+    const el = containerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, isLoading]);
 
   async function send() {
@@ -70,7 +73,7 @@ export default function Chatbot() {
   return (
     <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl flex flex-col gap-0 overflow-hidden">
       {/* Message list */}
-      <div className="flex flex-col gap-4 p-5 sm:p-6 overflow-y-auto max-h-80">
+      <div ref={containerRef} className="flex flex-col gap-4 p-5 sm:p-6 overflow-y-auto max-h-80">
         {messages.map((msg, i) =>
           msg.role === 'user' ? (
             <div key={i} className="flex items-start gap-3">
@@ -109,7 +112,6 @@ export default function Chatbot() {
           </div>
         )}
 
-        <div ref={bottomRef} />
       </div>
 
       {/* Input area */}
