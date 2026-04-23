@@ -159,6 +159,11 @@ export default function Chatbot() {
               onKeyDown={onKeyDown}
               placeholder="Ställ en fråga om elpriset..."
               disabled={isLoading}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              inputMode="text"
+              enterKeyHint="send"
               className="flex-1 bg-[#0A2540] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-xl px-4 py-3 text-base text-white placeholder-[#4a6b8a] transition-colors duration-150 disabled:opacity-50"
             />
             <button
