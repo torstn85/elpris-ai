@@ -85,101 +85,97 @@ export default function Chatbot() {
     }
   }
 
-  // ── Shared rendering helpers ──────────────────────────────────────────────
+  // ── JSX-uttryck (ej komponenter — undviker remount vid render) ───────────
 
-  function MessageBubbles() {
-    return (
-      <>
-        {messages.map((msg, i) =>
-          msg.role === 'user' ? (
-            <div key={i} className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[#00E5FF] text-sm">⚡</span>
-              </div>
-              <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-md">
-                {msg.content}
-              </div>
+  const messageBubbles = (
+    <>
+      {messages.map((msg, i) =>
+        msg.role === 'user' ? (
+          <div key={i} className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[#00E5FF] text-sm">⚡</span>
             </div>
-          ) : (
-            <div key={i} className="flex items-start gap-3 flex-row-reverse">
-              <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-[#22C55E] text-xs font-bold">AI</span>
-              </div>
-              <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-sm">
-                {msg.content}
-              </div>
+            <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-md">
+              {msg.content}
             </div>
-          ),
-        )}
-        {isLoading && (
-          <div className="flex items-start gap-3 flex-row-reverse">
+          </div>
+        ) : (
+          <div key={i} className="flex items-start gap-3 flex-row-reverse">
             <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-[#22C55E] text-xs font-bold">AI</span>
             </div>
-            <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#8fafc9] flex items-center gap-1.5">
-              <span>AI tänker</span>
-              <span className="flex gap-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:0ms]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:150ms]" />
-                <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:300ms]" />
-              </span>
+            <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-sm">
+              {msg.content}
             </div>
           </div>
-        )}
-      </>
-    );
-  }
+        ),
+      )}
+      {isLoading && (
+        <div className="flex items-start gap-3 flex-row-reverse">
+          <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-[#22C55E] text-xs font-bold">AI</span>
+          </div>
+          <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#8fafc9] flex items-center gap-1.5">
+            <span>AI tänker</span>
+            <span className="flex gap-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8fafc9] animate-bounce [animation-delay:300ms]" />
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  );
 
-  function InputArea({ iosSafe = false }: { iosSafe?: boolean }) {
-    return (
-      <div
-        className="border-t border-[#1E4976] p-4 sm:p-5 flex flex-col gap-2 flex-shrink-0"
-        style={iosSafe ? { paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' } : undefined}
-      >
-        {hardLimitReached ? (
-          <p className="text-xs text-[#8fafc9] text-center py-2">
-            Du har nått maxgränsen på 20 frågor för denna session. Ladda om sidan för att börja om.
+  const inputArea = (iosSafe: boolean) => (
+    <div
+      className="border-t border-[#1E4976] p-4 sm:p-5 flex flex-col gap-2 flex-shrink-0"
+      style={iosSafe ? { paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' } : undefined}
+    >
+      {hardLimitReached ? (
+        <p className="text-xs text-[#8fafc9] text-center py-2">
+          Du har nått maxgränsen på 20 frågor för denna session. Ladda om sidan för att börja om.
+        </p>
+      ) : softLimitReached ? (
+        <div className="flex flex-col items-center gap-3 py-2">
+          <p className="text-sm text-[#8fafc9] text-center">
+            Du har ställt 10 frågor. Vill du fortsätta? Du kan ställa 10 frågor till.
           </p>
-        ) : softLimitReached ? (
-          <div className="flex flex-col items-center gap-3 py-2">
-            <p className="text-sm text-[#8fafc9] text-center">
-              Du har ställt 10 frågor. Vill du fortsätta? Du kan ställa 10 frågor till.
-            </p>
+          <button
+            onClick={() => setExtendedSession(true)}
+            className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20"
+          >
+            Fortsätt chatta
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
+              onKeyDown={onKeyDown}
+              placeholder="Ställ en fråga om elpriset..."
+              disabled={isLoading}
+              className="flex-1 bg-[#0A2540] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-xl px-4 py-3 text-base text-white placeholder-[#4a6b8a] transition-colors duration-150 disabled:opacity-50"
+            />
             <button
-              onClick={() => setExtendedSession(true)}
-              className="bg-[#22C55E] hover:bg-[#16a34a] text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20"
+              onClick={send}
+              disabled={isLoading || !input.trim()}
+              className="bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 flex-shrink-0"
             >
-              Fortsätt chatta
+              Fråga
             </button>
           </div>
-        ) : (
-          <>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
-                onKeyDown={onKeyDown}
-                placeholder="Ställ en fråga om elpriset..."
-                disabled={isLoading}
-                className="flex-1 bg-[#0A2540] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-xl px-4 py-3 text-base text-white placeholder-[#4a6b8a] transition-colors duration-150 disabled:opacity-50"
-              />
-              <button
-                onClick={send}
-                disabled={isLoading || !input.trim()}
-                className="bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm px-5 py-3 rounded-xl transition-colors duration-150 shadow-md shadow-[#22C55E]/20 flex-shrink-0"
-              >
-                Fråga
-              </button>
-            </div>
-            <p className="text-xs text-[#4a6b8a] text-right">
-              {input.length}/{MAX_CHARS}
-            </p>
-          </>
-        )}
-      </div>
-    );
-  }
+          <p className="text-xs text-[#4a6b8a] text-right">
+            {input.length}/{MAX_CHARS}
+          </p>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -220,10 +216,10 @@ export default function Chatbot() {
               className={`flex-1 overflow-y-auto flex flex-col gap-4 p-5 ${SCROLLBAR}`}
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E4976 transparent' }}
             >
-              <MessageBubbles />
+              {messageBubbles}
             </div>
 
-            <InputArea iosSafe />
+            {inputArea(true)}
           </div>
         )}
       </div>
@@ -235,9 +231,9 @@ export default function Chatbot() {
           className={`flex flex-col gap-4 p-6 overflow-y-auto max-h-96 md:max-h-[600px] ${SCROLLBAR}`}
           style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E4976 transparent' }}
         >
-          <MessageBubbles />
+          {messageBubbles}
         </div>
-        <InputArea />
+        {inputArea(false)}
       </div>
     </>
   );
