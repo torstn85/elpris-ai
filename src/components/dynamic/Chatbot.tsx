@@ -153,7 +153,8 @@ export default function Chatbot() {
         <>
           <div className="flex gap-3">
             <input
-              type="text"
+              type="search"
+              name="chat-input"
               value={input}
               onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
               onKeyDown={onKeyDown}
@@ -162,8 +163,11 @@ export default function Chatbot() {
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
-              inputMode="text"
+              inputMode="search"
               enterKeyHint="send"
+              aria-autocomplete="none"
+              data-1p-ignore
+              data-lpignore="true"
               className="flex-1 bg-[#0A2540] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-xl px-4 py-3 text-base text-white placeholder-[#4a6b8a] transition-colors duration-150 disabled:opacity-50"
             />
             <button
