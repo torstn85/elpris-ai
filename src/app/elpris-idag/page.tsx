@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NavBar from "@/components/NavBar";
+import CookiebotRenewButton from "@/components/CookiebotRenewButton";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
@@ -293,6 +294,7 @@ export default async function ElprisIdag() {
               >
                 Integritetspolicy
               </a>
+              <CookiebotRenewButton />
               <span>© 2026 elpris.ai</span>
             </div>
             <div className="flex flex-wrap justify-center gap-6">

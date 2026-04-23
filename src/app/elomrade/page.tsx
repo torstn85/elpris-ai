@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import CookiebotRenewButton from "@/components/CookiebotRenewButton";
 import SwedenMap from "@/components/SwedenMap";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
@@ -222,6 +223,7 @@ export default function ElomradenPage() {
               <a href="/integritetspolicy" className="hover:text-[#00E5FF] transition-colors">
                 Integritetspolicy
               </a>
+              <CookiebotRenewButton />
               <span>© 2026 elpris.ai</span>
             </div>
             <div className="flex flex-wrap justify-center gap-6">

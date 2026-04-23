@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Chatbot from "@/components/dynamic/Chatbot";
+import CookiebotRenewButton from "@/components/CookiebotRenewButton";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
 import { stockholmHour } from "@/lib/time";
@@ -496,6 +497,7 @@ export default function Home() {
               >
                 Integritetspolicy
               </Link>
+              <CookiebotRenewButton />
               <span className="text-xs text-[#8fafc9]">© 2026 elpris.ai</span>
             </div>
 
