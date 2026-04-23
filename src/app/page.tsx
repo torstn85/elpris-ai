@@ -547,6 +547,7 @@ export default function Home() {
               >
                 Integritetspolicy
               </Link>
+              <span className="text-xs text-[#8fafc9]">© 2026 elpris.ai</span>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm text-[#8fafc9]">

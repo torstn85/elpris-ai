@@ -293,6 +293,7 @@ export default async function ElprisIdag() {
               >
                 Integritetspolicy
               </a>
+              <span>© 2026 elpris.ai</span>
             </div>
             <div className="flex flex-wrap justify-center gap-6">
               <span>Data från Supabase · elprisetjustnu.se</span>
