@@ -113,6 +113,13 @@ const SE1_REGIONS = ["norrbotten", "västerbotten"];
 const SE2_REGIONS = ["jämtland", "västernorrland"];
 const SE4_REGIONS = ["skåne", "blekinge", "kronoberg"];
 
+function priceAccentColor(avg: number | null): string {
+  if (avg === null) return "#00E5FF";
+  if (avg <= 50) return "#22C55E";
+  if (avg < 100) return "#F59E0B";
+  return "#EF4444";
+}
+
 function regionToArea(region: string): "SE1" | "SE2" | "SE3" | "SE4" {
   const r = region.toLowerCase();
   if (SE1_REGIONS.some((s) => r.includes(s))) return "SE1";
@@ -434,7 +441,7 @@ export default function Home() {
                   ? `Snittpriser ${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh`
                   : "Laddar..."
               }
-              accent="#00E5FF"
+              accent={priceAccentColor(cheap?.avg ?? null)}
             />
             <ValueCard
               icon={
