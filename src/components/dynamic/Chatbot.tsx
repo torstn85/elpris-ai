@@ -26,6 +26,8 @@ export default function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const [extendedSession, setExtendedSession] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [swipeTranslateY, setSwipeTranslateY] = useState(0);
   const mobileContainerRef = useRef<HTMLDivElement>(null);
   const desktopContainerRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +78,36 @@ export default function Chatbot() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  // ── Swipe-to-close (mobil) ───────────────────────────────────────────────
+
+  function closeMobileChat() {
+    setSwipeTranslateY(window.innerHeight);
+    setTimeout(() => {
+      setIsMobileOpen(false);
+      setSwipeTranslateY(0);
+      setTouchStartY(null);
+    }, 200);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    setTouchStartY(e.touches[0].clientY);
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (touchStartY === null) return;
+    const delta = e.touches[0].clientY - touchStartY;
+    if (delta > 0) setSwipeTranslateY(delta);
+  }
+
+  function handleTouchEnd() {
+    if (swipeTranslateY > 100) {
+      closeMobileChat();
+    } else {
+      setSwipeTranslateY(0);
+    }
+    setTouchStartY(null);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -226,20 +258,37 @@ export default function Chatbot() {
             </div>
           </div>
         ) : (
-          <div className="fixed inset-0 z-50 bg-[#0A2540] flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1E4976] flex-shrink-0">
-              <h2 className="text-base font-bold text-white">Fråga elpris.ai</h2>
-              <button
-                onClick={() => setIsMobileOpen(false)}
-                className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
-                aria-label="Stäng chatten"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+          <div
+            className="fixed inset-0 z-50 bg-[#0A2540] flex flex-col h-[100dvh]"
+            style={{
+              transform: `translateY(${swipeTranslateY}px)`,
+              transition: touchStartY !== null ? 'none' : 'transform 200ms ease',
+            }}
+          >
+            {/* Header — sticky, drag-to-close zon */}
+            <div
+              className="sticky top-0 z-10 bg-[#0A2540] flex-shrink-0 border-b border-[#1E4976]"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Drag indicator */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-[#4a6b8a]" />
+              </div>
+              <div className="flex items-center justify-between px-5 pb-4">
+                <h2 className="text-base font-bold text-white">Fråga elpris.ai</h2>
+                <button
+                  onClick={closeMobileChat}
+                  className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                  aria-label="Stäng chatten"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
