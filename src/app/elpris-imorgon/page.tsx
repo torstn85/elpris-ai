@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import NavBar from "@/components/NavBar";
-import CookiebotRenewButton from "@/components/CookiebotRenewButton";
+import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmDayUTCRange } from "@/lib/time";
 
@@ -279,27 +279,7 @@ export default async function ElprisImorgon() {
             </>
           )}
 
-          {/* ── Footer note ── */}
-          <section className="border-t border-[#1E4976] pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8fafc9]">
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <a href="/" className="font-extrabold text-sm text-[#8fafc9]">
-                elpris<span className="text-[#00E5FF]">.ai</span>
-              </a>
-              <a
-                href="/integritetspolicy"
-                className="hover:text-[#00E5FF] transition-colors"
-              >
-                Integritetspolicy
-              </a>
-              <CookiebotRenewButton />
-              <span>© 2026 elpris.ai</span>
-            </div>
-            <div className="flex flex-wrap justify-center gap-6">
-              <span>Data från Supabase · elprisetjustnu.se</span>
-              <span>Day-ahead-priser publiceras kl 13:15</span>
-              <span>Spotpris exkl. moms & nätavgift</span>
-            </div>
-          </section>
+          <Footer />
         </div>
       </main>
     </>

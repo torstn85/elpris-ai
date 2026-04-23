@@ -12,6 +12,7 @@ import remarkGfm from 'remark-gfm';
 import type { Metadata } from 'next';
 import { mdxComponents } from '@/components/dynamic/mdxComponents';
 import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -186,6 +187,9 @@ export default function ArticlePage({ params }: PageProps) {
             </a>
           </div>
         </article>
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <Footer />
+        </div>
       </div>
     </>
   );

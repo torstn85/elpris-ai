@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Chatbot from "@/components/dynamic/Chatbot";
-import CookiebotRenewButton from "@/components/CookiebotRenewButton";
+import Footer from "@/components/Footer";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
 import { stockholmHour } from "@/lib/time";
@@ -485,74 +485,7 @@ export default function Home() {
         </section>
 
         {/* ── 5. Trust section ── */}
-        <section id="om-oss" className="border-t border-[#1E4976] pt-10 pb-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex flex-col items-center sm:items-start gap-1">
-              <span className="font-extrabold text-lg text-[#8fafc9]">
-                elpris<span className="text-[#00E5FF]">.ai</span>
-              </span>
-              <Link
-                href="/integritetspolicy"
-                className="text-xs text-[#8fafc9] hover:text-[#00E5FF] transition-colors"
-              >
-                Integritetspolicy
-              </Link>
-              <CookiebotRenewButton />
-              <span className="text-xs text-[#8fafc9]">© 2026 elpris.ai</span>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm text-[#8fafc9]">
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 text-[#22C55E] flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Data från elprisetjustnu.se
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 text-[#22C55E] flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Uppdateras var 15:e minut
-              </span>
-              <span className="flex items-center gap-2">
-                <svg
-                  className="w-4 h-4 text-[#22C55E] flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Täcker SE1–SE4
-              </span>
-            </div>
-          </div>
-        </section>
+        <Footer id="om-oss" />
       </div>
     </main>
   );
