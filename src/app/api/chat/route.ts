@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const SYSTEM_PROMPT =
-  'Du är elpris.ai:s AI-assistent. Du hjälper svenska användare förstå elpriser och spara pengar. Du svarar alltid på svenska, kort och konkret (max 3-4 meningar). När användaren frågar om aktuellt pris, billigaste timmar, eller liknande - använd get_current_price eller get_today_prices function calls. Gissa ALDRIG priser - hämta alltid live-data via funktionerna. Om frågan inte handlar om el, säg vänligt att du bara hjälper med elprisfrågor. Använd ALDRIG markdown-formattering (ingen fet text med **asterisker**, inga listor med bindestreck, inga rubriker). Skriv bara ren text. Du får gärna använda emojis sparsamt när det passar.';
+  'Du är elpris.ai:s AI-assistent. Du hjälper svenska användare förstå elpriser och spara pengar. Du svarar alltid på svenska, kort och konkret (max 3-4 meningar). När användaren frågar om aktuellt pris, billigaste timmar, eller liknande - använd get_current_price eller get_today_prices function calls. För frågor om morgondagen - använd get_tomorrow_prices. Om available: false returneras, förklara vänligt att priserna släpps kl 13:15 varje dag. Gissa ALDRIG priser - hämta alltid live-data via funktionerna. Om frågan inte handlar om el, säg vänligt att du bara hjälper med elprisfrågor. Använd ALDRIG markdown-formattering (ingen fet text med **asterisker**, inga listor med bindestreck, inga rubriker). Skriv bara ren text. Du får gärna använda emojis sparsamt när det passar.';
 
 const TOOLS: Anthropic.Tool[] = [
   {
@@ -28,6 +28,21 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: 'get_today_prices',
     description: 'Hämtar dagens timpriser (öre/kWh) för ett elområde.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        area: {
+          type: 'string',
+          enum: ['SE1', 'SE2', 'SE3', 'SE4'],
+          description: 'Elområde: SE1=Luleå, SE2=Sundsvall, SE3=Stockholm, SE4=Malmö',
+        },
+      },
+      required: ['area'],
+    },
+  },
+  {
+    name: 'get_tomorrow_prices',
+    description: 'Hämtar morgondagens timpriser för valt elområde. Returneras endast efter kl 13:15 svensk tid när day-ahead-priserna släpps. Om available: false returneras, är priserna inte publicerade än.',
     input_schema: {
       type: 'object',
       properties: {
@@ -67,6 +82,20 @@ async function executeTool(
       const data = await res.json();
       return JSON.stringify({
         area: input.area,
+        hourly: data.areas?.[input.area] ?? [],
+      });
+    }
+
+    if (name === 'get_tomorrow_prices') {
+      const res = await fetch(`${baseUrl}/api/prices/tomorrow`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.available === false) {
+        return JSON.stringify({ available: false, message: data.message, date: data.date });
+      }
+      return JSON.stringify({
+        area: input.area,
+        date: data.date,
         hourly: data.areas?.[input.area] ?? [],
       });
     }
