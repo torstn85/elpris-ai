@@ -75,7 +75,13 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
   const [stats, setStats] = useState<PriceStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState<number>(cfg.defaultValue);
+  const [inputText, setInputText] = useState<string>(String(cfg.defaultValue));
+
+  // Reset text when type prop changes
+  useEffect(() => {
+    setInputText(String(cfg.defaultValue));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +127,12 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
     );
   }
 
+  // Clamp to valid range for use in calculation — rawValue may be mid-edit
+  const rawValue = parseInt(inputText, 10);
+  const inputValue = isNaN(rawValue)
+    ? cfg.defaultValue
+    : Math.min(cfg.max, Math.max(cfg.min, rawValue));
+
   const yearlyKwh = cfg.toYearlyKwh(inputValue);
   const costExpensive = (yearlyKwh * stats.avgExpensive) / 100;
   const costCheap = (yearlyKwh * stats.avgCheap) / 100;
@@ -147,18 +159,17 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
         <div className="flex items-center gap-3">
           <input
             type="number"
+            inputMode="numeric"
             min={cfg.min}
             max={cfg.max}
             step={cfg.step}
-            value={inputValue}
-            onChange={(e) => {
-              const v = parseInt(e.target.value, 10);
-              if (!isNaN(v)) setInputValue(v);
-            }}
-            onBlur={(e) => {
-              const v = parseInt(e.target.value, 10);
-              if (isNaN(v) || v < cfg.min) setInputValue(cfg.min);
-              else if (v > cfg.max) setInputValue(cfg.max);
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onBlur={() => {
+              const v = parseInt(inputText, 10);
+              if (isNaN(v) || v < cfg.min) setInputText(String(cfg.min));
+              else if (v > cfg.max) setInputText(String(cfg.max));
+              else setInputText(String(v));
             }}
             className="w-36 bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none rounded-lg px-3 py-2 text-white text-sm transition-colors"
           />
