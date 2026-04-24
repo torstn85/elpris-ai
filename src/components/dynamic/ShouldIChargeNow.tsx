@@ -104,10 +104,12 @@ const CONFIG = {
   },
 };
 
-export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
+export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
+  const [selectedArea, setSelectedArea] = useState<Area>(areaProp);
   const [result, setResult] = useState<ChargeResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tomorrowCheap, setTomorrowCheap] = useState<HourPrice | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,20 +117,46 @@ export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
     async function fetchData() {
       try {
         setLoading(true);
-        const res = await fetch('/api/prices/today');
-        if (!res.ok) throw new Error('Fel');
-        const json = await res.json();
 
-        const areaData: Array<{ hour: number; ore_per_kwh: number }> =
-          json.areas?.[area] || [];
-        const hours: HourPrice[] = areaData.map((item) => ({
-          hour: item.hour,
-          price: item.ore_per_kwh,
-        }));
+        const [todayRes, tomorrowRes] = await Promise.allSettled([
+          fetch('/api/prices/today'),
+          fetch(`/api/prices/tomorrow?area=${selectedArea}`),
+        ]);
 
-        if (!cancelled) {
-          setResult(analyze(hours));
-          setError(null);
+        // Today
+        if (todayRes.status === 'fulfilled' && todayRes.value.ok) {
+          const json = await todayRes.value.json();
+          const areaData: Array<{ hour: number; ore_per_kwh: number }> =
+            json.areas?.[selectedArea] || [];
+          const hours: HourPrice[] = areaData.map((item) => ({
+            hour: item.hour,
+            price: item.ore_per_kwh,
+          }));
+          if (!cancelled) {
+            setResult(analyze(hours));
+            setError(null);
+          }
+        } else {
+          if (!cancelled) setError('Kunde inte hämta prisdata');
+        }
+
+        // Tomorrow
+        if (tomorrowRes.status === 'fulfilled' && tomorrowRes.value.ok) {
+          const tj = await tomorrowRes.value.json();
+          if (tj.available !== false && tj.areas?.[selectedArea]?.length > 0) {
+            const tmHours: HourPrice[] = tj.areas[selectedArea].map(
+              (item: { hour: number; ore_per_kwh: number }) => ({
+                hour: item.hour,
+                price: item.ore_per_kwh,
+              })
+            );
+            const cheapest = tmHours.reduce((min, h) => (h.price < min.price ? h : min));
+            if (!cancelled) setTomorrowCheap(cheapest);
+          } else {
+            if (!cancelled) setTomorrowCheap(null);
+          }
+        } else {
+          if (!cancelled) setTomorrowCheap(null);
         }
       } catch {
         if (!cancelled) setError('Kunde inte hämta prisdata');
@@ -139,11 +167,31 @@ export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [area]);
+  }, [selectedArea]);
+
+  const areaSelector = (
+    <div className="flex gap-1">
+      {(['SE1', 'SE2', 'SE3', 'SE4'] as Area[]).map((a) => (
+        <button
+          key={a}
+          onClick={() => setSelectedArea(a)}
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
+            selectedArea === a
+              ? 'bg-cyan-500 text-slate-900'
+              : 'bg-[#1E4976] text-[#8fafc9] hover:bg-[#1E4976]/80'
+          }`}
+          aria-label={`Välj elområde ${a}`}
+        >
+          {a}
+        </button>
+      ))}
+    </div>
+  );
 
   if (loading) {
     return (
       <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] animate-pulse">
+        <div className="flex justify-end mb-3">{areaSelector}</div>
         <div className="h-8 bg-[#1E4976] rounded w-1/3 mb-3" />
         <div className="h-12 bg-[#1E4976] rounded w-1/2 mb-3" />
         <div className="h-4 bg-[#1E4976] rounded w-2/3" />
@@ -154,6 +202,7 @@ export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
   if (error || !result) {
     return (
       <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
+        <div className="flex justify-end mb-3">{areaSelector}</div>
         <p className="text-amber-400 text-sm">{error ?? 'Ingen prisdata tillgänglig.'}</p>
       </div>
     );
@@ -165,25 +214,33 @@ export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
       ? result.nextCheapHour.hour - getCurrentStockholmHour()
       : null;
 
+  const showTomorrow =
+    tomorrowCheap !== null &&
+    !(result.decision === 'JA' && tomorrowCheap.price > result.currentPrice) &&
+    Math.abs(tomorrowCheap.price - result.currentPrice) / result.currentPrice > 0.1;
+
   return (
     <div className={`my-6 rounded-2xl bg-gradient-to-br ${cfg.gradient} p-6 ring-1 ${cfg.ring}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-3xl">{cfg.emoji}</span>
-        <div>
-          <p className={`text-xs uppercase tracking-wider font-semibold ${cfg.accent}`}>
-            Ska jag ladda nu?
-          </p>
-          <h3 className="text-xl font-bold text-white">{cfg.label}</h3>
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{cfg.emoji}</span>
+          <div>
+            <p className={`text-xs uppercase tracking-wider font-semibold ${cfg.accent}`}>
+              Ska jag ladda nu?
+            </p>
+            <h3 className="text-xl font-bold text-white">{cfg.label}</h3>
+          </div>
         </div>
+        {areaSelector}
       </div>
 
-      {/* Current price — färg följer prisregler, inte tillstånd */}
+      {/* Current price */}
       <div className="flex items-baseline gap-2 mb-4">
         <span className="text-5xl font-bold" style={{ color: priceColor(result.currentPrice) }}>
           {result.currentPrice.toFixed(1)}
         </span>
-        <span className="text-slate-400 text-sm">öre/kWh just nu i {area}</span>
+        <span className="text-slate-400 text-sm">öre/kWh just nu i {selectedArea}</span>
       </div>
 
       {/* Decision message */}
@@ -239,10 +296,24 @@ export default function ShouldIChargeNow({ area = 'SE3' }: Props) {
             Priset är okej. Det finns inga billigare timmar kvar idag.
           </p>
         )}
+
+        {/* Tomorrow tip */}
+        {showTomorrow && tomorrowCheap && (
+          <p className="text-slate-400 text-xs mt-2">
+            💡 Eller vänta till imorgon kl{' '}
+            <span className="font-semibold text-[#00E5FF]">
+              {String(tomorrowCheap.hour).padStart(2, '0')}:00
+            </span>{' '}
+            då priset är{' '}
+            <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
+              {tomorrowCheap.price.toFixed(1)} öre/kWh
+            </span>.
+          </p>
+        )}
       </div>
 
       <p className="mt-4 text-xs text-slate-500">
-        Uppdaterad {lastSlotTime()} · Spotpris i {area}
+        Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea}
       </p>
     </div>
   );
