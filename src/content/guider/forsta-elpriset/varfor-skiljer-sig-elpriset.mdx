@@ -1,0 +1,122 @@
+---
+title: "Varför skiljer sig elpriset mellan timmar, dagar och elområden?"
+slug: "varfor-skiljer-sig-elpriset"
+category: "forsta-elpriset"
+description: "Spotpriset kan variera 100x mellan timmar och dubbleras mellan elområden. Vi förklarar de fyra faktorerna som styr varför."
+metaTitle: "Varför skiljer sig elpriset? Mekanismen bakom prisvariationer | elpris.ai"
+publishedAt: "2026-04-24"
+updatedAt: "2026-04-24"
+author: "elpris.ai redaktion"
+keywords:
+  - varför skiljer sig elpriset
+  - varför varierar elpriset
+  - varför olika elpris
+  - elpris variation förklaring
+  - prisvariation el
+  - varför dyrare el söder
+readTime: "7 min"
+---
+
+Elpriset kan vara 100 gånger högre kl 18 än kl 03 samma dag — och dubbelt så högt i Malmö som i Luleå vid samma tidpunkt. Det beror inte på att elbolagen sätter olika priser, utan på hur den nordiska elmarknaden fungerar. Här går vi igenom de fyra mekanismerna som styr varför ditt spotpris ser ut som det gör just nu.
+
+<LivePriceWidget />
+
+Det aktuella spotpriset i ditt elområde just nu — formet av faktorerna vi förklarar nedan.
+
+## Faktor 1: Utbud och efterfrågan i realtid
+
+Den enskilt största orsaken till att elpriset varierar är att **el inte kan lagras i någon större skala**. Det betyder att exakt så mycket som produceras varje sekund måste konsumeras varje sekund. När efterfrågan stiger måste fler kraftverk slås på. När efterfrågan sjunker måste produktionen sänkas.
+
+Det är detta som auktioneringsprincipen på Nord Pool fångar: varje 15-minutersintervall sätts ett pris där den dyraste produktionsenheten som behövs för att täcka efterfrågan bestämmer priset för alla. Det kallas **marginalprissättning**.
+
+I praktiken betyder det:
+
+- När **vindkraft + vattenkraft** räcker till, sätter de priset → lågt pris
+- När man måste tända **gaskraftverk** eller importera dyr el → högt pris
+
+Skillnaden mellan dessa två tillstånd kan vara 10-100x i öre/kWh.
+
+## Faktor 2: Dygnsmönster i konsumtionen
+
+Mänskligt beteende skapar förutsägbara toppar och dalar i efterfrågan över dygnet:
+
+- **07-09 (morgontoppen):** Alla vaknar samtidigt, värmer upp huset, lagar frukost, åker till jobbet (laddar bilen)
+- **17-20 (kvällstoppen):** Hemkomst, matlagning, dusch, värme, TV
+- **00-06 (lågpunkten):** Industrin går på lågvarv, hushåll sover
+
+<PriceGraph />
+
+Här ser du dygnsmönstret tydligt i dagens timpriser. De två topparna och natt-dalen återkommer nästan varje dag.
+
+På sommaren är mönstret mildare — mindre uppvärmningsbehov gör att skillnaderna minskar. På vintern är topparna brutalare, särskilt vid kyla.
+
+## Faktor 3: Väder och säsong
+
+Vädret påverkar både utbud och efterfrågan samtidigt:
+
+**På utbudssidan:**
+- **Vind:** När det blåser kraftigt producerar svenska vindkraftverk på max → priset rasar
+- **Vattenflöde:** Snösmältning på våren och mycket regn fyller magasinen → låg pris-period
+- **Sol:** Solkraft har växt snabbt, framförallt i Tyskland och södra Sverige → press nedåt mitt på dagen
+
+**På efterfrågesidan:**
+- **Temperatur:** Varje grad kallare ökar elförbrukningen markant (fler värmepumpar går på max)
+- **Mörker:** Kortare dagar = mer belysning och tidigare hemkomst → högre kvällstoppar
+
+Det är därför vinterelpriserna i Sverige kan vara 5-10x högre än sommarens — kallt + mörkt + lite vind är den värsta kombinationen för plånboken.
+
+## Faktor 4: Geografi och elområden
+
+Det är här det blir intressant: **samma timme kan kosta dubbelt så mycket beroende på vart du bor i Sverige**. Anledningen är att Sverige har fyra elområden (SE1-SE4) och stamnätet inte alltid kan transportera elen mellan dem.
+
+<PriceComparisonByArea />
+
+Just nu ser du själv hur priset skiljer sig mellan elområdena.
+
+**Varför är det så här?**
+
+Sverige har en obalans mellan var elen produceras och var den används:
+
+- **SE1 och SE2 (norra Sverige):** Mycket vattenkraft och vindkraft, relativt låg befolkning → överskott
+- **SE3 (mellersta Sverige):** Stor industri och stor befolkning, men begränsad lokal produktion → balanserad till underskott
+- **SE4 (södra Sverige):** Tät befolkning, ingen storskalig vattenkraft, sammankopplad med Tyskland och Polen → underskott
+
+I en perfekt värld skulle billig el från norr fritt kunna flöda till söder. Men **stamnätet har flaskhalsar** — man kan helt enkelt inte transportera obegränsat med el på ledningarna mellan SE2 och SE3, eller mellan SE3 och SE4.
+
+När flaskhalsen är aktiv blir konsekvensen:
+- Priset **rasar i norr** (för mycket el, ingen avsättning)
+- Priset **stiger i söder** (för lite el, dyr import behövs)
+
+Det är därför du kan se SE1 på 5 öre/kWh medan SE4 ligger på 80 öre/kWh samma timme.
+
+## Faktor 5 (bonus): Sammankoppling med kontinenten
+
+Sverige är inte ett isolerat elsystem. Vi är sammankopplade via undervattenskablar med Tyskland, Polen, Danmark, Finland, Norge och Litauen. Det betyder att **europeiska prisrörelser smittar av sig på svenska priser** — särskilt i SE4.
+
+När gaspriset sköt i höjden i Europa 2022-2023 drogs svenska priser med upp, även om vi själva har gott om billig el. Anledningen: våra producenter hellre exporterar dyrt än säljer billigt hemma. Marknaden hittar alltid jämvikt.
+
+Det här är också skälet till att vissa argumenterar för att stänga ner exportkablarna — fast då skulle vi också förlora möjligheten att importera billig norsk vattenkraft när vi behöver den.
+
+## Sammanfattning: Varför ser ditt pris ut som det gör?
+
+Nästa gång du tittar på spotpriset just nu, vet du att det är en kombination av fem saker:
+
+1. **Hur mycket el efterfrågas just nu** (tid på dygnet, säsong, temperatur)
+2. **Hur mycket producerar förnybart just nu** (vind, sol, vattenflöde)
+3. **Hur ser efterfrågan ut nästa timme** (auktionen är prediktiv)
+4. **Var bor du** (vilket elområde, var finns flaskhalsarna)
+5. **Vad händer i Europa** (gaspriser, kärnkraftsstatus, väder söderöver)
+
+Det är komplext — men förståelig komplexitet. Och med rätt verktyg kan du faktiskt utnyttja det till din fördel genom att flytta din konsumtion till billiga timmar.
+
+<SevenDayPriceTrend />
+
+Veckans utveckling i ditt elområde — du ser hur de fem faktorerna spelat ut sig de senaste sju dagarna.
+
+---
+
+Vill du gå djupare? Läs [hur Nord Pool-auktionen fungerar steg för steg](/guider/forsta-elpriset/nord-pool-forklarat) *(publiceras snart)*, [vad du egentligen betalar för på elräkningen](/guider/forsta-elpriset/elprisets-bestandsdelar) *(publiceras snart)* eller [varför elen alltid är billigast 00-06](/guider/forsta-elpriset/dygnsmonster-elpris) *(publiceras snart)*.
+
+För en geografisk översikt över alla elområden, se [vår elområden-sida med klickbar Sverigekarta](/elomrade).
+
+Se [aktuella spotpriser för alla elområden](/elpris-idag) eller [morgondagens priser](/elpris-imorgon) på elpris.ai.
