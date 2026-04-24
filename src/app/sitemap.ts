@@ -91,6 +91,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/om-oss`,
+      lastModified: new Date("2026-04-24"),
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
+    {
       url: `${BASE_URL}/integritetspolicy`,
       lastModified: new Date("2026-04-14"),
       changeFrequency: "yearly",
