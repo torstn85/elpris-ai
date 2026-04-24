@@ -27,6 +27,13 @@ function priceColor(price: number): string {
   return '#EF4444';
 }
 
+// Absolut bakgrundsnivå baserat på pris — oberoende av relativ 6h-logik
+function getBackgroundLevel(price: number): Decision {
+  if (price <= 50) return 'JA';
+  if (price < 100) return 'OK';
+  return 'VÄNTA';
+}
+
 function getCurrentStockholmHour(): number {
   return parseInt(
     new Intl.DateTimeFormat('sv-SE', {
@@ -84,9 +91,9 @@ const CONFIG = {
   VÄNTA: {
     emoji: '⏰',
     label: 'Vänta lite',
-    gradient: 'from-amber-950 to-[#0A2540]',
-    ring: 'ring-amber-900',
-    accent: 'text-amber-400',
+    gradient: 'from-red-950 to-[#0A2540]',
+    ring: 'ring-red-900',
+    accent: 'text-red-400',
     tip: null,
   },
   OK: {
@@ -108,7 +115,6 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    // Reset immediately so stale data doesn't show during area switch
     setResult(null);
     setTomorrowCheap(null);
     setLoading(true);
@@ -198,7 +204,11 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
     );
   }
 
+  // Relativ logik (6h) → texter och status-label
   const cfg = CONFIG[result.decision];
+  // Absolut logik (pris vs tröskelvärden) → bakgrundsfärg
+  const bgCfg = CONFIG[getBackgroundLevel(result.currentPrice)];
+
   const hoursUntilCheap =
     result.nextCheapHour !== null
       ? result.nextCheapHour.hour - getCurrentStockholmHour()
@@ -209,17 +219,29 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
     !(result.decision === 'JA' && tomorrowCheap.price > result.currentPrice) &&
     Math.abs(tomorrowCheap.price - result.currentPrice) / result.currentPrice > 0.1;
 
-  // Pris-färg för nästa billiga timme (används av både tid och pris-siffra)
   const nextPriceClr = result.nextCheapHour ? priceColor(result.nextCheapHour.price) : '#00E5FF';
 
+  const tomorrowLine = showTomorrow && tomorrowCheap ? (
+    <p className="text-slate-300">
+      Eller imorgon kl{' '}
+      <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
+        {String(tomorrowCheap.hour).padStart(2, '0')}:00
+      </span>{' '}
+      då priset är{' '}
+      <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
+        {tomorrowCheap.price.toFixed(1)} öre/kWh
+      </span>.
+    </p>
+  ) : null;
+
   return (
-    <div className={`my-6 rounded-2xl bg-gradient-to-br ${cfg.gradient} p-6 ring-1 ${cfg.ring}`}>
-      {/* Header: rubrik + area selector */}
+    <div className={`my-6 rounded-2xl bg-gradient-to-br ${bgCfg.gradient} p-6 ring-1 ${bgCfg.ring}`}>
+      {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-semibold text-white">Ska jag tvätta nu?</h3>
-          <p className={`text-sm font-semibold mt-0.5 ${cfg.accent}`}>
-            {cfg.emoji} {cfg.label}
+          <p className={`text-lg font-semibold mt-0.5 ${cfg.accent}`}>
+            {cfg.label} {cfg.emoji}
           </p>
         </div>
         {areaSelector}
@@ -234,79 +256,78 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
       </div>
 
       {/* Decision message */}
-      <div className="space-y-2 text-sm">
+      <div className="space-y-1 text-sm">
         {result.decision === 'JA' && (
           <p className="text-slate-300">{cfg.tip}</p>
         )}
 
         {result.decision === 'VÄNTA' && result.nextCheapHour && (
-          <p className="text-slate-300">
-            Priset är bland dagens dyraste.{' '}
-            {hoursUntilCheap !== null && hoursUntilCheap > 0 ? (
-              <>
-                Vänta{' '}
-                <span className="font-semibold" style={{ color: nextPriceClr }}>
-                  {hoursUntilCheap} {hoursUntilCheap === 1 ? 'timme' : 'timmar'}
-                </span>{' '}
-                — kl{' '}
-                <span className="font-semibold" style={{ color: nextPriceClr }}>
-                  {String(result.nextCheapHour.hour).padStart(2, '0')}:00
-                </span>{' '}
-                sjunker priset till{' '}
-                <span className="font-semibold" style={{ color: nextPriceClr }}>
-                  {result.nextCheapHour.price.toFixed(1)} öre/kWh
-                </span>.
-              </>
-            ) : (
-              <>Inga billigare timmar återstår idag.</>
-            )}
-          </p>
+          <>
+            <p className="text-slate-300">
+              Priset är bland dagens dyraste.{' '}
+              {hoursUntilCheap !== null && hoursUntilCheap > 0 ? (
+                <>
+                  Vänta{' '}
+                  <span className="font-semibold" style={{ color: nextPriceClr }}>
+                    {hoursUntilCheap} {hoursUntilCheap === 1 ? 'timme' : 'timmar'}
+                  </span>{' '}
+                  — kl{' '}
+                  <span className="font-semibold" style={{ color: nextPriceClr }}>
+                    {String(result.nextCheapHour.hour).padStart(2, '0')}:00
+                  </span>{' '}
+                  sjunker priset till{' '}
+                  <span className="font-semibold" style={{ color: nextPriceClr }}>
+                    {result.nextCheapHour.price.toFixed(1)} öre/kWh
+                  </span>.
+                </>
+              ) : (
+                <>Inga billigare timmar återstår idag.</>
+              )}
+            </p>
+            {tomorrowLine}
+          </>
         )}
 
         {result.decision === 'VÄNTA' && !result.nextCheapHour && (
-          <p className="text-slate-300">
-            Priset är bland dagens dyraste. Inga billigare timmar återstår idag.
-          </p>
+          <>
+            <p className="text-slate-300">
+              Priset är bland dagens dyraste. Inga billigare timmar återstår idag.
+            </p>
+            {tomorrowLine}
+          </>
         )}
 
         {result.decision === 'OK' && result.nextCheapHour && (
-          <p className="text-slate-300">
-            Priset är varken billigast eller dyrast just nu. Det blir billigare kl{' '}
-            <span className="font-semibold" style={{ color: nextPriceClr }}>
-              {String(result.nextCheapHour.hour).padStart(2, '0')}:00
-            </span>{' '}
-            (
-            <span className="font-semibold" style={{ color: nextPriceClr }}>
-              {result.nextCheapHour.price.toFixed(1)} öre/kWh
-            </span>
-            ).
-          </p>
+          <>
+            <p className="text-slate-300">
+              Priset är varken billigast eller dyrast just nu. Det blir billigare kl{' '}
+              <span className="font-semibold" style={{ color: nextPriceClr }}>
+                {String(result.nextCheapHour.hour).padStart(2, '0')}:00
+              </span>{' '}
+              (
+              <span className="font-semibold" style={{ color: nextPriceClr }}>
+                {result.nextCheapHour.price.toFixed(1)} öre/kWh
+              </span>
+              ).
+            </p>
+            {tomorrowLine}
+          </>
         )}
 
         {result.decision === 'OK' && !result.nextCheapHour && (
-          <p className="text-slate-300">
-            Priset är okej. Det finns inga billigare timmar kvar idag.
-          </p>
-        )}
-
-        {showTomorrow && tomorrowCheap && (
-          <p className="text-slate-400 text-xs mt-2">
-            💡 Eller vänta till imorgon kl{' '}
-            <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
-              {String(tomorrowCheap.hour).padStart(2, '0')}:00
-            </span>{' '}
-            då priset är{' '}
-            <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
-              {tomorrowCheap.price.toFixed(1)} öre/kWh
-            </span>.
-          </p>
+          <>
+            <p className="text-slate-300">
+              Priset är okej. Det finns inga billigare timmar kvar idag.
+            </p>
+            {tomorrowLine}
+          </>
         )}
       </div>
 
-      <p className="mt-4 text-xs text-slate-500">
-        Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea}
-      </p>
-      <p className="text-xs text-slate-600">Alla priser som visas är timsnitt</p>
+      <div className="mt-4">
+        <p className="text-xs text-slate-500">Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea}</p>
+        <p className="text-xs text-slate-600">Priser som visas här är timsnitt och exkl. moms & nätavgift</p>
+      </div>
     </div>
   );
 }
