@@ -50,6 +50,26 @@ function toRows(area: Area, entries: RawEntry[]): SpotPriceRow[] {
   }));
 }
 
+interface AreaResult {
+  area: Area;
+  rows_upserted?: number;
+  error?: string;
+}
+
+// Fetch + upsert one area, returning a structured result either way
+async function fetchAndUpsertArea(area: Area, dateStr: string): Promise<AreaResult> {
+  try {
+    const entries = await fetchRawArea(area, dateStr);
+    const rows = toRows(area, entries);
+    const count = await upsertRows(rows);
+    return { area, rows_upserted: count };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`[fetch-prices] ${area} failed for ${dateStr}: ${message}`);
+    return { area, error: message };
+  }
+}
+
 export async function GET() {
   try {
     const now = new Date();
@@ -59,42 +79,66 @@ export async function GET() {
     const stockholmMinute = fmt({ minute: "numeric" });
     const afterDayAhead = stockholmHour > 13 || (stockholmHour === 13 && stockholmMinute >= 15);
 
-    // ── Today ──────────────────────────────────────────────────────────────────
+    // ── Today — fetch all four areas in parallel, tolerate individual failures ──
     const dateStr = stockholmDateString();
-    const todayResults = await Promise.all(
-      AREAS.map((area) =>
-        fetchRawArea(area, dateStr).then((entries) => ({ area, entries }))
-      )
-    );
-    const todayRows: SpotPriceRow[] = todayResults.flatMap(({ area, entries }) =>
-      toRows(area, entries)
-    );
-    const todayUpserted = await upsertRows(todayRows);
+    const todayResults = await Promise.all(AREAS.map((area) => fetchAndUpsertArea(area, dateStr)));
+    const todayOk = todayResults.filter((r) => !r.error);
+    const todayFailed = todayResults.filter((r) => r.error);
 
-    // ── Tomorrow (only after 13:15 Stockholm time) ─────────────────────────────
-    let tomorrowUpserted: number | null = null;
+    if (todayOk.length > 0) {
+      console.log(`[fetch-prices] Today ${dateStr}: ${todayOk.length}/4 areas ok, ${todayFailed.length} failed`);
+    }
+    if (todayFailed.length > 0) {
+      console.error(`[fetch-prices] Today failed areas: ${todayFailed.map((r) => `${r.area}(${r.error})`).join(", ")}`);
+    }
+
+    // ── Tomorrow — only after 13:15 Stockholm time ─────────────────────────────
+    let tomorrowResults: AreaResult[] | null = null;
     if (afterDayAhead) {
       const tomorrowStr = getTomorrowDateString();
-      const tomorrowResults = await Promise.all(
-        AREAS.map((area) =>
-          fetchRawArea(area, tomorrowStr).then((entries) => ({ area, entries }))
-        )
+      tomorrowResults = await Promise.all(AREAS.map((area) => fetchAndUpsertArea(area, tomorrowStr)));
+      const tmOk = tomorrowResults.filter((r) => !r.error);
+      const tmFailed = tomorrowResults.filter((r) => r.error);
+      if (tmOk.length > 0) {
+        console.log(`[fetch-prices] Tomorrow ${tomorrowStr}: ${tmOk.length}/4 areas ok, ${tmFailed.length} failed`);
+      }
+      if (tmFailed.length > 0) {
+        console.error(`[fetch-prices] Tomorrow failed areas: ${tmFailed.map((r) => `${r.area}(${r.error})`).join(", ")}`);
+      }
+    }
+
+    // Return 500 only if ALL four today-areas failed
+    if (todayOk.length === 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "All four areas failed for today",
+          today: { date: dateStr, failed: todayFailed },
+        },
+        { status: 500 }
       );
-      const tomorrowRows: SpotPriceRow[] = tomorrowResults.flatMap(({ area, entries }) =>
-        toRows(area, entries)
-      );
-      tomorrowUpserted = await upsertRows(tomorrowRows);
     }
 
     return NextResponse.json({
       ok: true,
-      today: { date: dateStr, rows_upserted: todayUpserted },
-      tomorrow: afterDayAhead
-        ? { date: getTomorrowDateString(), rows_upserted: tomorrowUpserted }
+      today: {
+        date: dateStr,
+        rows_upserted: todayOk.reduce((s, r) => s + (r.rows_upserted ?? 0), 0),
+        areas_ok: todayOk.map((r) => r.area),
+        areas_failed: todayFailed.map((r) => ({ area: r.area, error: r.error })),
+      },
+      tomorrow: tomorrowResults
+        ? {
+            date: getTomorrowDateString(),
+            rows_upserted: tomorrowResults.filter((r) => !r.error).reduce((s, r) => s + (r.rows_upserted ?? 0), 0),
+            areas_ok: tomorrowResults.filter((r) => !r.error).map((r) => r.area),
+            areas_failed: tomorrowResults.filter((r) => r.error).map((r) => ({ area: r.area, error: r.error })),
+          }
         : null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error(`[fetch-prices] Unexpected error: ${message}`);
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
