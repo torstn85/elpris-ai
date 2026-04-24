@@ -10,6 +10,7 @@ import MostExpensiveHoursToday from './MostExpensiveHoursToday';
 import PriceComparisonByArea from './PriceComparisonByArea';
 import AdSlot from './AdSlot';
 import ShouldIWashNow from './ShouldIWashNow';
+import ShouldIChargeNow from './ShouldIChargeNow';
 import SavingsCalculator from './SavingsCalculator';
 import SevenDayPriceTrend from './SevenDayPriceTrend';
 
@@ -21,6 +22,7 @@ export const mdxComponents = {
   PriceComparisonByArea,
   AdSlot,
   ShouldIWashNow,
+  ShouldIChargeNow,
   SavingsCalculator,
   SevenDayPriceTrend,
   // Lägg till nya komponenter här när de skapas:
