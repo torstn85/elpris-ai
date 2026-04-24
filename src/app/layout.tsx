@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "elpris.ai – Realtidspriser på el i Sverige",
   description:
     "Se elpriset just nu för SE1–SE4. AI-driven analys av när du bör ladda bilen, tvätta eller använda el.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
