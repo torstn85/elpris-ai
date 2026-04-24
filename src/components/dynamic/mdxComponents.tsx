@@ -9,6 +9,7 @@ import CheapestHoursToday from './CheapestHoursToday';
 import MostExpensiveHoursToday from './MostExpensiveHoursToday';
 import PriceComparisonByArea from './PriceComparisonByArea';
 import AdSlot from './AdSlot';
+import ShouldIWashNow from './ShouldIWashNow';
 
 export const mdxComponents = {
   LivePriceWidget,
@@ -17,6 +18,7 @@ export const mdxComponents = {
   MostExpensiveHoursToday,
   PriceComparisonByArea,
   AdSlot,
+  ShouldIWashNow,
   // Lägg till nya komponenter här när de skapas:
   // SevenDayPriceTrend,
   // TomorrowPriceTeaser,
