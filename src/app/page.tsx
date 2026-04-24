@@ -421,73 +421,79 @@ export default function Home() {
             Smarta rekommendationer
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <ValueCard
-              icon="🧺"
-              title="Billigaste tvättid"
-              value={cheap ? cheap.label : "–"}
-              detail={
-                cheap
-                  ? `${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh i snitt`
-                  : "Laddar..."
-              }
-              accent="#22C55E"
-            />
-            <ValueCard
-              icon="🚗"
-              title="Ladda elbilen"
-              value={cheap ? cheap.label : "–"}
-              detail={
-                cheap
-                  ? `Snittpriser ${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh`
-                  : "Laddar..."
-              }
-              accent={priceAccentColor(cheap?.avg ?? null)}
-            />
-            <ValueCard
-              icon={
-                currentPrice !== null && currentPrice <= 0
-                  ? "⚡"
-                  : "📊"
-              }
-              title={
-                currentPrice === null
-                  ? "PRIS JUST NU"
-                  : currentPrice <= 0
-                  ? "GRATIS JUST NU"
-                  : currentPrice <= 50
-                  ? "BILLIGT JUST NU"
-                  : currentPrice >= 100
-                  ? "DYRT JUST NU"
-                  : "NORMALT JUST NU"
-              }
-              value={
-                currentPrice !== null
-                  ? `${currentPrice.toFixed(1).replace(".", ",")} öre`
-                  : "–"
-              }
-              detail={
-                currentPrice === null
-                  ? "Laddar..."
-                  : currentPrice <= 0
-                  ? "Negativt pris – kör allt nu!"
-                  : currentPrice <= 50
-                  ? "Lågt pris – bra tid att förbruka"
-                  : currentPrice >= 100
-                  ? "Högt pris – undvik onödig förbrukning"
-                  : "Normalt pris just nu"
-              }
-              accent={
-                currentPrice === null
-                  ? "#8fafc9"
-                  : currentPrice <= 0
-                  ? "#22C55E"
-                  : currentPrice <= 50
-                  ? "#22C55E"
-                  : currentPrice >= 100
-                  ? "#EF4444"
-                  : "#00E5FF"
-              }
-            />
+            <Link href="/guider/spara-el/tvatta-billigt" className="block transition-transform hover:scale-[1.02]">
+              <ValueCard
+                icon="🧺"
+                title="Billigaste tvättid"
+                value={cheap ? cheap.label : "–"}
+                detail={
+                  cheap
+                    ? `${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh i snitt`
+                    : "Laddar..."
+                }
+                accent="#22C55E"
+              />
+            </Link>
+            <Link href="/guider/spara-el/ladda-elbil-billigt" className="block transition-transform hover:scale-[1.02]">
+              <ValueCard
+                icon="🚗"
+                title="Ladda elbilen"
+                value={cheap ? cheap.label : "–"}
+                detail={
+                  cheap
+                    ? `Snittpriser ${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh`
+                    : "Laddar..."
+                }
+                accent={priceAccentColor(cheap?.avg ?? null)}
+              />
+            </Link>
+            <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="block transition-transform hover:scale-[1.02]">
+              <ValueCard
+                icon={
+                  currentPrice !== null && currentPrice <= 0
+                    ? "⚡"
+                    : "📊"
+                }
+                title={
+                  currentPrice === null
+                    ? "PRIS JUST NU"
+                    : currentPrice <= 0
+                    ? "GRATIS JUST NU"
+                    : currentPrice <= 50
+                    ? "BILLIGT JUST NU"
+                    : currentPrice >= 100
+                    ? "DYRT JUST NU"
+                    : "NORMALT JUST NU"
+                }
+                value={
+                  currentPrice !== null
+                    ? `${currentPrice.toFixed(1).replace(".", ",")} öre`
+                    : "–"
+                }
+                detail={
+                  currentPrice === null
+                    ? "Laddar..."
+                    : currentPrice <= 0
+                    ? "Negativt pris – kör allt nu!"
+                    : currentPrice <= 50
+                    ? "Lågt pris – bra tid att förbruka"
+                    : currentPrice >= 100
+                    ? "Högt pris – undvik onödig förbrukning"
+                    : "Normalt pris just nu"
+                }
+                accent={
+                  currentPrice === null
+                    ? "#8fafc9"
+                    : currentPrice <= 0
+                    ? "#22C55E"
+                    : currentPrice <= 50
+                    ? "#22C55E"
+                    : currentPrice >= 100
+                    ? "#EF4444"
+                    : "#00E5FF"
+                }
+              />
+            </Link>
           </div>
         </section>
 
