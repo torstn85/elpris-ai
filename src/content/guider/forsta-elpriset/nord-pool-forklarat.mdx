@@ -1,0 +1,160 @@
+---
+title: "Nord Pool förklarat – så fungerar elbörsen som sätter ditt pris"
+slug: "nord-pool-forklarat"
+category: "forsta-elpriset"
+description: "Day-ahead-auktion, marginalprissättning och flödesanalys. Vi går igenom Nord Pool steg för steg och förklarar var ditt elpris kommer från."
+metaTitle: "Nord Pool förklarat – så sätts spotpriset steg för steg | elpris.ai"
+publishedAt: "2026-04-24"
+updatedAt: "2026-04-24"
+author: "elpris.ai redaktion"
+keywords:
+  - nord pool
+  - nord pool förklarat
+  - hur fungerar nord pool
+  - elbörsen
+  - day-ahead auktion
+  - spotpris auktion
+readTime: "8 min"
+---
+
+Nord Pool är den nordiska elbörsen där priset på el sätts varje dag genom en auktion. Det är här svenska, norska, finska, danska och baltiska elproducenter och elhandelsbolag möts för att handla med el — och det är resultatet av denna auktion som blir ditt spotpris. Här går vi igenom exakt hur det går till, från klockan 12:00 när buden stänger till klockan 13:15 när priserna publiceras.
+
+<LivePriceWidget />
+
+Det här är resultatet av Nord Pool-auktionen för det aktuella 15-minutersintervallet i ditt elområde.
+
+## Vad är Nord Pool?
+
+Nord Pool grundades 1993 och var världens första gränsöverskridande elbörs. Den ägs idag av en grupp nordiska och baltiska systemoperatörer (Svenska kraftnät för Sveriges del) tillsammans med privata aktörer.
+
+Nord Pool driver två huvudmarknader:
+
+- **Day-ahead-marknaden** — auktionen som sätter spotpriset för varje 15-minutersintervall nästa dygn
+- **Intraday-marknaden** — kontinuerlig handel under själva leveransdagen för att justera obalanser
+
+Det är **day-ahead-marknaden** som är intressant för dig som konsument — det är där ditt rörliga elpris och kvartspris sätts.
+
+## Steg 1: Buden samlas in (00:00-12:00)
+
+Varje dag fram till klockan 12:00 svensk tid skickar producenter och handlare in sina bud till Nord Pool. Buden är **tvåsidiga**:
+
+**Säljbud (från producenter):**
+- "Vi kan leverera 500 MW till minst 30 öre/kWh kl 14:00"
+- "Vi kan leverera 200 MW till minst 50 öre/kWh kl 14:00"
+- "Vi kan leverera 100 MW till minst 80 öre/kWh kl 14:00"
+
+**Köpbud (från elhandelsbolag och stora industrier):**
+- "Vi vill köpa 600 MW för max 70 öre/kWh kl 14:00"
+- "Vi vill köpa 200 MW för max 50 öre/kWh kl 14:00"
+
+Varje aktör skickar in **96 bud per dygn** — ett för varje 15-minutersintervall. För hela Norden handlar det om miljontals bud per dygn.
+
+## Steg 2: Auktionen stänger 12:00
+
+Klockan 12:00 stänger budgivningen. Inga nya bud accepteras. Nord Pools algoritm — som heter **EUPHEMIA** — börjar arbeta.
+
+EUPHEMIA är en optimeringsalgoritm som löser ett enormt matematiskt problem: hitta priset där utbud och efterfrågan möts perfekt i varje elområde, med hänsyn till kapaciteten på alla överföringsledningar mellan länderna.
+
+Det här är inte trivialt — algoritmen ska samtidigt hantera:
+- 4 svenska elområden + 5 norska + 1 finska + 2 danska + 3 baltiska + flera tyska
+- Cross-border-flöden mellan alla dessa
+- Säsongsmagasin för vattenkraft
+- Tekniska restriktioner (vissa kraftverk måste köras kontinuerligt)
+
+## Steg 3: Marginalprissättning bestämmer priset
+
+Här blir det intressant. Nord Pool använder **marginalprissättning** (även kallat "merit order"-systemet). Det betyder:
+
+**Den dyraste producenten som behövs för att täcka efterfrågan sätter priset för ALLA producenter.**
+
+Tänk dig att efterfrågan är 800 MW kl 14:00, och säljbuden ser ut så här (sorterade efter pris):
+
+1. Vattenkraft: 300 MW @ 10 öre
+2. Vindkraft: 200 MW @ 15 öre
+3. Kärnkraft: 200 MW @ 25 öre
+4. Gaskraft: 100 MW @ **80 öre**
+
+För att täcka 800 MW behöver alla fyra köras. Den dyraste — gaskraften @ 80 öre — sätter då priset för **alla**. Vattenkraften får 80 öre/kWh trots att de bjöd 10. Det är en stor extra vinst för dem.
+
+Det är detta system som gör att priset kan svänga så dramatiskt: så fort en gaskraftturbin inte längre behövs (vinden ökar, en kärnreaktor kommer igång) rasar priset till nästa nivå i ordningen.
+
+## Steg 4: Elområdespriser och flaskhalsar
+
+Sverige har fyra elområden (SE1-SE4) eftersom stamnätet inte alltid kan transportera el fritt mellan dem. När EUPHEMIA räknar ut priserna måste den ta hänsyn till **överföringskapaciteten** mellan områdena.
+
+Två scenarier:
+
+**Inga flaskhalsar:** Om kapaciteten räcker för att flytta all billig el från norr till söder, blir priset **samma i alla fyra områden**. Detta händer vid låg efterfrågan eller när det blåser mycket.
+
+**Flaskhals aktiv:** Om kapaciteten inte räcker, splittras marknaden. Då räknar algoritmen ut **separata priser** för varje område baserat på lokalt utbud och efterfrågan. Detta är varför du kan ha 5 öre/kWh i SE1 samtidigt som SE4 har 80 öre.
+
+<PriceComparisonByArea />
+
+Här ser du om flaskhalsarna är aktiva just nu — om alla fyra områden har samma pris flödar elen fritt, om de skiljer sig åt är systemet "splittrat".
+
+## Steg 5: Resultatet publiceras 13:15
+
+Senast klockan 13:15 publicerar Nord Pool dagens auktion på sin hemsida. För varje elområde och varje 15-minutersintervall finns nu ett pris fastställt för **nästa dygn** (00:00-23:45).
+
+Det är dessa priser som:
+- Visas på elpris.ai
+- Ditt elhandelsbolag använder för att fakturera dig om du har rörligt eller kvartsprisavtal
+- Smarta laddboxar och energiappar (Tibber, Greenely) använder för att schemalägga din elförbrukning
+
+## Vad händer vid 13:15 om elen?
+
+När priserna publiceras börjar **realtidsoptimering** över hela landet:
+
+- **Industri planerar produktion** — om imorgon är dyr el flyttas processer till natten
+- **Vattenkraftverk planerar magasinsutsläpp** — håll vattnet om priserna är ännu högre senare
+- **Smarta laddboxar bokar tid** — schemaläggning av elbilsladdning på billigaste timmarna
+- **Värmepumpar förvärmer** — höj temperaturen extra innan dyra perioder
+- **Stora batterier** (kommersiella) bestämmer när de ska ladda vs urladda
+
+För dig som privatperson är det här tidpunkten då du kan börja planera morgondagen om du har rörligt eller kvartspris-avtal.
+
+## Steg 6: Intraday-handel under själva dygnet
+
+När leveransdygnet börjar har vi spotpriserna fastställda — men verkligheten avviker alltid något från prognosen. Vinden blåser starkare än väntat, en kärnreaktor får problem, eller efterfrågan är högre än beräknat.
+
+Då används **intraday-marknaden** för att hantera obalanser. Den är öppen för kontinuerlig handel under hela leveransdygnet. Här kan en aktör som plötsligt har överskott sälja till någon som behöver mer.
+
+Intraday-priserna kan avvika från day-ahead-priserna, men för dig som konsument är det fortfarande **day-ahead-priset (spotpriset) som faktureras** — det är basen för ditt elavtal.
+
+## Vad styr Nord Pools priser?
+
+På makronivå styrs spotpriserna av samma faktorer vi diskuterat på sajten:
+
+- **Väder** (vind, sol, temperatur, vattenflöde)
+- **Efterfrågan** (klockslag, säsong, kyla)
+- **Bränslepriser** (gas, kol, uran för dyra produktionskällor)
+- **CO2-utsläppsrätter** (gör fossil produktion dyrare)
+- **Cross-border-flöden** (export/import till Tyskland, Polen, Storbritannien via NorNed-kabeln)
+- **Tekniska problem** (kärnreaktor som stannar, kabel som går sönder)
+
+På Nord Pool är dessa faktorer redan inbyggda i de bud som producenter och handlare lämnar. EUPHEMIA tar bara emot buden och optimerar utfallet.
+
+<PriceGraph />
+
+Resultatet av dagens auktion: priserna timme för timme i ditt elområde.
+
+## Vanliga missförstånd om Nord Pool
+
+**"Nord Pool sätter elpriset"**
+Nej. Nord Pool är bara marknadsplatsen där priset uppstår. Priset sätts av utbud och efterfrågan från tusentals aktörer.
+
+**"Vi kan stänga ner Nord Pool för att slippa höga priser"**
+Nej. Utan Nord Pool skulle vi tappa möjligheten att importera billig norsk vattenkraft när vi behöver den. Och inhemska producenter skulle ändå kräva sina kostnader täckta.
+
+**"Sverige exporterar billig el och får dyrare hemma"**
+Halvsant. Vi exporterar när det är vinst i det. Om vi förbjöd export skulle producenterna helt enkelt minska produktionen — vilket också skulle höja priset.
+
+## Sammanfattning
+
+Nord Pool är hjärtat i den nordiska elmarknaden. Varje dag samlas miljontals bud in fram till kl 12:00, EUPHEMIA-algoritmen löser ett komplext optimeringsproblem på ungefär en timme, och kl 13:15 publiceras dagens spotpriser för alla 96 kvartsintervall i alla nordiska elområden. Marginalprissättningen — där den dyraste producenten sätter priset för alla — är det som gör att priserna kan svänga så dramatiskt mellan timmar.
+
+---
+
+Vill du gå djupare? Läs [varför skiljer sig elpriset mellan timmar och elområden](/guider/forsta-elpriset/varfor-skiljer-sig-elpriset), [vad består din elräkning egentligen av](/guider/forsta-elpriset/elprisets-bestandsdelar) eller [vad är spotpris egentligen](/guider/forsta-elpriset/vad-ar-spotpris).
+
+Se [aktuella spotpriser för alla elområden](/elpris-idag) eller [morgondagens priser](/elpris-imorgon) på elpris.ai.
