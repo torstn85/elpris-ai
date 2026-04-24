@@ -322,18 +322,24 @@ export default function Home() {
           </Link>
           {cheap && (
             <div className="flex flex-wrap justify-center gap-3 mt-2">
-              <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
+              <Link
+                href="/guider/spara-el/tvatta-billigt"
+                className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm transition-transform duration-150 hover:scale-[1.02] cursor-pointer"
+              >
                 <span>🧺</span>
                 <span className="text-[#8fafc9]">Tvätt/disk billigast:</span>
                 <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
                 <span className="text-[#8fafc9]">{cheap.avg <= 0 ? "⚡ Gratis!" : `(${cheap.avg} öre)`}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm">
+              </Link>
+              <Link
+                href="/guider/spara-el/ladda-elbil-billigt"
+                className="flex items-center gap-2 bg-[#0F3460] border border-[#22C55E]/40 rounded-full px-4 py-2 text-sm transition-transform duration-150 hover:scale-[1.02] cursor-pointer"
+              >
                 <span>🚗</span>
                 <span className="text-[#8fafc9]">Ladda elbil billigast:</span>
                 <span className="text-[#22C55E] font-semibold">{cheap.label}</span>
                 <span className="text-[#8fafc9]">{cheap.avg <= 0 ? "⚡ Gratis!" : `(${cheap.avg} öre)`}</span>
-              </div>
+              </Link>
             </div>
           )}
         </section>
