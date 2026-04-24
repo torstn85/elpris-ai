@@ -68,7 +68,12 @@ function ValueCard({
   accent: string;
 }) {
   return (
-    <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 flex flex-col gap-3 hover:border-[#00E5FF]/40 transition-colors duration-200">
+    <div className="relative bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 flex flex-col gap-3 hover:border-[#00E5FF]/40 transition-colors duration-200">
+      {/* CTA-badge — visuell signal, kortet är klickbart via Link-wrapper */}
+      <span className="absolute top-3 right-3 flex items-center rounded-full bg-[#22C55E] text-white text-xs font-semibold px-2.5 py-1 shadow-sm shadow-[#22C55E]/30">
+        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse mr-1.5" />
+        Klicka för mer →
+      </span>
       <div className="text-2xl">{icon}</div>
       <p className="text-[#8fafc9] text-sm font-medium uppercase tracking-wider">
         {title}
