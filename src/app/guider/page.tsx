@@ -72,7 +72,7 @@ export default function GuiderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-[#0A2540] text-white">
       <NavBar />
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
@@ -100,7 +100,7 @@ export default function GuiderPage() {
                     <a
                       key={article.slug}
                       href={`/guider/${article.category}/${article.slug}`}
-                      className="block rounded-xl bg-slate-900 hover:bg-slate-800 ring-1 ring-slate-800 hover:ring-cyan-500 transition p-6"
+                      className="block rounded-xl bg-[#0F3460] hover:bg-[#0F3460]/80 ring-1 ring-[#1E4976] hover:ring-[#00E5FF]/40 transition p-6"
                     >
                       <h3 className="text-xl font-bold text-white mb-2">
                         {article.title}

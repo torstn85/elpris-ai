@@ -129,7 +129,7 @@ export default function ArticlePage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
-      <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
         <article className="mx-auto max-w-3xl px-4 sm:px-6 py-8 sm:py-12">
@@ -168,7 +168,7 @@ export default function ArticlePage({ params }: PageProps) {
             prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline
             prose-strong:text-white
             prose-table:text-sm
-            prose-th:text-white prose-th:bg-slate-800 prose-th:font-semibold
+            prose-th:text-white prose-th:bg-[#0F3460] prose-th:font-semibold
             prose-td:border-slate-700
             prose-li:text-slate-300">
             <MDXRemote
@@ -178,7 +178,7 @@ export default function ArticlePage({ params }: PageProps) {
             />
           </div>
 
-          <div className="mt-16 pt-8 border-t border-slate-800">
+          <div className="mt-16 pt-8 border-t border-[#1E4976]">
             <a
               href="/guider"
               className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition text-sm font-medium"
