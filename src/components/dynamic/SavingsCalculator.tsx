@@ -153,7 +153,12 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
             value={inputValue}
             onChange={(e) => {
               const v = parseInt(e.target.value, 10);
-              if (!isNaN(v) && v >= cfg.min && v <= cfg.max) setInputValue(v);
+              if (!isNaN(v)) setInputValue(v);
+            }}
+            onBlur={(e) => {
+              const v = parseInt(e.target.value, 10);
+              if (isNaN(v) || v < cfg.min) setInputValue(cfg.min);
+              else if (v > cfg.max) setInputValue(cfg.max);
             }}
             className="w-36 bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none rounded-lg px-3 py-2 text-white text-sm transition-colors"
           />
