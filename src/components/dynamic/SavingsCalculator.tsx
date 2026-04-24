@@ -171,7 +171,7 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
               else if (v > cfg.max) setInputText(String(cfg.max));
               else setInputText(String(v));
             }}
-            className="w-36 bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none rounded-lg px-3 py-2 text-white text-sm transition-colors"
+            className="w-36 bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none rounded-lg px-3 py-2 text-white text-base transition-colors"
           />
           <span className="text-slate-400 text-sm">{cfg.inputUnit}</span>
         </div>
