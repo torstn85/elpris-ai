@@ -337,15 +337,15 @@ export default function Home() {
             <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#22C55E]" />
-                Billigt (&le;50)
+                Billigt (≤50 öre)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#00E5FF]" />
-                Normalt
+                Normalt (51–99 öre)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444]" />
-                Dyrt (&ge;100)
+                Dyrt (≥100 öre)
               </span>
             </div>
           </div>
