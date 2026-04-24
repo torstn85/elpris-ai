@@ -85,7 +85,7 @@ export default function LivePriceWidget({
     });
 
   return (
-    <div className="my-8 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800 shadow-lg">
+    <div className="my-8 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] shadow-lg">
       <div className="flex items-start justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wider text-cyan-400 font-semibold">
@@ -105,7 +105,7 @@ export default function LivePriceWidget({
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                   area === a
                     ? 'bg-cyan-500 text-slate-900'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    : 'bg-[#1E4976] text-[#8fafc9] hover:bg-[#1E4976]/80'
                 }`}
                 aria-label={`Välj elområde ${a}`}
               >
@@ -118,8 +118,8 @@ export default function LivePriceWidget({
 
       {loading && !data && (
         <div className="animate-pulse">
-          <div className="h-16 bg-slate-800 rounded w-2/3 mb-3" />
-          <div className="h-4 bg-slate-800 rounded w-1/3" />
+          <div className="h-16 bg-[#1E4976] rounded w-2/3 mb-3" />
+          <div className="h-4 bg-[#1E4976] rounded w-1/3" />
         </div>
       )}
 

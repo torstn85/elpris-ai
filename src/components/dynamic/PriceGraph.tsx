@@ -89,7 +89,7 @@ export default function PriceGraph({
     if (!active || !payload || !payload[0]) return null;
     const value = payload[0].value;
     return (
-      <div className="rounded-lg bg-slate-900 px-3 py-2 ring-1 ring-slate-700 shadow-xl">
+      <div className="rounded-lg bg-[#0F3460] px-3 py-2 ring-1 ring-[#1E4976] shadow-xl">
         <p className="text-xs text-slate-400">{label}:00–{label}:59</p>
         <p className="text-sm font-bold text-white">
           {value.toFixed(1)} <span className="text-slate-400 font-normal">öre/kWh</span>
@@ -99,7 +99,7 @@ export default function PriceGraph({
   };
 
   return (
-    <div className="my-8 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+    <div className="my-8 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <h3 className="text-lg font-bold text-white">

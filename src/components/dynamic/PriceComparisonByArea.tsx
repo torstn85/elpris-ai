@@ -67,7 +67,7 @@ export default function PriceComparisonByArea({ highlightArea = 'SE3' }: Props) 
   };
 
   return (
-    <div className="my-8 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+    <div className="my-8 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
       <div className="mb-5">
         <h3 className="text-lg font-bold text-white">
           Jämför just nu: alla fyra elområden
@@ -80,7 +80,7 @@ export default function PriceComparisonByArea({ highlightArea = 'SE3' }: Props) 
       {loading && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-pulse">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 bg-slate-800 rounded-xl" />
+            <div key={i} className="h-32 bg-[#1E4976] rounded-xl" />
           ))}
         </div>
       )}
@@ -99,7 +99,7 @@ export default function PriceComparisonByArea({ highlightArea = 'SE3' }: Props) 
                 className={`rounded-xl p-4 transition ${
                   isHighlight
                     ? 'bg-cyan-950/50 ring-2 ring-cyan-500'
-                    : 'bg-slate-800/50 ring-1 ring-slate-700'
+                    : 'bg-[#1E4976]/50 ring-1 ring-[#1E4976]'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">

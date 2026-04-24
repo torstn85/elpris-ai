@@ -66,7 +66,7 @@ const CONFIG = {
   JA: {
     emoji: '🧺',
     label: 'Tvätta nu!',
-    gradient: 'from-green-950 to-slate-900',
+    gradient: 'from-green-950 to-[#0A2540]',
     ring: 'ring-green-900',
     accent: 'text-green-400',
     tip: 'Nu är ett bra tillfälle att köra tvätt, diskmaskin eller ladda elbilen.',
@@ -74,7 +74,7 @@ const CONFIG = {
   VÄNTA: {
     emoji: '⏰',
     label: 'Vänta lite',
-    gradient: 'from-amber-950 to-slate-900',
+    gradient: 'from-amber-950 to-[#0A2540]',
     ring: 'ring-amber-900',
     accent: 'text-amber-400',
     tip: null,
@@ -82,7 +82,7 @@ const CONFIG = {
   OK: {
     emoji: '👌',
     label: 'OK att tvätta',
-    gradient: 'from-blue-950 to-slate-900',
+    gradient: 'from-blue-950 to-[#0A2540]',
     ring: 'ring-blue-900',
     accent: 'text-blue-400',
     tip: null,
@@ -128,17 +128,17 @@ export default function ShouldIWashNow({ area = 'SE3' }: Props) {
 
   if (loading) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800 animate-pulse">
-        <div className="h-8 bg-slate-800 rounded w-1/3 mb-3" />
-        <div className="h-12 bg-slate-800 rounded w-1/2 mb-3" />
-        <div className="h-4 bg-slate-800 rounded w-2/3" />
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] animate-pulse">
+        <div className="h-8 bg-[#1E4976] rounded w-1/3 mb-3" />
+        <div className="h-12 bg-[#1E4976] rounded w-1/2 mb-3" />
+        <div className="h-4 bg-[#1E4976] rounded w-2/3" />
       </div>
     );
   }
 
   if (error || !result) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
         <p className="text-amber-400 text-sm">{error ?? 'Ingen prisdata tillgänglig.'}</p>
       </div>
     );

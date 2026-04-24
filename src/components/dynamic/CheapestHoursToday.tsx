@@ -77,7 +77,7 @@ export default function CheapestHoursToday({
       {loading && (
         <div className="space-y-2 animate-pulse">
           {Array.from({ length: count }).map((_, i) => (
-            <div key={i} className="h-12 bg-slate-800/50 rounded-lg" />
+            <div key={i} className="h-12 bg-[#0A2540]/50 rounded-lg" />
           ))}
         </div>
       )}
@@ -91,7 +91,7 @@ export default function CheapestHoursToday({
           {hours.map((h, i) => (
             <li
               key={h.hour}
-              className="flex items-center justify-between bg-slate-900/50 rounded-lg px-4 py-3"
+              className="flex items-center justify-between bg-[#0A2540]/60 rounded-lg px-4 py-3"
             >
               <span className="flex items-center gap-3">
                 <span className="text-xs font-bold text-green-400 w-5">#{i + 1}</span>

@@ -45,7 +45,7 @@ const CustomTooltip = ({
 }) => {
   if (!active || !payload || !payload[0]) return null;
   return (
-    <div className="rounded-lg bg-slate-900 px-3 py-2 ring-1 ring-slate-700 shadow-xl">
+    <div className="rounded-lg bg-[#0F3460] px-3 py-2 ring-1 ring-[#1E4976] shadow-xl">
       <p className="text-xs text-slate-400">{label}</p>
       <p className="text-sm font-bold text-white">
         {payload[0].value.toFixed(1)}{' '}
@@ -95,16 +95,16 @@ export default function SevenDayPriceTrend({ area = 'SE3' }: Props) {
 
   if (loading) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800 animate-pulse">
-        <div className="h-5 bg-slate-800 rounded w-1/3 mb-4" />
-        <div className="h-[180px] bg-slate-800 rounded" />
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] animate-pulse">
+        <div className="h-5 bg-[#1E4976] rounded w-1/3 mb-4" />
+        <div className="h-[180px] bg-[#1E4976] rounded" />
       </div>
     );
   }
 
   if (error || days.length === 0) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
         <p className="text-amber-400 text-sm">{error ?? 'Ingen historik tillgänglig ännu.'}</p>
       </div>
     );

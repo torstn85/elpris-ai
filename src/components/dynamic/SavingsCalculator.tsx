@@ -111,17 +111,17 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
 
   if (loading) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800 animate-pulse">
-        <div className="h-6 bg-slate-800 rounded w-1/3 mb-4" />
-        <div className="h-10 bg-slate-800 rounded w-full mb-4" />
-        <div className="h-20 bg-slate-800 rounded w-full" />
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] animate-pulse">
+        <div className="h-6 bg-[#1E4976] rounded w-1/3 mb-4" />
+        <div className="h-10 bg-[#1E4976] rounded w-full mb-4" />
+        <div className="h-20 bg-[#1E4976] rounded w-full" />
       </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <div className="my-6 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+      <div className="my-6 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
         <p className="text-amber-400 text-sm">{error ?? 'Ingen prisdata tillgänglig.'}</p>
       </div>
     );
@@ -171,7 +171,7 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
               else if (v > cfg.max) setInputText(String(cfg.max));
               else setInputText(String(v));
             }}
-            className="w-36 bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none rounded-lg px-3 py-2 text-white text-base transition-colors"
+            className="w-36 bg-[#0F3460] border border-[#1E4976] focus:border-[#00E5FF]/60 outline-none rounded-lg px-3 py-2 text-white text-base transition-colors"
           />
           <span className="text-slate-400 text-sm">{cfg.inputUnit}</span>
         </div>
@@ -180,12 +180,12 @@ export default function SavingsCalculator({ type = 'tvatt', area = 'SE3' }: Prop
 
       {/* Result */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        <div className="bg-slate-800/60 rounded-xl p-4">
+        <div className="bg-[#0A2540]/80 rounded-xl p-4">
           <p className="text-xs text-slate-400 mb-1">På dyra timmar</p>
           <p className="text-xl font-bold text-red-400">{formatKr(costExpensive)} kr</p>
           <p className="text-xs text-slate-500 mt-0.5">({stats.avgExpensive.toFixed(0)} öre/kWh snitt)</p>
         </div>
-        <div className="bg-slate-800/60 rounded-xl p-4">
+        <div className="bg-[#0A2540]/80 rounded-xl p-4">
           <p className="text-xs text-slate-400 mb-1">På billiga timmar</p>
           <p className="text-xl font-bold text-green-400">{formatKr(costCheap)} kr</p>
           <p className="text-xs text-slate-500 mt-0.5">({stats.avgCheap.toFixed(0)} öre/kWh snitt)</p>
