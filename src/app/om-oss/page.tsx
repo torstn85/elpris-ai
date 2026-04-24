@@ -123,7 +123,9 @@ export default function OmOssPage() {
         </div>
       </main>
 
-      <Footer />
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <Footer />
+      </div>
     </div>
   );
 }
