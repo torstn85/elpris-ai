@@ -256,7 +256,7 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
       </div>
 
       {/* Decision message */}
-      <div className="space-y-1 text-sm">
+      <div className="space-y-0.5 text-sm">
         {result.decision === 'JA' && (
           <p className="text-slate-300">{cfg.tip}</p>
         )}
@@ -324,7 +324,7 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
         )}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-8">
         <p className="text-xs text-slate-500">Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea}</p>
         <p className="text-xs text-slate-600">Priser som visas här är timsnitt och exkl. moms & nätavgift</p>
       </div>
