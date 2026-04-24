@@ -241,7 +241,7 @@ export default function Home() {
             <span className="text-[#8fafc9]">
               · {selectedArea}
               {updatedAt ? ` · Uppdaterad ${updatedAt}` : ""}
-              {minutesLeft > 0 ? ` · Nästa om ${minutesLeft} min` : ""}
+              <span className="hidden sm:inline">{minutesLeft > 0 ? ` · Nästa om ${minutesLeft} min` : ""}</span>
             </span>
           </div>
 
