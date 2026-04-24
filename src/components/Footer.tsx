@@ -9,7 +9,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
   return (
     <section
       id={id}
-      className={`border-t border-[#1E4976] pt-8 pb-4 px-4 sm:px-6 flex flex-col gap-4 text-xs text-[#8fafc9] ${className}`.trim()}
+      className={`border-t border-[#1E4976] pt-8 pb-4 flex flex-col gap-4 text-xs text-[#8fafc9] ${className}`.trim()}
     >
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex flex-col items-center sm:items-start gap-1">
