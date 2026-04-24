@@ -15,6 +15,9 @@ export default function Footer({ id, className = '' }: FooterProps) {
         <a href="/" className="font-extrabold text-sm text-[#8fafc9]">
           elpris<span className="text-[#00E5FF]">.ai</span>
         </a>
+        <a href="/om-oss" className="hover:text-[#00E5FF] transition-colors">
+          Om oss
+        </a>
         <a href="/integritetspolicy" className="hover:text-[#00E5FF] transition-colors">
           Integritetspolicy
         </a>

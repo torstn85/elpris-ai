@@ -9,7 +9,7 @@ const LINKS = [
   { href: '/elomrade', label: 'Elområden' },
   { href: '/guider', label: 'Guider' },
   { href: '/#rekommendationer', label: 'Prognos' },
-  { href: '/#om-oss', label: 'Om oss' },
+  { href: '/om-oss', label: 'Om oss' },
 ];
 
 function MenuIcon() {
