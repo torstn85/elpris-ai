@@ -76,12 +76,15 @@ export default function LivePriceWidget({
     return 'Dyrt';
   };
 
-  const formatTime = (date: Date): string =>
-    date.toLocaleTimeString('sv-SE', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'Europe/Stockholm',
-    });
+  const lastSlotTime = (): string => {
+    const now = new Date();
+    const fmt = (opts: Intl.DateTimeFormatOptions) =>
+      parseInt(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', ...opts }).format(now), 10);
+    const hour = fmt({ hour: 'numeric', hour12: false });
+    const minute = fmt({ minute: 'numeric' });
+    const slotMinute = Math.floor(minute / 15) * 15;
+    return `${String(hour).padStart(2, '0')}:${String(slotMinute).padStart(2, '0')}`;
+  };
 
   return (
     <div className="my-8 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976] shadow-lg">
@@ -151,7 +154,7 @@ export default function LivePriceWidget({
 
           {lastFetch && (
             <p className="mt-3 text-xs text-slate-500">
-              Uppdaterad {formatTime(lastFetch)} · Nästa uppdatering inom 5 min
+              Uppdaterad {lastSlotTime()}
             </p>
           )}
         </>
