@@ -1,0 +1,129 @@
+import type { Metadata } from "next";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Om oss | elpris.ai",
+  description:
+    "elpris.ai är byggt för en enkel sak: att göra elpriser begripliga. Vi drivs oberoende och vill hjälpa svenska konsumenter förstå elmarknaden.",
+  alternates: {
+    canonical: "https://www.elpris.ai/om-oss",
+  },
+};
+
+export default function OmOssPage() {
+  return (
+    <div className="min-h-screen bg-[#0A2540] text-white">
+      <NavBar />
+
+      <main className="max-w-3xl mx-auto px-4 py-12 md:py-16">
+        <h1 className="text-3xl md:text-4xl font-bold mb-8">Om elpris.ai</h1>
+
+        <div className="space-y-5 text-slate-200 leading-relaxed">
+          <p>
+            <strong className="text-white">elpris.ai</strong> är byggt för en
+            enkel sak: att göra elpriser begripliga.
+          </p>
+
+          <p>
+            Elmarknaden påverkar nästan alla svenska hushåll, men informationen
+            är ofta svår att tolka. Spotpris, elområden, kvartspris, nätavgifter
+            och skatter blandas ihop – och det är inte alltid självklart vad som
+            faktiskt spelar roll för din elräkning.
+          </p>
+
+          <p className="text-white font-medium">Vi vill ändra på det.</p>
+
+          <p>
+            På elpris.ai får du aktuella elpriser för Sveriges fyra elområden,
+            tydliga grafer och konkreta råd om när det kan vara smart att använda
+            el. Målet är inte att göra dig till energiexpert – utan att ge dig
+            rätt information i rätt ögonblick, så att du kan fatta bättre beslut
+            i vardagen.
+          </p>
+
+          <p>
+            Du ska snabbt kunna se om elen är billig eller dyr just nu, när
+            dagens bästa timmar infaller och hur du kan planera saker som tvätt,
+            diskmaskin, uppvärmning eller elbilsladdning.
+          </p>
+
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            Oberoende och transparent
+          </h2>
+          <p>
+            elpris.ai säljer inga elavtal och ägs inte av något elbolag. Sajten
+            drivs oberoende och finansieras genom annonser. I framtiden kan
+            vissa sidor innehålla affiliate-länkar till relevanta tjänster eller
+            produkter, men sådana länkar kommer alltid att märkas tydligt.
+          </p>
+          <p>
+            Vårt mål är att vara en neutral plats där du kan förstå elpriset
+            innan du fattar egna beslut.
+          </p>
+
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            Datakällor
+          </h2>
+          <p>
+            Prisdata hämtas från{" "}
+            <a
+              href="https://www.elprisetjustnu.se"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#00E5FF] hover:underline"
+            >
+              elprisetjustnu.se
+            </a>
+            , som i sin tur bygger på data från ENTSO-E Transparency Platform.
+          </p>
+          <p>
+            Priserna som visas på elpris.ai är spotpriser exklusive moms. Det är
+            det pris som sätts på elbörsen Nord Pool och utgör grunden för din
+            elkostnad.
+          </p>
+          <p>
+            Din faktiska elkostnad påverkas även av moms, elnätsavgifter,
+            energiskatt och eventuella påslag från ditt elavtal. Informationen
+            på elpris.ai ska därför ses som en vägledning för hur elpriset
+            utvecklas – inte som din exakta totala kostnad.
+          </p>
+          <p>
+            Vi visar spotpriset eftersom det är den del av elpriset du själv kan
+            påverka genom när du använder el.
+          </p>
+
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            AI som hjälpmedel
+          </h2>
+          <p>
+            elpris.ai använder AI för att göra eldata enklare att förstå.
+            Chatboten kan hjälpa dig tolka priser, jämföra tider på dygnet och
+            ge generella energitips baserat på aktuell information.
+          </p>
+          <p>
+            AI:n ska aldrig ersätta eget omdöme, men den kan hjälpa dig ställa
+            bättre frågor och snabbare förstå vad dagens elpris betyder för dig.
+          </p>
+
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            Kontakta oss
+          </h2>
+          <p>
+            Har du frågor, feedback eller idéer på hur elpris.ai kan bli bättre?
+            Hör gärna av dig på{" "}
+            <a
+              href="mailto:info@elpris.ai"
+              className="text-[#00E5FF] hover:underline font-medium"
+            >
+              info@elpris.ai
+            </a>
+            .
+          </p>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
