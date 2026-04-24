@@ -240,7 +240,7 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <h3 className="text-lg font-semibold text-white">Ska jag tvätta nu?</h3>
-          <p className={`text-lg font-semibold mt-0.5 ${cfg.accent}`}>
+          <p className={`text-lg font-bold mt-0.5 ${cfg.accent}`}>
             {cfg.label} {cfg.emoji}
           </p>
         </div>
@@ -248,11 +248,11 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
       </div>
 
       {/* Current price */}
-      <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-5xl font-bold" style={{ color: priceColor(result.currentPrice) }}>
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-5xl font-bold leading-none" style={{ color: priceColor(result.currentPrice) }}>
           {result.currentPrice.toFixed(1)}
         </span>
-        <span className="text-slate-400 text-sm">öre/kWh just nu i {selectedArea}</span>
+        <span className="text-slate-400 text-sm">öre/kWh<br />just nu i {selectedArea}</span>
       </div>
 
       {/* Decision message */}
@@ -324,10 +324,10 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
         )}
       </div>
 
-      <div className="mt-8">
-        <p className="text-xs text-slate-500">Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea}</p>
-        <p className="text-xs text-slate-600">Priser som visas här är timsnitt och exkl. moms & nätavgift</p>
-      </div>
+      <p className="mt-8 text-xs text-slate-500 flex flex-wrap gap-x-1">
+        <span>Uppdaterad {lastSlotTime()} · Spotpris i {selectedArea} ·</span>
+        <span>Priser som visas här är timsnitt och exkl. moms & nätavgift</span>
+      </p>
     </div>
   );
 }
