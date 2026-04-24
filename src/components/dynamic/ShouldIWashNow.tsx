@@ -32,6 +32,22 @@ function getCurrentStockholmHour(): number {
   );
 }
 
+function priceColor(price: number): string {
+  if (price <= 50) return '#22C55E';
+  if (price < 100) return '#00E5FF';
+  return '#EF4444';
+}
+
+function lastSlotTime(): string {
+  const now = new Date();
+  const fmt = (opts: Intl.DateTimeFormatOptions) =>
+    parseInt(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', ...opts }).format(now), 10);
+  const hour = fmt({ hour: 'numeric', hour12: false });
+  const minute = fmt({ minute: 'numeric' });
+  const slotMinute = Math.floor(minute / 15) * 15;
+  return `${String(hour).padStart(2, '0')}:${String(slotMinute).padStart(2, '0')}`;
+}
+
 function analyze(hours: HourPrice[]): WashResult | null {
   if (hours.length === 0) return null;
 
@@ -163,9 +179,9 @@ export default function ShouldIWashNow({ area = 'SE3' }: Props) {
         </div>
       </div>
 
-      {/* Current price */}
+      {/* Current price — färg följer prisregler, inte tillstånd */}
       <div className="flex items-baseline gap-2 mb-4">
-        <span className={`text-5xl font-bold ${cfg.accent}`}>
+        <span className="text-5xl font-bold" style={{ color: priceColor(result.currentPrice) }}>
           {result.currentPrice.toFixed(1)}
         </span>
         <span className="text-slate-400 text-sm">öre/kWh just nu i {area}</span>
@@ -227,7 +243,7 @@ export default function ShouldIWashNow({ area = 'SE3' }: Props) {
       </div>
 
       <p className="mt-4 text-xs text-slate-500">
-        Baserat på spotpris i {area} — uppdateras när du laddar sidan.
+        Uppdaterad {lastSlotTime()} · Spotpris i {area}
       </p>
     </div>
   );
