@@ -8,7 +8,6 @@ const LINKS = [
   { href: '/elpris-imorgon', label: 'Elpris imorgon' },
   { href: '/elomrade', label: 'Elområden' },
   { href: '/guider', label: 'Guider' },
-  { href: '/#rekommendationer', label: 'Prognos' },
   { href: '/om-oss', label: 'Om oss' },
 ];
 
