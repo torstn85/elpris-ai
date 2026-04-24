@@ -79,10 +79,9 @@ export default function PriceGraph({
   }, [area]);
 
   const getBarColor = (price: number): string => {
-    if (price < 0) return '#22d3ee';
-    if (price <= 50) return '#22c55e';
-    if (price <= 100) return '#f59e0b';
-    return '#ef4444';
+    if (price <= 50) return '#22C55E';
+    if (price < 100) return '#00E5FF';
+    return '#EF4444';
   };
 
   const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
@@ -154,20 +153,16 @@ export default function PriceGraph({
 
       <div className="mt-4 flex flex-wrap gap-3 text-xs">
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded bg-cyan-400" />
-          <span className="text-slate-400">Negativt</span>
+          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#22C55E' }} />
+          <span className="text-slate-400">Billigt (≤50 öre)</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded bg-green-500" />
-          <span className="text-slate-400">Billigt (≤50)</span>
+          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#00E5FF' }} />
+          <span className="text-slate-400">Normalt (51–99 öre)</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded bg-amber-500" />
-          <span className="text-slate-400">Normalt (51–100)</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded bg-red-500" />
-          <span className="text-slate-400">Dyrt (&gt;100)</span>
+          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#EF4444' }} />
+          <span className="text-slate-400">Dyrt (≥100 öre)</span>
         </span>
       </div>
 
