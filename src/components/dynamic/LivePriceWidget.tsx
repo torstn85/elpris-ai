@@ -64,16 +64,15 @@ export default function LivePriceWidget({
   }, [area]);
 
   const getPriceColor = (price: number): string => {
-    if (price < 0) return 'text-cyan-400';
     if (price <= 50) return 'text-green-400';
-    if (price <= 100) return 'text-amber-400';
+    if (price < 100) return 'text-[#00E5FF]';
     return 'text-red-400';
   };
 
   const getPriceLabel = (price: number): string => {
-    if (price < 0) return '⚡ Negativt — du får betalt';
+    if (price <= 0) return '⚡ Negativt — du får betalt';
     if (price <= 50) return 'Billigt';
-    if (price <= 100) return 'Normalt';
+    if (price < 100) return 'Normalt';
     return 'Dyrt';
   };
 

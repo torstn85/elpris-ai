@@ -116,7 +116,7 @@ const SE4_REGIONS = ["skåne", "blekinge", "kronoberg"];
 function priceAccentColor(avg: number | null): string {
   if (avg === null) return "#00E5FF";
   if (avg <= 50) return "#22C55E";
-  if (avg < 100) return "#F59E0B";
+  if (avg < 100) return "#00E5FF";
   return "#EF4444";
 }
 
