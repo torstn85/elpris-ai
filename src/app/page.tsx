@@ -137,6 +137,21 @@ export default function Home() {
   const [currentPriceData, setCurrentPriceData] = useState<CurrentPriceResponse | null>(null);
   const [currentLoading, setCurrentLoading] = useState(true);
   const [selectedArea, setSelectedArea] = useState<"SE1" | "SE2" | "SE3" | "SE4">("SE3");
+  const [minutesLeft, setMinutesLeft] = useState<number>(0);
+
+  // Tick countdown to next 15-min slot
+  useEffect(() => {
+    function compute() {
+      const minute = parseInt(
+        new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", minute: "numeric" }).format(new Date()),
+        10
+      );
+      setMinutesLeft(15 - (minute % 15));
+    }
+    compute();
+    const id = setInterval(compute, 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Geolocation: detect user's Swedish region and pre-select area
   useEffect(() => {
@@ -221,6 +236,7 @@ export default function Home() {
             <span className="text-[#8fafc9]">
               · {selectedArea}
               {updatedAt ? ` · Uppdaterad ${updatedAt}` : ""}
+              {minutesLeft > 0 ? ` · Nästa om ${minutesLeft} min` : ""}
             </span>
           </div>
 
