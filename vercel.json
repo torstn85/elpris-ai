@@ -1,1 +1,10 @@
-{}
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "elpris.ai" }],
+      "destination": "https://www.elpris.ai/$1",
+      "permanent": true
+    }
+  ]
+}
