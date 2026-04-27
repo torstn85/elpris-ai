@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
-import { stockholmISODate, stockholmDayUTCRange } from "@/lib/time";
+import { stockholmDayUTCRange } from "@/lib/time";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -100,9 +103,12 @@ function fmt(price: number): string {
 export default async function ElprisImorgon() {
   const areas = await fetchTomorrowPrices();
 
-  const todayDate = new Date(stockholmISODate());
-  todayDate.setDate(todayDate.getDate() + 1);
-  const tomorrow = todayDate.toISOString().slice(0, 10);
+  const tomorrow = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
 
   const tomorrowLabel = new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Europe/Stockholm",
