@@ -4,6 +4,9 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
