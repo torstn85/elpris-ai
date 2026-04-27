@@ -27,7 +27,6 @@ function priceColor(price: number): string {
   return '#EF4444';
 }
 
-// Absolut bakgrundsnivå baserat på pris — oberoende av relativ 6h-logik
 function getBackgroundLevel(price: number): Decision {
   if (price <= 50) return 'JA';
   if (price < 100) return 'OK';
@@ -112,11 +111,15 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tomorrowCheap, setTomorrowCheap] = useState<HourPrice | null>(null);
+  const [todayHours, setTodayHours] = useState<HourPrice[]>([]);
+  const [tomorrowHours, setTomorrowHours] = useState<HourPrice[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     setResult(null);
     setTomorrowCheap(null);
+    setTodayHours([]);
+    setTomorrowHours([]);
     setLoading(true);
 
     async function fetchData() {
@@ -134,7 +137,11 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
             hour: item.hour,
             price: item.ore_per_kwh,
           }));
-          if (!cancelled) { setResult(analyze(hours)); setError(null); }
+          if (!cancelled) {
+            setTodayHours(hours);
+            setResult(analyze(hours));
+            setError(null);
+          }
         } else {
           if (!cancelled) setError('Kunde inte hämta prisdata');
         }
@@ -149,7 +156,10 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
               })
             );
             const cheapest = tmHours.reduce((min, h) => (h.price < min.price ? h : min));
-            if (!cancelled) setTomorrowCheap(cheapest);
+            if (!cancelled) {
+              setTomorrowHours(tmHours);
+              setTomorrowCheap(cheapest);
+            }
           }
         }
       } catch {
@@ -204,9 +214,7 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
     );
   }
 
-  // Relativ logik (6h) → texter och status-label
   const cfg = CONFIG[result.decision];
-  // Absolut logik (pris vs tröskelvärden) → bakgrundsfärg
   const bgCfg = CONFIG[getBackgroundLevel(result.currentPrice)];
 
   const hoursUntilCheap =
@@ -234,6 +242,56 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
     </p>
   ) : null;
 
+  // ── Best alternative ≥3h ahead (JA-mode only) ─────────────────────────────
+  const currentHour = getCurrentStockholmHour();
+  let bestAlternative: { hour: number; price: number; isToday: boolean } | null = null;
+
+  if (result.decision === 'JA') {
+    const todayCandidates = todayHours
+      .filter((h) => h.hour >= currentHour + 3)
+      .map((h) => ({ ...h, isToday: true }));
+
+    // Tomorrow hour H is (24 - currentHour + H) hours away; need >= 3 → H >= currentHour - 21
+    const tmMinHour = Math.max(0, currentHour - 21);
+    const tomorrowCandidates = tomorrowHours
+      .filter((h) => h.hour >= tmMinHour)
+      .map((h) => ({ ...h, isToday: false }));
+
+    const all = [...todayCandidates, ...tomorrowCandidates];
+    if (all.length > 0) {
+      bestAlternative = all.reduce((min, h) => (h.price < min.price ? h : min));
+    }
+  }
+
+  const alternativeLine = bestAlternative ? (
+    <p className="text-slate-300">
+      {bestAlternative.isToday ? (
+        <>
+          Alternativt: vänta{' '}
+          <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
+            {bestAlternative.hour - currentHour}{' '}
+            {bestAlternative.hour - currentHour === 1 ? 'timme' : 'timmar'}
+          </span>{' '}
+          då elpriset är{' '}
+          <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
+            {bestAlternative.price.toFixed(1)} öre/kWh
+          </span>.
+        </>
+      ) : (
+        <>
+          Alternativt imorgon kl{' '}
+          <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
+            {String(bestAlternative.hour).padStart(2, '0')}:00
+          </span>{' '}
+          —{' '}
+          <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
+            {bestAlternative.price.toFixed(1)} öre/kWh
+          </span>.
+        </>
+      )}
+    </p>
+  ) : null;
+
   return (
     <div className={`my-6 rounded-2xl bg-gradient-to-br ${bgCfg.gradient} p-6 ring-1 ${bgCfg.ring}`}>
       {/* Header */}
@@ -258,7 +316,10 @@ export default function ShouldIWashNow({ area: areaProp = 'SE3' }: Props) {
       {/* Decision message */}
       <div className="space-y-0.5 text-sm">
         {result.decision === 'JA' && (
-          <p className="text-slate-300">{cfg.tip}</p>
+          <>
+            <p className="text-slate-300">{cfg.tip}</p>
+            {alternativeLine}
+          </>
         )}
 
         {result.decision === 'VÄNTA' && result.nextCheapHour && (
