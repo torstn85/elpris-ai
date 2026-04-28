@@ -1,8 +1,35 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { Redis } from '@upstash/redis';
+import { Ratelimit } from '@upstash/ratelimit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
+// ─── Upstash rate-limit setup ─────────────────────────────────────────────────
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+const rateLimitMinute = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '1 m'),
+  prefix: 'rl:chat:1m',
+});
+
+const rateLimitHour = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(30, '1 h'),
+  prefix: 'rl:chat:1h',
+});
+
+const rateLimitDay = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(100, '1 d'),
+  prefix: 'rl:chat:1d',
+});
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -118,6 +145,44 @@ async function executeTool(
 }
 
 export async function POST(request: Request) {
+  // ── Rate limiting (fail closed) ──────────────────────────────────────────
+  try {
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
+
+    if (!forwarded) {
+      console.warn('[rate-limit] No x-forwarded-for header — using 127.0.0.1 (local dev?)');
+    }
+
+    const [perMinute, perHour, perDay] = await Promise.all([
+      rateLimitMinute.limit(ip),
+      rateLimitHour.limit(ip),
+      rateLimitDay.limit(ip),
+    ]);
+
+    const blocked = [perMinute, perHour, perDay].find((r) => !r.success);
+    if (blocked) {
+      const retryAfter = Math.ceil((blocked.reset - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: 'Du skickar meddelanden för snabbt. Vänta en stund och försök igen.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.max(retryAfter, 1)),
+            'X-RateLimit-Remaining': String(blocked.remaining),
+          },
+        },
+      );
+    }
+  } catch (err) {
+    console.error('[rate-limit] Upstash unavailable — failing closed:', err);
+    return NextResponse.json(
+      { error: 'Tjänsten är tillfälligt otillgänglig. Försök igen om en stund.' },
+      { status: 503 },
+    );
+  }
+
+  // ── Chat logic ───────────────────────────────────────────────────────────
   try {
     const body = await request.json() as {
       messages: Array<{ role: 'user' | 'assistant'; content: string }>;
