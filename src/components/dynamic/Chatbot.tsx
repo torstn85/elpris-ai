@@ -66,10 +66,15 @@ export default function Chatbot() {
         body: JSON.stringify({ messages: next }),
       });
       const data = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: data.reply ?? 'Något gick fel. Försök igen.' },
-      ]);
+      if (!res.ok) {
+        const msg = data?.error ?? 'Något gick fel. Försök igen.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: msg }]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.reply ?? 'Något gick fel. Försök igen.' },
+        ]);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
