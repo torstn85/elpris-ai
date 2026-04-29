@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Chatbot from "@/components/dynamic/Chatbot";
+import DailyPriceAnalysis from "@/components/dynamic/DailyPriceAnalysis";
 import Footer from "@/components/Footer";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
@@ -402,6 +403,18 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── 3. AI chatbot (flyttad hit) ── */}
+        <section id="chat" className="flex flex-col gap-6">
+          <div>
+            <h2 className="font-bold text-2xl md:text-3xl">Fråga elpris.ai</h2>
+            <p className="text-[#8fafc9] text-sm mt-1">
+              AI-assistenten svarar på frågor om elpriset
+            </p>
+          </div>
+
+          <Chatbot />
+        </section>
+
         {/* ── 2. Price chart ── */}
         <section id="elomraden" className="flex flex-col gap-6">
           <div className="flex items-end justify-between">
@@ -488,17 +501,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── 3. AI chatbot ── */}
-        <section id="chat" className="flex flex-col gap-6">
-          <div>
-            <h2 className="font-bold text-2xl md:text-3xl">Fråga elpris.ai</h2>
-            <p className="text-[#8fafc9] text-sm mt-1">
-              AI-assistenten svarar på frågor om elpriset
-            </p>
-          </div>
-
-          <Chatbot />
-        </section>
+        {/* ── 2b. Daily price analysis ── */}
+        <DailyPriceAnalysis area={selectedArea} />
 
         {/* ── 4. Value blocks ── */}
         <section id="rekommendationer" className="flex flex-col gap-6">
