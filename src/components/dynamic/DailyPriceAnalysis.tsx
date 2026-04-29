@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -19,6 +18,7 @@ interface Analysis {
   cheap: HourEntry;
   expensive: HourEntry;
   level: 'lågt' | 'normalt' | 'högt';
+  levelColor: string;
   curveDesc: string;
 }
 
@@ -26,6 +26,12 @@ function fmt(h: number): string {
   const start = String(h).padStart(2, '0');
   const end = String((h + 1) % 24).padStart(2, '0');
   return `${start}–${end}`;
+}
+
+function priceColor(price: number): string {
+  if (price < 50) return '#22C55E';
+  if (price < 100) return '#00E5FF';
+  return '#EF4444';
 }
 
 function analyze(hours: HourEntry[]): Analysis | null {
@@ -36,7 +42,18 @@ function analyze(hours: HourEntry[]): Analysis | null {
   const cheap = hours.reduce((min, h) => (h.ore_per_kwh < min.ore_per_kwh ? h : min));
   const expensive = hours.reduce((max, h) => (h.ore_per_kwh > max.ore_per_kwh ? h : max));
 
-  const level: Analysis['level'] = avg < 50 ? 'lågt' : avg < 100 ? 'normalt' : 'högt';
+  let level: Analysis['level'];
+  let levelColor: string;
+  if (avg < 50) {
+    level = 'lågt';
+    levelColor = '#22C55E';
+  } else if (avg < 100) {
+    level = 'normalt';
+    levelColor = '#00E5FF';
+  } else {
+    level = 'högt';
+    levelColor = '#EF4444';
+  }
 
   // Check top 4 most expensive hours for dual-peak pattern
   const top4 = [...hours].sort((a, b) => b.ore_per_kwh - a.ore_per_kwh).slice(0, 4);
@@ -54,7 +71,7 @@ function analyze(hours: HourEntry[]): Analysis | null {
     curveDesc = 'Prismönstret avviker från det vanliga idag.';
   }
 
-  return { avg, cheap, expensive, level, curveDesc };
+  return { avg, cheap, expensive, level, levelColor, curveDesc };
 }
 
 export default function DailyPriceAnalysis({ area }: Props) {
@@ -90,48 +107,27 @@ export default function DailyPriceAnalysis({ area }: Props) {
 
   if (!result) return null;
 
-  const { avg, cheap, expensive, level, curveDesc } = result;
+  const { avg, cheap, expensive, level, levelColor, curveDesc } = result;
+  const avgColor = priceColor(avg);
 
   return (
-    <section className="py-12">
+    <section className="py-6">
       <div className="max-w-3xl mx-auto">
         <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
           Vad betyder dagens prismönster?
         </h2>
         <p className="text-base text-[#8fafc9] leading-relaxed">
           Idag är dygnssnittet{' '}
-          <strong className="text-white">{avg.toFixed(1)} öre/kWh</strong> i{' '}
+          <strong style={{ color: avgColor }}>{avg.toFixed(1)} öre/kWh</strong> i{' '}
           {area}, vilket är{' '}
-          <strong className="text-white">{level}</strong> för säsongen.
+          <strong style={{ color: levelColor }}>{level}</strong> för säsongen.
           Billigaste timmen är{' '}
-          <strong className="text-white">kl {fmt(cheap.hour)}</strong>{' '}
-          ({cheap.ore_per_kwh.toFixed(1)} öre), dyraste är{' '}
-          <strong className="text-white">kl {fmt(expensive.hour)}</strong>{' '}
-          ({expensive.ore_per_kwh.toFixed(1)} öre). {curveDesc}
-        </p>
-
-        <p className="mt-6 text-sm text-[#8fafc9]">
-          Läs mer:{' '}
-          <Link
-            href="/guider/spara-el/tvatta-billigt"
-            className="text-[#00E5FF] hover:underline transition-colors duration-150"
-          >
-            Tvätta billigt
-          </Link>
-          <span className="mx-2">·</span>
-          <Link
-            href="/guider/spara-el/ladda-elbil-billigt"
-            className="text-[#00E5FF] hover:underline transition-colors duration-150"
-          >
-            Ladda elbil billigt
-          </Link>
-          <span className="mx-2">·</span>
-          <Link
-            href="/guider/forsta-elpriset/dygnsmonster-elpris"
-            className="text-[#00E5FF] hover:underline transition-colors duration-150"
-          >
-            Dygnsmönster i elpriset
-          </Link>
+          <strong className="text-[#22C55E]">kl {fmt(cheap.hour)}</strong>{' '}
+          (<span className="text-[#22C55E]">{cheap.ore_per_kwh.toFixed(1)} öre</span>),
+          dyraste är{' '}
+          <strong className="text-[#EF4444]">kl {fmt(expensive.hour)}</strong>{' '}
+          (<span className="text-[#EF4444]">{expensive.ore_per_kwh.toFixed(1)} öre</span>).
+          {' '}{curveDesc}
         </p>
       </div>
     </section>

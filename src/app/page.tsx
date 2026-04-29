@@ -235,7 +235,7 @@ export default function Home() {
       {/* ── Nav ── */}
       <NavBar />
 
-      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-20">
+      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
         {/* ── 1. Hero ── */}
         <section className="flex flex-col items-center text-center gap-6 pt-8">
           {/* Live badge */}
@@ -352,7 +352,7 @@ export default function Home() {
         </section>
 
         {/* ── 1b. Intro-sektion ── */}
-        <section className="py-16">
+        <section className="py-6">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
               Så fungerar elpriset i Sverige
