@@ -106,7 +106,9 @@ export async function GET() {
 
     return NextResponse.json(result, {
       headers: {
-        "Cache-Control": "public, s-maxage=900, stale-while-revalidate=60",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store",
       },
     });
   } catch (err) {

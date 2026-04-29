@@ -100,7 +100,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ days } satisfies HistoryResponse, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=300",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store",
       },
     });
   } catch (err) {
