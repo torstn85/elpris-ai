@@ -350,6 +350,58 @@ export default function Home() {
           )}
         </section>
 
+        {/* ── 1b. Intro-sektion ── */}
+        <section className="py-16">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
+              Så fungerar elpriset i Sverige
+            </h2>
+            {/* Stycke 1 */}
+            <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
+              Elpriset varierar varje{" "}
+              <Link href="/guider/elavtal/kvartspris-vs-timpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">kvart</Link>.
+              {" "}Sedan oktober 2025 sätts priset i 15-minutersintervaller på den nordiska elbörsen{" "}
+              <Link href="/guider/forsta-elpriset/nord-pool-forklarat" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">Nord Pool</Link>,
+              {" "}baserat på utbud och efterfrågan. När det blåser mycket, solen skiner och
+              konsumtionen är låg blir elen billig — ibland till och med{" "}
+              <Link href="/guider/forsta-elpriset/negativa-elpriser" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">negativ</Link>.
+              {" "}När många använder el samtidigt och produktionen är låg stiger priset snabbt.
+            </p>
+            {/* Stycke 2 */}
+            <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
+              Sverige är indelat i{" "}
+              <Link href="/elomrade" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">fyra elområden</Link>
+              {" "}där priserna kan skilja sig markant beroende på var produktionen av el
+              sker och hur överföringskapaciteten ser ut. Bor du i söder har du historiskt
+              haft högre och mer volatila priser än norra Sverige.
+            </p>
+            {/* Stycke 3 */}
+            <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
+              På elpris.ai ser du{" "}
+              <Link href="/elpris-idag" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">aktuella priser i realtid</Link>
+              {" "}för alla fyra elområden, dagens dygnskurva timme för timme, samt{" "}
+              <Link href="/elpris-imorgon" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">morgondagens priser</Link>
+              {" "}så snart de publiceras runt kl 13:15 varje dag. Du kan också ställa frågor
+              till vår AI-assistent som hämtar färska prisdata och ger konkreta råd: när är
+              det billigast att{" "}
+              <Link href="/guider/spara-el/tvatta-billigt" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">tvätta idag</Link>?
+              {" "}När bör jag{" "}
+              <Link href="/guider/spara-el/ladda-elbil-billigt" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">ladda elbilen</Link>?
+              {" "}Är det dyrt just nu jämfört med dygnssnittet?
+            </p>
+            {/* Stycke 4 */}
+            <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
+              Priserna som visas är{" "}
+              <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">spotpris</Link>
+              {" "}exklusive moms och nätavgifter — det vill säga den del av elpriset som faktiskt
+              varierar över dygnet och som du kan påverka genom när du använder el. För att
+              få din fulla kostnad lägger du till moms (25%), elnätsavgift, energiskatt och
+              eventuellt påslag från ditt{" "}
+              <Link href="/guider/elavtal/byta-elavtal-guide" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elavtal</Link>.
+            </p>
+          </div>
+        </section>
+
         {/* ── 2. Price chart ── */}
         <section id="elomraden" className="flex flex-col gap-6">
           <div className="flex items-end justify-between">
