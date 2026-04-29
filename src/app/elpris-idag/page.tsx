@@ -98,6 +98,13 @@ function fmt(price: number): string {
 export default async function ElprisIdag() {
   const areas = await fetchTodayPrices();
   const now = stockholmHour();
+  const todayLabel = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -174,6 +181,7 @@ export default async function ElprisIdag() {
             <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
               Timpriser för alla elområden
             </h2>
+            <p className="text-[#8fafc9] text-sm capitalize">{todayLabel}</p>
 
             {/* Legend */}
             <div className="flex flex-wrap gap-5 text-xs text-[#8fafc9] mb-6">
