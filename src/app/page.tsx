@@ -189,18 +189,24 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/prices/current")
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<CurrentPriceResponse>;
-      })
-      .then((data) => {
-        setCurrentPriceData(data);
-        setCurrentLoading(false);
-      })
-      .catch(() => {
-        setCurrentLoading(false);
-      });
+    function fetchCurrent() {
+      fetch("/api/prices/current")
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json() as Promise<CurrentPriceResponse>;
+        })
+        .then((data) => {
+          setCurrentPriceData(data);
+          setCurrentLoading(false);
+        })
+        .catch(() => {
+          setCurrentLoading(false);
+        });
+    }
+
+    fetchCurrent();
+    const id = setInterval(fetchCurrent, 60_000);
+    return () => clearInterval(id);
   }, []);
 
   const now = stockholmHour();
