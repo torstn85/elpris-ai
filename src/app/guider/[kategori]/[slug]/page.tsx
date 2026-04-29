@@ -144,8 +144,8 @@ export default function ArticlePage({ params }: PageProps) {
           </nav>
 
           <div className="mb-6 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#00E5FF] flex items-center justify-center flex-shrink-0">
-              <span className="text-[#0A2540] font-bold text-xs">ER</span>
+            <div className="w-8 h-8 rounded-full bg-[#0F3460] border border-[#1E4976] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#00E5FF] font-extrabold text-base">e</span>
             </div>
             <div>
               <p className="font-medium text-sm text-white">
@@ -200,8 +200,8 @@ export default function ArticlePage({ params }: PageProps) {
 
           {/* Om författaren */}
           <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 mt-12 mb-8 flex gap-4 items-start">
-            <div className="w-12 h-12 rounded-full bg-[#00E5FF] flex items-center justify-center flex-shrink-0">
-              <span className="text-[#0A2540] font-bold text-sm">ER</span>
+            <div className="w-12 h-12 rounded-full bg-[#0F3460] border border-[#1E4976] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#00E5FF] font-extrabold text-xl">e</span>
             </div>
             <div>
               <p className="font-bold text-lg text-white mb-2">
