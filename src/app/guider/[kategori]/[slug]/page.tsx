@@ -143,20 +143,40 @@ export default function ArticlePage({ params }: PageProps) {
             </a>
           </nav>
 
-          <div className="mb-2 text-xs text-slate-500 flex items-center gap-3">
-            <time dateTime={frontmatter.publishedAt}>
-              {new Date(frontmatter.publishedAt).toLocaleDateString('sv-SE', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </time>
-            {frontmatter.readTime && (
-              <>
-                <span>·</span>
-                <span>{frontmatter.readTime} läsning</span>
-              </>
-            )}
+          <div className="mb-6 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#00E5FF] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#0A2540] font-bold text-xs">ER</span>
+            </div>
+            <div>
+              <p className="font-medium text-sm text-white">
+                Av {frontmatter.author}
+              </p>
+              <p className="text-xs text-[#8fafc9]">
+                <time dateTime={frontmatter.publishedAt}>
+                  Publicerad{' '}
+                  {new Date(frontmatter.publishedAt).toLocaleDateString('sv-SE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </time>
+                {frontmatter.updatedAt &&
+                  frontmatter.updatedAt !== frontmatter.publishedAt && (
+                    <>
+                      {' · '}
+                      <time dateTime={frontmatter.updatedAt}>
+                        Uppdaterad{' '}
+                        {new Date(frontmatter.updatedAt).toLocaleDateString('sv-SE', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </time>
+                    </>
+                  )}
+                {frontmatter.readTime && <> · {frontmatter.readTime} läsning</>}
+              </p>
+            </div>
           </div>
 
           <div className="prose prose-invert prose-lg max-w-none
@@ -178,7 +198,30 @@ export default function ArticlePage({ params }: PageProps) {
             />
           </div>
 
-          <div className="mt-16 pt-8 border-t border-[#1E4976]">
+          {/* Om författaren */}
+          <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 mt-12 mb-8 flex gap-4 items-start">
+            <div className="w-12 h-12 rounded-full bg-[#00E5FF] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#0A2540] font-bold text-sm">ER</span>
+            </div>
+            <div>
+              <p className="font-bold text-lg text-white mb-2">
+                Av {frontmatter.author}
+              </p>
+              <p className="text-sm text-[#8fafc9] mb-3">
+                elpris.ai är en oberoende redaktion som skriver om elpriser,
+                energimarknaden och hur du som konsument kan dra nytta av
+                kvartspris och smart elanvändning.
+              </p>
+              <a
+                href="/om-oss"
+                className="text-sm text-[#00E5FF] hover:underline"
+              >
+                → Läs mer om oss
+              </a>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-[#1E4976]">
             <a
               href="/guider"
               className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition text-sm font-medium"
