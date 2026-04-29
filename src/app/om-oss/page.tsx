@@ -173,7 +173,6 @@ export default function OmOssPage() {
             en funktion? Vill du tipsa om något vi borde skriva om? Hör av dig.
           </p>
           <p>
-            📧{" "}
             <a
               href="mailto:info@elpris.ai"
               className="text-[#00E5FF] hover:underline font-medium"
