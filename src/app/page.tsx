@@ -191,12 +191,14 @@ export default function Home() {
 
   useEffect(() => {
     function fetchCurrent() {
+      console.log("[Hero] fetchCurrent called at " + new Date().toISOString());
       fetch("/api/prices/current")
         .then((r) => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json() as Promise<CurrentPriceResponse>;
         })
         .then((data) => {
+          console.log("[Hero] Got data, slot_start=" + data.slot_start);
           setCurrentPriceData(data);
           setCurrentLoading(false);
         })
@@ -205,9 +207,13 @@ export default function Home() {
         });
     }
 
+    console.log("[Hero] useEffect mounted, setting up fetchCurrent + interval");
     fetchCurrent();
     const id = setInterval(fetchCurrent, 60_000);
-    return () => clearInterval(id);
+    return () => {
+      console.log("[Hero] useEffect cleanup, clearing interval");
+      clearInterval(id);
+    };
   }, []);
 
   const now = stockholmHour();
