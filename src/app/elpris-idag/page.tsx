@@ -181,7 +181,7 @@ export default async function ElprisIdag() {
             <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
               Timpriser för alla elområden
             </h2>
-            <p className="text-[#8fafc9] text-sm capitalize">{todayLabel}</p>
+            <p className="text-[#8fafc9] text-sm capitalize mb-4">{todayLabel}</p>
 
             {/* Legend */}
             <div className="flex flex-wrap gap-5 text-xs text-[#8fafc9] mb-6">
