@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import DailyPriceAnalysis from "@/components/dynamic/DailyPriceAnalysis";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 
@@ -99,13 +98,6 @@ function fmt(price: number): string {
 export default async function ElprisIdag() {
   const areas = await fetchTodayPrices();
   const now = stockholmHour();
-  const dateLabel = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date());
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -143,12 +135,7 @@ export default async function ElprisIdag() {
               visar timpriser för alla fyra elområden, från midnatt till midnatt. Priserna
               baseras på spotpriset från Nord Pool och uppdateras automatiskt.
             </p>
-            <p className="text-[#8fafc9] text-sm capitalize">{dateLabel}</p>
           </section>
-
-          {/* ── Dagens läge (DailyPriceAnalysis) ── */}
-          {/* Defaultar till SE3; komponenten hanterar sin egna fetch client-side */}
-          <DailyPriceAnalysis area="SE3" />
 
           {/* ── Hur ska jag läsa dagens priser? ── */}
           <section>
