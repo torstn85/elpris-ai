@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import CookiebotRenewButton from './CookiebotRenewButton';
 
 interface FooterProps {
@@ -7,39 +8,117 @@ interface FooterProps {
 
 export default function Footer({ id, className = '' }: FooterProps) {
   return (
-    <section
+    <footer
       id={id}
-      className={`border-t border-[#1E4976] pt-8 pb-4 flex flex-col gap-4 text-xs text-[#8fafc9] ${className}`.trim()}
+      className={`border-t border-[#1E4976] pt-12 pb-8 ${className}`.trim()}
     >
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex flex-col items-center sm:items-start gap-1">
-          <a href="/" className="font-extrabold text-sm text-[#8fafc9]">
-            elpris<span className="text-[#00E5FF]">.ai</span>
-          </a>
-          <a href="/integritetspolicy" className="hover:text-[#00E5FF] transition-colors">
-            Integritetspolicy
-          </a>
-          <CookiebotRenewButton />
-          <span>© 2026 elpris.ai</span>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        {/* ── Four columns ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+
+          {/* Col 1: Om elpris.ai */}
+          <div>
+            <Link href="/" className="font-extrabold text-base text-white">
+              elpris<span className="text-[#00E5FF]">.ai</span>
+            </Link>
+            <p className="text-xs text-[#8fafc9] mt-2 mb-4">
+              Realtidspriser och AI-rådgivning för svensk el
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/om-oss" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Om oss
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:info@elpris.ai" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Kontakta oss
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 2: Verktyg */}
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-3">Verktyg</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/elpris-idag" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Elpris idag
+                </Link>
+              </li>
+              <li>
+                <Link href="/elpris-imorgon" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Elpris imorgon
+                </Link>
+              </li>
+              <li>
+                <Link href="/elomrade" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Elområden SE1–SE4
+                </Link>
+              </li>
+              <li>
+                <Link href="/#chat" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Fråga AI
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Guider */}
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-3">Guider</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/guider" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Alla guider
+                </Link>
+              </li>
+              <li>
+                <Link href="/guider/spara-el" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Spara el
+                </Link>
+              </li>
+              <li>
+                <Link href="/guider/elavtal" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Elavtal
+                </Link>
+              </li>
+              <li>
+                <Link href="/guider/forsta-elpriset" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Förstå elpriset
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Information */}
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-3">Information</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/integritetspolicy" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Integritetspolicy
+                </Link>
+              </li>
+              <li>
+                <CookiebotRenewButton />
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm text-[#8fafc9]">
-          {['Data från elprisetjustnu.se', 'Uppdateras var 15:e minut', 'Täcker SE1–SE4'].map((label) => (
-            <span key={label} className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[#22C55E] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              {label}
-            </span>
-          ))}
+
+        {/* ── Bottom row ── */}
+        <div className="border-t border-[#1E4976] pt-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#8fafc9]">
+          <span>© 2026 elpris.ai</span>
+          <span className="hidden sm:block text-center">
+            Data från elprisetjustnu.se · Uppdateras var 15:e minut · Täcker SE1–SE4
+          </span>
+          <span className="text-center sm:text-right">
+            Vägledande information, ej ekonomisk rådgivning.
+          </span>
         </div>
       </div>
-      <p className="text-xs text-slate-500 text-center mt-1">
-        Informationen på elpris.ai är vägledande och ska inte ses som ekonomisk rådgivning. Vi reserverar oss för eventuella fel i prisdata.{' '}
-        <a href="/om-oss" className="hover:text-slate-400 transition-colors underline">
-          Läs mer i Om oss
-        </a>
-        .
-      </p>
-    </section>
+    </footer>
   );
 }
