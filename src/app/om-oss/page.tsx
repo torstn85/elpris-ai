@@ -34,6 +34,24 @@ export default function OmOssPage() {
 
           <p className="text-white font-medium">Vi vill ändra på det.</p>
 
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            Vilka står bakom elpris.ai?
+          </h2>
+          <p>
+            elpris.ai drivs av en liten oberoende redaktion med intresse för
+            energi, teknik och konsumentfrågor. Vi är inte ett elbolag, en
+            jämförelsetjänst eller en del av en mediekoncern – vi är ett
+            fristående initiativ som startade när vi själva insåg hur svårt det
+            var att förstå sin elräkning trots att informationen finns
+            tillgänglig.
+          </p>
+          <p>
+            Vårt arbete bygger på tre principer: data ska vara aktuell,
+            förklaringar ska vara begripliga och rekommendationer ska vara
+            opartiska. När du läser något på elpris.ai ska du kunna lita på att
+            det är skrivet utan baktankar om att sälja dig något.
+          </p>
+
           <p>
             På elpris.ai får du aktuella elpriser för Sveriges fyra elområden,
             tydliga grafer och konkreta råd om när det kan vara smart att använda
@@ -60,6 +78,46 @@ export default function OmOssPage() {
           <p>
             Vårt mål är att vara en neutral plats där du kan förstå elpriset
             innan du fattar egna beslut.
+          </p>
+
+          <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
+            Redaktionella principer
+          </h2>
+          <p>
+            För att hålla en hög och jämn kvalitet följer redaktionen några
+            principer i allt vi publicerar:
+          </p>
+          <p>
+            <strong className="text-white">Faktakontroll.</strong> Alla siffror
+            om skatter, avgifter, regler eller marknadsförhållanden kontrolleras
+            mot myndighetskällor (Skatteverket, Energimarknadsinspektionen,
+            Svenska kraftnät) eller etablerade branschkällor innan publicering.
+          </p>
+          <p>
+            <strong className="text-white">Tydliga källor.</strong> När vi
+            hänvisar till specifika fakta länkar vi till primärkällan. När vi
+            gör beräkningar redovisar vi förutsättningarna så att du själv kan
+            kontrollera dem.
+          </p>
+          <p>
+            <strong className="text-white">
+              Inga produktrekommendationer utan grund.
+            </strong>{" "}
+            Vi listar inte specifika varumärken eller modeller om vi inte
+            själva har testat dem eller har goda skäl att rekommendera dem.
+            Marknaden förändras snabbt och rekommendationer åldras fort –
+            därför fokuserar vi på principer och funktioner snarare än
+            produktnamn.
+          </p>
+          <p>
+            <strong className="text-white">Uppdateringar.</strong> Artiklar kan
+            uppdateras när reglerna ändras, marknaden utvecklas eller vi får ny
+            information. Vi markerar tydligt när en artikel senast uppdaterats.
+          </p>
+          <p>
+            <strong className="text-white">Opartiskhet.</strong> Vi tar inte
+            betalt för att skriva positivt om någon aktör. Eventuella
+            affiliate-länkar kommer alltid att märkas tydligt.
           </p>
 
           <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
@@ -109,18 +167,29 @@ export default function OmOssPage() {
           <h2 className="text-xl md:text-2xl font-semibold text-white pt-6">
             Kontakta oss
           </h2>
+          <p>Vi tar gärna emot synpunkter, frågor och idéer.</p>
           <p>
-            Har du frågor, feedback eller idéer på hur elpris.ai kan bli bättre?
-            Hör gärna av dig på{" "}
+            Har du upptäckt ett fel i en artikel eller i prisdatan? Saknar du
+            en funktion? Vill du tipsa om något vi borde skriva om? Hör av dig.
+          </p>
+          <p>
+            📧{" "}
             <a
               href="mailto:info@elpris.ai"
               className="text-[#00E5FF] hover:underline font-medium"
             >
-              info@elpris.ai
+              <strong className="text-white">info@elpris.ai</strong>
             </a>
-            .
+          </p>
+          <p>
+            Vi läser alla mejl och svarar så snart vi kan, vanligtvis inom
+            några arbetsdagar.
           </p>
         </div>
+
+        <p className="text-xs text-[#8fafc9]/60 mt-12 italic">
+          Senast uppdaterad: 29 april 2026
+        </p>
       </main>
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
