@@ -16,6 +16,14 @@ import Footer from '@/components/Footer';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
+function formatMonthYear(iso: string): string {
+  const formatted = new Intl.DateTimeFormat('sv-SE', {
+    year: 'numeric',
+    month: 'long',
+  }).format(new Date(iso));
+  return formatted.charAt(0).toLowerCase() + formatted.slice(1);
+}
+
 interface PageProps {
   params: { kategori: string; slug: string };
 }
@@ -154,11 +162,7 @@ export default function ArticlePage({ params }: PageProps) {
               <p className="text-xs text-[#8fafc9]">
                 <time dateTime={frontmatter.publishedAt}>
                   Publicerad{' '}
-                  {new Date(frontmatter.publishedAt).toLocaleDateString('sv-SE', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {formatMonthYear(frontmatter.publishedAt)}
                 </time>
                 {frontmatter.updatedAt &&
                   frontmatter.updatedAt !== frontmatter.publishedAt && (
@@ -166,11 +170,7 @@ export default function ArticlePage({ params }: PageProps) {
                       {' · '}
                       <time dateTime={frontmatter.updatedAt}>
                         Uppdaterad{' '}
-                        {new Date(frontmatter.updatedAt).toLocaleDateString('sv-SE', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
+                        {formatMonthYear(frontmatter.updatedAt)}
                       </time>
                     </>
                   )}
