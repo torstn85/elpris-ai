@@ -20,7 +20,11 @@ export default function TestTomorrowTeaser() {
       <TomorrowPriceTeaser area="SE1" />
 
       <hr className="border-[#1E4976] my-6" />
-      <h2 className="text-lg font-semibold mb-2">3. SE4</h2>
+      <h2 className="text-lg font-semibold mb-2">3. SE2</h2>
+      <TomorrowPriceTeaser area="SE2" />
+
+      <hr className="border-[#1E4976] my-6" />
+      <h2 className="text-lg font-semibold mb-2">4. SE4</h2>
       <TomorrowPriceTeaser area="SE4" />
     </div>
   );

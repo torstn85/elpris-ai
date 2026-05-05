@@ -151,7 +151,7 @@ export default function TomorrowPriceTeaser({ area = 'SE3' }: Props) {
         >
           {tomorrowAvg.toFixed(1)}
         </span>
-        <span className="text-base text-slate-400 font-medium">öre/kWh</span>
+        <span className="text-base text-slate-400 font-medium">öre/kWh i snitt</span>
       </div>
 
       {diffNode}
