@@ -3,10 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { CELL_SIZE, GRID, TICK_MS } from '@/lib/snake/gameConfig';
 import {
+  continueAfterLevelUp,
   createInitialState,
+  OPPOSITE_DIRECTION,
+  startMoving,
   tick,
   type Direction,
   type GameState,
+  type Level,
 } from '@/lib/snake/gameLogic';
 
 const CANVAS_WIDTH = GRID.COLS * CELL_SIZE;
@@ -16,12 +20,17 @@ const COLOR_BG = '#0A2540';
 const COLOR_SNAKE = '#00E5FF';
 const COLOR_CHARGE = '#22C55E';
 
-const OPPOSITE: Record<Direction, Direction> = {
-  up: 'down',
-  down: 'up',
-  left: 'right',
-  right: 'left',
+const VEHICLE_NAMES: Record<Level, string> = {
+  1: 'Elmoped',
+  2: 'Elbil',
+  3: 'Elflygplan',
 };
+
+function tickMsForLevel(level: Level): number {
+  if (level === 1) return TICK_MS.LEVEL_1;
+  if (level === 2) return TICK_MS.LEVEL_2;
+  return TICK_MS.LEVEL_3;
+}
 
 function keyToDirection(key: string): Direction | null {
   switch (key) {
@@ -56,8 +65,11 @@ export default function ElbilSnake() {
       if (!newDir) return;
       if (e.key.startsWith('Arrow')) e.preventDefault();
       setState((prev) => {
+        if (prev.status === 'waiting') {
+          return startMoving(prev, newDir);
+        }
         if (prev.status !== 'playing') return prev;
-        if (OPPOSITE[prev.direction] === newDir) return prev;
+        if (OPPOSITE_DIRECTION[prev.direction] === newDir) return prev;
         if (prev.direction === newDir) return prev;
         return { ...prev, direction: newDir };
       });
@@ -70,9 +82,9 @@ export default function ElbilSnake() {
     if (state.status !== 'playing') return;
     const id = setInterval(() => {
       setState((prev) => tick(prev));
-    }, TICK_MS.LEVEL_1);
+    }, tickMsForLevel(state.level));
     return () => clearInterval(id);
-  }, [state.status]);
+  }, [state.status, state.level]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -106,10 +118,14 @@ export default function ElbilSnake() {
     setState(createInitialState());
   }
 
+  function handleContinue() {
+    setState((prev) => continueAfterLevelUp(prev));
+  }
+
   return (
     <div>
       <h2 style={{ color: 'white', fontSize: 24, marginBottom: 8 }}>
-        kWh laddat: {state.score}
+        kWh laddat: {state.score} | Nivå {state.level} ({VEHICLE_NAMES[state.level]})
       </h2>
       <div style={{ position: 'relative', width: CANVAS_WIDTH, height: CANVAS_HEIGHT }}>
         <canvas
@@ -118,6 +134,51 @@ export default function ElbilSnake() {
           height={CANVAS_HEIGHT}
           style={{ display: 'block' }}
         />
+        {state.status === 'waiting' && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <p style={{ color: 'white', fontSize: 18, margin: 0, opacity: 0.9 }}>
+              Tryck på en piltangent för att starta
+            </p>
+          </div>
+        )}
+        {state.status === 'levelup' && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 16,
+            }}
+          >
+            <p style={{ color: 'white', fontSize: 32, margin: 0 }}>
+              Nivå {state.level} klarad!
+            </p>
+            <button
+              onClick={handleContinue}
+              style={{
+                padding: '8px 16px',
+                fontSize: 16,
+                cursor: 'pointer',
+              }}
+            >
+              Uppgradera fordon
+            </button>
+          </div>
+        )}
         {state.status === 'gameover' && (
           <div
             style={{

@@ -1,6 +1,12 @@
 // Pure-function speloglik för Elbil-Snake. Ingen React, ingen DOM.
 
-import { GRID, INITIAL_SNAKE_LENGTH, POINTS } from './gameConfig';
+import {
+  GRID,
+  INITIAL_SNAKE_LENGTH,
+  LEVEL_MULTIPLIER,
+  LEVEL_THRESHOLDS,
+  POINTS,
+} from './gameConfig';
 
 export interface Position {
   x: number;
@@ -9,7 +15,16 @@ export interface Position {
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
-export type GameStatus = 'playing' | 'paused' | 'gameover';
+export const OPPOSITE_DIRECTION: Record<Direction, Direction> = {
+  up: 'down',
+  down: 'up',
+  left: 'right',
+  right: 'left',
+};
+
+export type GameStatus = 'waiting' | 'playing' | 'paused' | 'levelup' | 'gameover';
+
+export type Level = 1 | 2 | 3;
 
 export interface GameState {
   snake: Position[];
@@ -19,6 +34,8 @@ export interface GameState {
   status: GameStatus;
   currentMoveCount: number;
   chargeStationsEaten: number;
+  level: Level;
+  previousLevel: Level;
 }
 
 export function getNextHead(head: Position, direction: Direction): Position {
@@ -67,9 +84,39 @@ export function createInitialState(): GameState {
     direction: 'right',
     chargeStation,
     score: 0,
-    status: 'playing',
+    status: 'waiting',
     currentMoveCount: 0,
     chargeStationsEaten: 0,
+    level: 1,
+    previousLevel: 1,
+  };
+}
+
+function levelForLength(length: number): Level {
+  if (length < LEVEL_THRESHOLDS.MOPED_TO_CAR) return 1;
+  if (length < LEVEL_THRESHOLDS.CAR_TO_PLANE) return 2;
+  return 3;
+}
+
+export function continueAfterLevelUp(state: GameState): GameState {
+  return {
+    ...state,
+    status: 'waiting',
+    previousLevel: state.level,
+  };
+}
+
+export function startMoving(
+  state: GameState,
+  newDirection: Direction,
+): GameState {
+  if (OPPOSITE_DIRECTION[state.direction] === newDirection) {
+    return state;
+  }
+  return {
+    ...state,
+    direction: newDirection,
+    status: 'playing',
   };
 }
 
@@ -106,13 +153,20 @@ export function tick(state: GameState): GameState {
   const newSnake: Position[] = [nextHead, ...bodyAfterMove];
 
   if (pickup) {
+    const newScore =
+      state.score + POINTS.CHARGE_STATION * LEVEL_MULTIPLIER[state.level];
+    const newLevel = levelForLength(newSnake.length);
+    const leveledUp = newLevel > state.level;
+
     return {
       ...state,
       snake: newSnake,
       chargeStation: spawnChargeStation(newSnake),
-      score: state.score + POINTS.CHARGE_STATION,
+      score: newScore,
       currentMoveCount: state.currentMoveCount + 1,
       chargeStationsEaten: state.chargeStationsEaten + 1,
+      level: leveledUp ? newLevel : state.level,
+      status: leveledUp ? 'levelup' : state.status,
     };
   }
 
