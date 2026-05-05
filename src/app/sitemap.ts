@@ -2,9 +2,19 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import type { MetadataRoute } from "next";
+import { CITIES } from "@/lib/cities";
 
-const BASE_URL = "https://elpris.ai";
+const BASE_URL = "https://www.elpris.ai";
 const CONTENT_DIR = path.join(process.cwd(), "src/content/guider");
+
+function getCityEntries(now: Date): MetadataRoute.Sitemap {
+  return Object.values(CITIES).map((city) => ({
+    url: `${BASE_URL}/elpris-idag/${city.slug}`,
+    lastModified: now,
+    changeFrequency: "hourly",
+    priority: 0.9,
+  }));
+}
 
 function getGuideEntries(): MetadataRoute.Sitemap {
   if (!fs.existsSync(CONTENT_DIR)) return [];
@@ -54,6 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    ...getCityEntries(now),
     {
       url: `${BASE_URL}/elpris-imorgon`,
       lastModified: now,
