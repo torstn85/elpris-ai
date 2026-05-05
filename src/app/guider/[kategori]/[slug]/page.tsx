@@ -11,6 +11,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import type { Metadata } from 'next';
 import { mdxComponents } from '@/components/dynamic/mdxComponents';
+import FaqAccordion, { type FaqItem } from '@/components/dynamic/FaqAccordion';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 
@@ -39,6 +40,7 @@ interface Frontmatter {
   author?: string;
   keywords?: string[];
   readTime?: string;
+  faqs?: FaqItem[];
 }
 
 function getArticle(kategori: string, slug: string) {
@@ -106,6 +108,22 @@ export default function ArticlePage({ params }: PageProps) {
     },
   };
 
+  const faqLd =
+    frontmatter.faqs && frontmatter.faqs.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: frontmatter.faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: f.answer,
+            },
+          })),
+        }
+      : null;
+
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -136,6 +154,12 @@ export default function ArticlePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
 
       <div className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
@@ -197,6 +221,15 @@ export default function ArticlePage({ params }: PageProps) {
               options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
             />
           </div>
+
+          {frontmatter.faqs && frontmatter.faqs.length > 0 && (
+            <section className="mt-12">
+              <h2 className="text-2xl font-bold text-cyan-100 mb-6">
+                Vanliga frågor
+              </h2>
+              <FaqAccordion items={frontmatter.faqs} />
+            </section>
+          )}
 
           {/* Om författaren */}
           <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 mt-12 mb-8 flex gap-4 items-start">

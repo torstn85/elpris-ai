@@ -13,6 +13,7 @@ import ShouldIWashNow from './ShouldIWashNow';
 import ShouldIChargeNow from './ShouldIChargeNow';
 import SavingsCalculator from './SavingsCalculator';
 import SevenDayPriceTrend from './SevenDayPriceTrend';
+import FaqAccordion from './FaqAccordion';
 
 export const mdxComponents = {
   LivePriceWidget,
@@ -25,10 +26,9 @@ export const mdxComponents = {
   ShouldIChargeNow,
   SavingsCalculator,
   SevenDayPriceTrend,
+  FaqAccordion,
   // Lägg till nya komponenter här när de skapas:
-  // SevenDayPriceTrend,
   // TomorrowPriceTeaser,
-  // SavingsCalculator,
   // NegativePriceAlert,
 };
 
