@@ -1,41 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-}
-
-// Auto-länkar interna /guider/-paths i chat-svar.
-// Endast paths som börjar med /guider/{kategori}/{slug} matchas — säkerhet
-// mot externa URL:er eller andra paths.
-const GUIDE_LINK_RE = /\/guider\/[a-z-]+\/[a-z-]+/g;
-const INLINE_LINK_CLASS =
-  'font-semibold text-[#00E5FF] hover:text-white underline transition-colors duration-150';
-
-function renderMessageWithLinks(text: string): React.ReactNode {
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  GUIDE_LINK_RE.lastIndex = 0;
-  while ((match = GUIDE_LINK_RE.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    parts.push(
-      <Link key={match.index} href={match[0]} className={INLINE_LINK_CLASS}>
-        {match[0]}
-      </Link>,
-    );
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (parts.length === 0) return text;
-  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
-  return <>{parts}</>;
 }
 
 const SOFT_LIMIT = 10;
@@ -164,7 +133,7 @@ export default function Chatbot() {
               <span className="text-[#00E5FF] text-sm">⚡</span>
             </div>
             <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-md">
-              {renderMessageWithLinks(msg.content)}
+              {msg.content}
             </div>
           </div>
         ) : (
@@ -173,7 +142,7 @@ export default function Chatbot() {
               <span className="text-[#22C55E] text-xs font-bold">AI</span>
             </div>
             <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-sm">
-              {renderMessageWithLinks(msg.content)}
+              {msg.content}
             </div>
           </div>
         ),
@@ -269,7 +238,7 @@ export default function Chatbot() {
                       <span className="text-[#00E5FF] text-sm">⚡</span>
                     </div>
                     <div className="bg-[#1E4976] rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
-                      {renderMessageWithLinks(msg.content)}
+                      {msg.content}
                     </div>
                   </div>
                 ) : (
@@ -278,7 +247,7 @@ export default function Chatbot() {
                       <span className="text-[#22C55E] text-xs font-bold">AI</span>
                     </div>
                     <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
-                      {renderMessageWithLinks(msg.content)}
+                      {msg.content}
                     </div>
                   </div>
                 ),
