@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
+import { searchKnowledge, type SearchResult } from '@/lib/rag/search';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -33,7 +34,27 @@ const rateLimitDay = new Ratelimit({
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-function getSystemPrompt(): string {
+function buildKnowledgeBlock(results: SearchResult[]): string {
+  const intro = `Följande utdrag är från elpris.ai:s egna guideartiklar. Använd dem som primär källa när du svarar. Om frågan inte berörs av utdragen, svara med din generella kunskap men säg det öppet (exempel: "Det här täcks inte direkt av våra artiklar, men generellt..."). Länka till artikeln i ditt svar i naturlig text när det är relevant — använd formatet /guider/{kategori}/{slug}.`;
+
+  const utdrag = results
+    .map(
+      (r, i) =>
+        `Utdrag ${i + 1} — ${r.heading_path}
+Källa: /guider/${r.category}/${r.article_slug}
+
+${r.chunk_text}`,
+    )
+    .join('\n\n');
+
+  return `<kunskapsbas>
+${intro}
+
+${utdrag}
+</kunskapsbas>`;
+}
+
+function getSystemPrompt(knowledgeBlock?: string | null): string {
   const now = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Europe/Stockholm',
     weekday: 'long',
@@ -44,7 +65,21 @@ function getSystemPrompt(): string {
     minute: '2-digit',
   }).format(new Date());
 
-  return `Just nu är det: ${now}. Du är elpris.ai:s AI-assistent. Du hjälper svenska användare förstå elpriser och spara pengar. Du svarar alltid på svenska, kort och konkret (max 3-4 meningar). När användaren frågar om aktuellt pris, billigaste timmar, eller liknande - använd get_current_price eller get_today_prices function calls. För frågor om morgondagen - använd get_tomorrow_prices. Day-ahead-priserna för imorgon släpps kl 13:15 varje dag. Kontrollera den aktuella tiden som står i början av denna prompt innan du säger att det är för tidigt eller sent. Om available: false returneras, förklara vänligt att priserna släpps kl 13:15 varje dag. Gissa ALDRIG priser - hämta alltid live-data via funktionerna. Om frågan inte handlar om el, säg vänligt att du bara hjälper med elprisfrågor. Använd ALDRIG markdown-formattering (ingen fet text med **asterisker**, inga listor med bindestreck, inga rubriker). Skriv bara ren text. Du får gärna använda emojis sparsamt när det passar.`;
+  const base = `Just nu är det: ${now}. Du är elpris.ai:s AI-assistent. Du hjälper svenska användare förstå elpriser och spara pengar. Du svarar alltid på svenska, kort och konkret (max 3-4 meningar). När användaren frågar om aktuellt pris, billigaste timmar, eller liknande - använd get_current_price eller get_today_prices function calls. För frågor om morgondagen - använd get_tomorrow_prices. Day-ahead-priserna för imorgon släpps kl 13:15 varje dag. Kontrollera den aktuella tiden som står i början av denna prompt innan du säger att det är för tidigt eller sent. Om available: false returneras, förklara vänligt att priserna släpps kl 13:15 varje dag. Gissa ALDRIG priser - hämta alltid live-data via funktionerna. Om frågan inte handlar om el, säg vänligt att du bara hjälper med elprisfrågor. Använd ALDRIG markdown-formattering (ingen fet text med **asterisker**, inga listor med bindestreck, inga rubriker). Skriv bara ren text. Du får gärna använda emojis sparsamt när det passar.`;
+
+  if (!knowledgeBlock) return base;
+
+  const ragRules = `
+
+Du har tillgång till en kunskapsbas i <kunskapsbas>-blocket nedan. Följ dessa regler:
+- Prioritera fakta från <kunskapsbas> framför din generella kunskap.
+- Vid motstrid mellan kunskapsbasen och din generella kunskap: lita på kunskapsbasen.
+- När du citerar fakta från ett utdrag, länka till artikeln i naturlig text med formatet /guider/{kategori}/{slug}.
+- Uppfinn ALDRIG länkar eller källor — använd bara slugs som faktiskt står i utdragen.
+
+${knowledgeBlock}`;
+
+  return base + ragRules;
 }
 
 const TOOLS: Anthropic.Tool[] = [
@@ -196,12 +231,38 @@ export async function POST(request: Request) {
       .slice(-6)
       .map((m) => ({ role: m.role, content: m.content }));
 
+    // ── RAG: hämta relevanta artikel-chunks baserat på senaste user-meddelandet.
+    //    Fail-soft: vid 429/timeout/fel kör vi vidare utan RAG-kontext.
+    let knowledgeBlock: string | null = null;
+    const userMessages = body.messages.filter((m) => m.role === 'user');
+    const latestUser = userMessages[userMessages.length - 1]?.content;
+
+    if (latestUser) {
+      try {
+        const results = await searchKnowledge(latestUser, {
+          limit: 4,
+          minSimilarity: 0.45,
+        });
+        if (results.length > 0) {
+          knowledgeBlock = buildKnowledgeBlock(results);
+          console.log(
+            `[rag] ${results.length} chunks found, top-1 sim=${results[0].similarity.toFixed(4)}`,
+          );
+        } else {
+          console.log('[rag] no chunks above threshold 0.45');
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`[rag] fail-soft (no RAG this turn): ${msg}`);
+      }
+    }
+
     // Tool use loop — max 5 iterations to avoid runaway loops
     for (let i = 0; i < 5; i++) {
       const response = await client.messages.create({
         model: 'claude-haiku-4-5',
         max_tokens: 300,
-        system: getSystemPrompt(),
+        system: getSystemPrompt(knowledgeBlock),
         tools: TOOLS,
         messages: apiMessages,
       });
