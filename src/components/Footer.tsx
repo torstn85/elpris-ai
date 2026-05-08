@@ -75,8 +75,8 @@ export default function Footer({ id, className = '' }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/guider/spara-el" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
-                  Spara el
+                <Link href="/guider/forsta-elpriset" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Förstå elpriset
                 </Link>
               </li>
               <li>
@@ -85,8 +85,13 @@ export default function Footer({ id, className = '' }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/guider/forsta-elpriset" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
-                  Förstå elpriset
+                <Link href="/guider/spara-el" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Spara el
+                </Link>
+              </li>
+              <li>
+                <Link href="/guider/teknik-och-trender" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Teknik &amp; trender
                 </Link>
               </li>
             </ul>
