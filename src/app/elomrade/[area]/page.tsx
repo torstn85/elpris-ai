@@ -3,14 +3,15 @@ import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import SwedenMap from "@/components/SwedenMap";
+import FaqAccordion from "@/components/dynamic/FaqAccordion";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AreaKey = "se1" | "se2" | "se3" | "se4";
 
 interface FaqItem {
-  q: string;
-  a: string;
+  question: string;
+  answer: string;
 }
 
 interface AreaContent {
@@ -43,16 +44,16 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
     counties: ["Norrbottens län", "Västerbottens län"],
     faq: [
       {
-        q: "Varför är elpriset lägst i SE1?",
-        a: "SE1 har Sveriges största vattenkraftproduktion och exporterar el söderut. Överföringskapaciteten är begränsad vilket skapar ett lokalt prisöverskott.",
+        question: "Varför är elpriset lägst i SE1?",
+        answer: "SE1 har Sveriges största vattenkraftproduktion och exporterar el söderut. Överföringskapaciteten är begränsad vilket skapar ett lokalt prisöverskott.",
       },
       {
-        q: "Vilka städer ingår i SE1?",
-        a: "Luleå, Umeå, Skellefteå, Kiruna och Gällivare är de största städerna i elområde SE1.",
+        question: "Vilka städer ingår i SE1?",
+        answer: "Luleå, Umeå, Skellefteå, Kiruna och Gällivare är de största städerna i elområde SE1.",
       },
       {
-        q: "Hur ofta är priset negativt i SE1?",
-        a: "Negativt elpris förekommer i SE1 under perioder med hög vattenkraftproduktion och låg förbrukning, särskilt under vår och höst.",
+        question: "Hur ofta är priset negativt i SE1?",
+        answer: "Negativt elpris förekommer i SE1 under perioder med hög vattenkraftproduktion och låg förbrukning, särskilt under vår och höst.",
       },
     ],
   },
@@ -71,16 +72,16 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
     ],
     faq: [
       {
-        q: "Vad ingår i elområde SE2?",
-        a: "SE2 omfattar mellersta Norrland och inkluderar städer som Sundsvall, Östersund, Falun och Gävle.",
+        question: "Vad ingår i elområde SE2?",
+        answer: "SE2 omfattar mellersta Norrland och inkluderar städer som Sundsvall, Östersund, Falun och Gävle.",
       },
       {
-        q: "Varför är SE2 billigare än SE3?",
-        a: "SE2 har mer vattenkraftproduktion per capita än SE3 och är fysiskt närmare de stora kraftverken i norr.",
+        question: "Varför är SE2 billigare än SE3?",
+        answer: "SE2 har mer vattenkraftproduktion per capita än SE3 och är fysiskt närmare de stora kraftverken i norr.",
       },
       {
-        q: "Hur påverkar vindkraft priset i SE2?",
-        a: "Ökad vindkraftsutbyggnad i SE2 pressar priserna nedåt, särskilt under blåsiga perioder.",
+        question: "Hur påverkar vindkraft priset i SE2?",
+        answer: "Ökad vindkraftsutbyggnad i SE2 pressar priserna nedåt, särskilt under blåsiga perioder.",
       },
     ],
   },
@@ -105,16 +106,16 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
     ],
     faq: [
       {
-        q: "Varför är elpriset högre i SE3 än i norra Sverige?",
-        a: "SE3 importerar el från norr och utlandet för att täcka sitt underskott. Överföringskapaciteten är begränsad och europeiska energipriser påverkar mer direkt.",
+        question: "Varför är elpriset högre i SE3 än i norra Sverige?",
+        answer: "SE3 importerar el från norr och utlandet för att täcka sitt underskott. Överföringskapaciteten är begränsad och europeiska energipriser påverkar mer direkt.",
       },
       {
-        q: "Ingår Gotland i SE3?",
-        a: "Ja, Gotland tillhör elområde SE3 men är anslutet via en separat likströmskabel till fastlandet.",
+        question: "Ingår Gotland i SE3?",
+        answer: "Ja, Gotland tillhör elområde SE3 men är anslutet via en separat likströmskabel till fastlandet.",
       },
       {
-        q: "Hur påverkar kärnkraften elpriset i SE3?",
-        a: "Kärnkraftverken Ringhals och Forsmark levererar stabil baskraft som dämpar prissvängningar. Planerade revisioner kan tillfälligt höja priserna.",
+        question: "Hur påverkar kärnkraften elpriset i SE3?",
+        answer: "Kärnkraftverken Ringhals och Forsmark levererar stabil baskraft som dämpar prissvängningar. Planerade revisioner kan tillfälligt höja priserna.",
       },
     ],
   },
@@ -134,16 +135,16 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
     ],
     faq: [
       {
-        q: "Varför är SE4 ofta dyrast i Sverige?",
-        a: "SE4 är starkt kopplat till det europeiska elnätet där gas- och kolkraft sätter marginalpriset. När Europa är dyrare smittar det av sig på SE4.",
+        question: "Varför är SE4 ofta dyrast i Sverige?",
+        answer: "SE4 är starkt kopplat till det europeiska elnätet där gas- och kolkraft sätter marginalpriset. När Europa är dyrare smittar det av sig på SE4.",
       },
       {
-        q: "Vilka länder påverkar elpriset i SE4?",
-        a: "Danmark, Tyskland och Polen påverkar SE4 mest via direkta elkablar. Hög vindkraft i Danmark kan ge låga priser, medan gasbrister i Europa driver upp dem.",
+        question: "Vilka länder påverkar elpriset i SE4?",
+        answer: "Danmark, Tyskland och Polen påverkar SE4 mest via direkta elkablar. Hög vindkraft i Danmark kan ge låga priser, medan gasbrister i Europa driver upp dem.",
       },
       {
-        q: "Vad hände när Barsebäck stängdes?",
-        a: "Nedläggningen av Barsebäck kärnkraftverk ökade SE4:s importberoende och bidrog till att priserna i söder ibland överstiger resten av Sverige.",
+        question: "Vad hände när Barsebäck stängdes?",
+        answer: "Nedläggningen av Barsebäck kärnkraftverk ökade SE4:s importberoende och bidrog till att priserna i söder ibland överstiger resten av Sverige.",
       },
     ],
   },
@@ -200,12 +201,34 @@ export default async function ElprisArea({
     ],
   };
 
+  const faqLd =
+    content.faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: content.faq.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: f.answer,
+            },
+          })),
+        }
+      : null;
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
 
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
@@ -296,19 +319,12 @@ export default async function ElprisArea({
             </div>
 
             {/* FAQ */}
-            <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-[#1E4976]">
-                <h2 className="font-bold text-lg">Vanliga frågor om {meta.name}</h2>
-              </div>
-              <div className="divide-y divide-[#1E4976]">
-                {content.faq.map((item, i) => (
-                  <div key={i} className="px-6 py-5 flex flex-col gap-2">
-                    <p className="font-semibold text-white text-sm">{item.q}</p>
-                    <p className="text-[#a8c4d8] text-sm leading-relaxed">{item.a}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <section>
+              <h2 className="text-2xl font-bold text-cyan-100 mb-6">
+                Vanliga frågor om {meta.name}
+              </h2>
+              <FaqAccordion items={content.faq} />
+            </section>
 
             {/* CTA */}
             <div className="flex justify-center">
