@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import SwedenMap from "@/components/SwedenMap";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
+import { CITIES } from "@/lib/cities";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -191,6 +192,10 @@ export default async function ElprisArea({
     );
   }
 
+  const citiesInArea = Object.values(CITIES).filter(
+    (c) => c.area === meta.name,
+  );
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -317,6 +322,30 @@ export default async function ElprisArea({
                 </div>
               </div>
             </div>
+
+            {/* Städer i elområdet — conditional rendering */}
+            {citiesInArea.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-cyan-100 mb-4">
+                  Städer i {meta.name}
+                </h2>
+                <p className="text-sm text-[#8fafc9] mb-4 leading-relaxed">
+                  Spotpriset är detsamma i hela elområde {meta.name}, men på stadssidorna får du även information om de större nätbolagen, lokala förutsättningar och svar på vanliga frågor om elen där du bor.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {citiesInArea.map((city) => (
+                    <Link
+                      key={city.slug}
+                      href={`/elpris-idag/${city.slug}`}
+                      className="bg-[#0F3460] border border-[#1E4976] rounded-2xl px-4 py-3 hover:border-[#00E5FF]/40 hover:bg-[#0F3460]/80 transition-colors"
+                    >
+                      <p className="font-semibold text-white text-sm">{city.name}</p>
+                      <p className="text-xs text-[#8fafc9] mt-0.5">{city.region}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* FAQ */}
             <section>
