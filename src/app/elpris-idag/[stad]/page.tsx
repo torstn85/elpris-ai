@@ -24,8 +24,8 @@ const PUBLISHED_LABEL = 'maj 2026';
 const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
   SE1: ['Luleå', 'Kiruna'],
   SE2: ['Sundsvall', 'Östersund'],
-  SE3: ['Stockholm', 'Göteborg', 'Uppsala'],
-  SE4: ['Malmö', 'Helsingborg'],
+  SE3: ['Stockholm', 'Göteborg', 'Uppsala', 'Kungsbacka'],
+  SE4: ['Malmö', 'Helsingborg', 'Halmstad', 'Falkenberg', 'Laholm', 'Båstad'],
 };
 
 const LINK_CLASS =
