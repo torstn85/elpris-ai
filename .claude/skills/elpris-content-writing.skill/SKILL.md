@@ -189,6 +189,31 @@ title: `Elpris ${meta.name} — Spotpris ${meta.city} & ${meta.region}`,  // ✅
 title: `${label} – guider`,  // ✅ ren
 ```
 
+**Dynamiska routes och OG/Twitter (etablerad maj 2026):**
+
+`title.template` i `layout.tsx` påverkar BARA `metadata.title`, inte `openGraph.title` eller `twitter.title`. För dynamiska routes som `[slug]/page.tsx` eller `[stad]/page.tsx` där OG/Twitter-title byggs från frontmatter eller props måste suffix `| elpris.ai` appendas explicit:
+
+```typescript
+// src/app/guider/[kategori]/[slug]/page.tsx
+return {
+  title: frontmatter.metaTitle || frontmatter.title,  // ✅ ren — template lägger på suffix
+  openGraph: {
+    title: `${frontmatter.metaTitle || frontmatter.title} | elpris.ai`,  // ✅ explicit suffix
+  },
+  twitter: {
+    title: `${frontmatter.metaTitle || frontmatter.title} | elpris.ai`,  // ✅ explicit suffix
+  },
+};
+```
+
+**Symptom på att detta missats:** Sociala kort (Facebook, X, LinkedIn) visar artikeltitel utan brand-namn "| elpris.ai".
+
+**Verifikation efter nya dynamiska routes:**
+```bash
+# Hitta alla openGraph.title som byggs från props/frontmatter utan suffix:
+grep -rn "openGraph:" src/app --include="*.tsx" -A 3 | grep "title:" | grep -v "elpris.ai"
+```
+
 **MDX-frontmatter:**
 
 ```yaml
