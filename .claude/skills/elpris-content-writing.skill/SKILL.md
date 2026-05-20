@@ -74,7 +74,48 @@ Alla guideartiklar måste ha:
 - **H2-sektioner** i logisk progression
 - **FAQ-block** i frontmatter (`faqs:` array) — auto-renderas till FaqAccordion + FAQPage JSON-LD
 - **Internlänkar** ut till relaterade artiklar (3-7 stycken)
-- **updatedAt-datum** uppdateras vid större ändringar
+- **updatedAt-datum** uppdateras vid VARJE ändring av artikeln (se egen sektion "updatedAt-disciplin" nedan)
+
+## updatedAt-disciplin (etablerad maj 2026)
+
+**HÅRD REGEL:** Varje gång en MDX-fil under `src/content/guider/` ändras — oavsett om det är brödtext, FAQ, frontmatter-fält, fakta-uppdatering eller bara typo-fix — ska `updatedAt` i frontmatter sättas till dagens datum (YYYY-MM-DD).
+
+**Varför detta är kritiskt:**
+- `updatedAt` mappas till `dateModified` i Article JSON-LD (`[slug]/page.tsx`)
+- Google använder `dateModified` som rankningssignal — nyare innehåll prioriteras
+- Sidan visar "Uppdaterad [datum]"-rad i UI:t — ger trovärdighet till läsare
+- Att skriva FAQ-block eller fixa fakta utan att uppdatera datum betyder att Google ser artikeln som "gammal" trots att den just förbättrats
+
+**Process vid VARJE artikel-ändring:**
+
+1. Gör innehållsändringen (brödtext, FAQ, fakta, typo, etc)
+2. **Innan commit:** uppdatera `updatedAt: 'YYYY-MM-DD'` till dagens datum
+3. Verifiera att fältet finns och har korrekt format
+4. Commit + push tillsammans
+
+**YAML-format:**
+
+```yaml
+---
+title: '...'
+publishedAt: '2026-04-15'
+updatedAt: '2026-05-20'   # ALLTID dagens datum vid ändring
+---
+```
+
+**Verifikation efter content-arbete:**
+
+```bash
+# Hitta filer som ändrats men där updatedAt INTE är dagens datum:
+TODAY=$(date +%Y-%m-%d)
+git diff --name-only HEAD | grep "\.mdx$" | while read f; do
+  if ! grep -q "updatedAt: '$TODAY'" "$f"; then
+    echo "⚠️  $f har ändrats men updatedAt är inte $TODAY"
+  fi
+done
+```
+
+**Vanlig fallgrop:** Att lägga till FAQ-block eller fixa en faktabugg utan att uppdatera datum. Det fångades efter en FAQ-tillägg på vad-ar-spotpris.mdx (maj 2026) där datum behövde retroaktiveras.
 
 ## Pillar page-specifika krav
 
