@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!label) return {};
 
   return {
-    title: `${label} – guider | elpris.ai`,
+    title: `${label} – guider`,
     description: CATEGORY_DESCRIPTIONS[params.kategori],
     alternates: { canonical: `https://www.elpris.ai/guider/${params.kategori}` },
   };

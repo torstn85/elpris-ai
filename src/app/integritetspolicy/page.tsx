@@ -3,7 +3,7 @@ import Link from "next/link";
 import NavBar from "@/components/NavBar";
 
 export const metadata: Metadata = {
-  title: "Integritetspolicy – elpris.ai",
+  title: "Integritetspolicy",
   description:
     "Läs om hur elpris.ai hanterar personuppgifter, cookies och tredjepartstjänster.",
 };

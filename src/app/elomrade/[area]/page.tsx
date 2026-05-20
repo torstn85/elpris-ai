@@ -168,7 +168,7 @@ export async function generateMetadata({
   const meta = AREA_META[area as AreaKey];
   if (!meta) return {};
   return {
-    title: `Elpris ${meta.name} | Spotpris ${meta.city} & ${meta.region} – elpris.ai`,
+    title: `Elpris ${meta.name} — Spotpris ${meta.city} & ${meta.region}`,
     description: `Se aktuellt elpris för elområde ${meta.name} (${meta.city}, ${meta.region}). Timpriser idag och imorgon i öre/kWh.`,
   };
 }

@@ -3,9 +3,30 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "elpris.ai – Realtidspriser på el i Sverige",
+  metadataBase: new URL("https://www.elpris.ai"),
+  title: {
+    default: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
+    template: "%s | elpris.ai",
+  },
   description:
-    "Se elpriset just nu för SE1–SE4. AI-driven analys av när du bör ladda bilen, tvätta eller använda el.",
+    "Se elpriset just nu för SE1, SE2, SE3 och SE4. AI-driven rådgivning för när du bör ladda elbilen, tvätta eller använda el.",
+  alternates: {
+    canonical: "https://www.elpris.ai",
+  },
+  openGraph: {
+    title: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
+    description:
+      "Se elpriset just nu för SE1, SE2, SE3 och SE4. AI-driven rådgivning för när du bör använda el.",
+    url: "https://www.elpris.ai",
+    siteName: "elpris.ai",
+    locale: "sv_SE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
+    description: "Se elpriset just nu för SE1, SE2, SE3 och SE4.",
+  },
   icons: {
     icon: "/favicon.png",
   },

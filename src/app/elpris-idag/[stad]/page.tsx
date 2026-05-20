@@ -32,9 +32,9 @@ const LINK_CLASS =
   'font-semibold text-[#00E5FF] hover:text-white underline transition-colors duration-150';
 
 function buildTitle(name: string): string {
-  const full = `Elpris idag i ${name} — timme för timme | elpris.ai`;
+  const full = `Elpris idag i ${name} — timme för timme`;
   if (full.length <= 60) return full;
-  return `Elpris idag i ${name} | elpris.ai`;
+  return `Elpris idag i ${name}`;
 }
 
 function buildDescription(name: string, area: Area): string {

@@ -12,7 +12,7 @@ import Footer from '@/components/Footer';
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
 export const metadata: Metadata = {
-  title: 'Guider om elpriser och elavtal | elpris.ai',
+  title: 'Guider om elpriser och elavtal',
   description: 'Allt du behöver veta om elpriser, elavtal och hur du sparar el. Konkreta guider med live-data från elmarknaden.',
   alternates: { canonical: 'https://www.elpris.ai/guider' },
 };

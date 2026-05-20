@@ -21,7 +21,7 @@ interface HourEntry {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Elpriset idag — Sveriges fyra elområden | elpris.ai",
+  title: "Elpriset idag — Sveriges fyra elområden",
   description:
     "Se aktuella elpriser idag för SE1, SE2, SE3 och SE4. Dygnssnitt, billigaste och dyraste timmar, samt tips på hur du sparar el genom att flytta förbrukning.",
   alternates: {

@@ -232,6 +232,50 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0A2540] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "elpris.ai",
+            url: "https://www.elpris.ai",
+            description:
+              "Realtidspriser och AI-rådgivning för svensk el. Se elpriset just nu för SE1, SE2, SE3 och SE4.",
+            inLanguage: "sv-SE",
+            publisher: {
+              "@type": "Organization",
+              name: "elpris.ai",
+              url: "https://www.elpris.ai",
+            },
+            potentialAction: {
+              "@type": "SearchAction",
+              target: {
+                "@type": "EntryPoint",
+                urlTemplate: "https://www.elpris.ai/elpris-idag?q={search_term_string}",
+              },
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "elpris.ai",
+            url: "https://www.elpris.ai",
+            logo: "https://www.elpris.ai/favicon.png",
+            description:
+              "Sveriges destination för realtidspriser på el och AI-driven energirådgivning.",
+            sameAs: [],
+          }),
+        }}
+      />
+
       {/* ── Nav ── */}
       <NavBar />
 

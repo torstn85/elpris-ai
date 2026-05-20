@@ -7,7 +7,7 @@ import SwedenMap from "@/components/SwedenMap";
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Elområden i Sverige | SE1, SE2, SE3, SE4 – elpris.ai",
+  title: "Elområden i Sverige — SE1, SE2, SE3, SE4",
   description:
     "Lär dig om Sveriges fyra elområden SE1–SE4. Förstå varför elpriset skiljer sig åt i Luleå, Sundsvall, Stockholm och Malmö.",
 };

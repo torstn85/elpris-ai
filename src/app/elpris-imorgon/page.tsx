@@ -21,7 +21,7 @@ interface HourEntry {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Elpriset imorgon — Sveriges fyra elområden | elpris.ai",
+  title: "Elpriset imorgon — Sveriges fyra elområden",
   description:
     "Se morgondagens elpriser för SE1, SE2, SE3 och SE4. Day-ahead-priser publiceras runt kl 13:15 varje dag. Planera tvätt, elbilsladdning och uppvärmning till de billigaste timmarna.",
 };

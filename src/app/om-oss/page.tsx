@@ -3,7 +3,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Om oss | elpris.ai",
+  title: "Om oss",
   description:
     "elpris.ai är byggt för en enkel sak: att göra elpriser begripliga. Vi drivs oberoende och vill hjälpa svenska konsumenter förstå elmarknaden.",
   alternates: {
