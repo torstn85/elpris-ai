@@ -130,15 +130,75 @@ När vi länkar från artikel A till artikel B:
 
 ## Meta-text-mallar
 
-**Meta title-mallar:**
-- Guide: "[Mål-fras] [år] – [vinkel] │ elpris.ai"
-  - Ex: "Energieffektivisera villan 2026 – spara mest │ elpris.ai"
-- Stadssida: "Elpris timme för timme i [Stad] │ elpris.ai"
+**Meta title-mallar (utan suffix — `| elpris.ai` läggs på automatiskt via template, se sektionen "Title-arkitektur" nedan):**
+- Guide: "[Mål-fras] [år] – [vinkel]"
+  - Ex: "Energieffektivisera villan 2026 – spara mest"
+- Stadssida: "Elpris timme för timme i [Stad]"
 
 **Meta description-mall:**
 "[Mål-fras-svar i 1 mening]. [Konkret nytta i 1 mening]. [Call-to-action eller löfte]."
 
 Exempel: "Här ser du aktuellt elpris timme för timme i Halmstad. Spotpriset är samma i hela SE4 men de exakta priserna varierar över dygnet. Planera tvätt och elbilsladdning efter de billigaste timmarna."
+
+## Title-arkitektur (etablerad v1.14+)
+
+`src/app/layout.tsx` innehåller en `title.template: '%s | elpris.ai'` som automatiskt suffixar alla barnsidors metadata.title med `| elpris.ai`.
+
+**Regler:**
+
+- **Barnsidors `metadata.title`**: skriv BARA den unika delen — INTE med `| elpris.ai`-suffix
+- **`openGraph.title` och `twitter.title`**: BEHÅLL `| elpris.ai`-suffix (sociala kort visas isolerat utan domänkontext)
+- **`layout.tsx` default-title**: behåll varumärket explicit ("elpris.ai — Realtidspriser...")
+- **MDX frontmatter `metaTitle`**: skriv utan suffix — det läggs på automatiskt via template
+
+**Exempel — KORREKT:**
+
+```typescript
+// src/app/elpris-idag/page.tsx
+export const metadata: Metadata = {
+  title: 'Elpriset idag — Sveriges fyra elområden',  // ✅ ren — template lägger på suffix
+  openGraph: {
+    title: 'Elpriset idag — Sveriges fyra elområden | elpris.ai',  // ✅ behåll suffix
+  },
+  twitter: {
+    title: 'Elpriset idag — Sveriges fyra elområden | elpris.ai',  // ✅ behåll suffix
+  },
+};
+```
+
+**Exempel — FEL (dubblering vid render):**
+
+```typescript
+export const metadata: Metadata = {
+  title: 'Elpriset idag — Sveriges fyra elområden | elpris.ai',  // ❌ blir "... | elpris.ai | elpris.ai"
+};
+```
+
+**Dynamiska titles (template literals):**
+
+För dynamiska sidor (stadssidor, områden, guider) — samma regel:
+
+```typescript
+// Stadssida [stad]/page.tsx
+title: `Elpris idag i ${name} — timme för timme`,  // ✅ ren
+
+// Områdessida [area]/page.tsx
+title: `Elpris ${meta.name} — Spotpris ${meta.city} & ${meta.region}`,  // ✅ ren
+
+// Guidekategori [kategori]/page.tsx
+title: `${label} – guider`,  // ✅ ren
+```
+
+**MDX-frontmatter:**
+
+```yaml
+---
+metaTitle: 'Energieffektivisera villan 2026 – spara mest'  # ✅ ren, ingen | elpris.ai
+title: '...'
+---
+```
+
+**Tumregel vid varje ny sida/artikel:** Om din `title` redan slutar på `| elpris.ai` har du gjort fel — ta bort suffix.
 
 ## Frontmatter-template för ny artikel
 
