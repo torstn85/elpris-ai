@@ -119,4 +119,26 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  varberg: {
+    slug: 'varberg',
+    name: 'Varberg',
+    area: 'SE3',
+    region: 'Halland',
+    uniqueIntro:
+      'Varberg är Hallands tredje största kommun med drygt 65 000 invånare och en av västkustens viktigaste hamnstäder. Staden tillhör elområde SE3 — samma område som Stockholm och Göteborg — och är den sydligaste SE3-staden i Halland innan elprisgränsen till SE4 vid Falkenberg. Det innebär att Varberg ofta har 20–40 % lägre spotpris än Halmstad bara 50 kilometer söderut. Varberg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i kustområden som Apelviken och Träslövsläge, samt industri och hamnverksamhet. SE3-tillhörigheten gör smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — du kan utnyttja både dygnsmönster och regionala prisskillnader.',
+    commonGridCompanies:
+      'Bland de större nätbolagen i Varberg finns Varberg Energi och Varbergsortens Elkraft, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Varberg?',
+        answer:
+          'Varberg tillhör elområde SE3, samma område som Göteborg och Stockholm. Det är den sydligaste SE3-staden i Halland — Falkenberg och Halmstad strax söderut tillhör SE4. Halland är ett av Sveriges tydligaste exempel på att elprisområden inte följer länsgränser.',
+      },
+      {
+        question: 'Är elen billigare i Varberg än i Falkenberg?',
+        answer:
+          'Ja, ofta. Varberg tillhör SE3 och Falkenberg tillhör SE4, trots att städerna ligger knappt 30 kilometer ifrån varandra. SE4 har konsekvent högre spotpris än SE3 — typiskt 20–40 % mer för samma timme. Skillnaden beror på begränsad överföringskapacitet i elnätet och kopplingen till europeiska elnätet via Tyskland och Polen.',
+      },
+    ],
+  },
 };
