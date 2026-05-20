@@ -24,6 +24,23 @@ export const metadata: Metadata = {
   title: "Elpriset idag — Sveriges fyra elområden | elpris.ai",
   description:
     "Se aktuella elpriser idag för SE1, SE2, SE3 och SE4. Dygnssnitt, billigaste och dyraste timmar, samt tips på hur du sparar el genom att flytta förbrukning.",
+  alternates: {
+    canonical: "https://www.elpris.ai/elpris-idag",
+  },
+  openGraph: {
+    title: "Elpriset idag — Sveriges fyra elområden",
+    description:
+      "Se aktuella elpriser idag för SE1, SE2, SE3 och SE4. Dygnssnitt, billigaste och dyraste timmar, samt tips på hur du sparar el.",
+    url: "https://www.elpris.ai/elpris-idag",
+    siteName: "elpris.ai",
+    locale: "sv_SE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Elpriset idag — Sveriges fyra elområden",
+    description: "Se aktuella elpriser idag för SE1, SE2, SE3 och SE4.",
+  },
 };
 
 // ─── Data fetching ────────────────────────────────────────────────────────────
@@ -120,6 +137,78 @@ export default async function ElprisIdag() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            name: "Elpriser idag för SE1, SE2, SE3 och SE4",
+            description:
+              "Aktuella spotpriser per timme för Sveriges fyra elprisområden. Datan uppdateras automatiskt från Nord Pool via elprisetjustnu.se.",
+            url: "https://www.elpris.ai/elpris-idag",
+            keywords: ["elpris", "spotpris", "Nord Pool", "SE1", "SE2", "SE3", "SE4", "Sverige"],
+            isAccessibleForFree: true,
+            license: "https://www.elprisetjustnu.se/elpris-api",
+            creator: {
+              "@type": "Organization",
+              name: "elpris.ai",
+              url: "https://www.elpris.ai",
+            },
+            temporalCoverage: new Date().toISOString().split("T")[0],
+            spatialCoverage: {
+              "@type": "Place",
+              name: "Sverige",
+            },
+            variableMeasured: "Elpris (öre/kWh)",
+          }),
+        }}
+      />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Hur ska jag läsa dagens elpriser?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Elpriset uppdateras varje kvart, men i tabellen visas timsnitt för enklare överblick. Färgmarkeringarna visar när det är värt att förbruka el (grönt = billigt, rött = dyrt) och när det lönar sig att vänta.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Vilka elområden finns i Sverige?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Sverige är indelat i fyra elprisområden: SE1 (Luleå), SE2 (Sundsvall), SE3 (Stockholm) och SE4 (Malmö). Priset varierar mellan områdena beroende på produktion, förbrukning och överföringskapacitet.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Varför är elen dyrare i södra Sverige?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "SE4 (södra Sverige) har ofta 20-40 % högre spotpris än SE1-SE3. Det beror på begränsad överföringskapacitet från norra Sverige och kopplingen till europeiska elnätet via Tyskland och Polen.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Var kommer prisdatan ifrån?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Priserna är spotpriser från den nordiska elbörsen Nord Pool. Vi hämtar datan via elprisetjustnu.se och uppdaterar automatiskt.",
+                },
+              },
+            ],
+          }),
+        }}
       />
 
       <main className="min-h-screen bg-[#0A2540] text-white">
