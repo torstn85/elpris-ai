@@ -423,9 +423,9 @@ export default function Home() {
             {/* Stycke 3 */}
             <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
               På elpris.ai ser du{" "}
-              <Link href="/elpris-idag" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">aktuella priser i realtid</Link>
+              <Link href="/elpris-idag" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elpris idag</Link>
               {" "}för alla fyra elområden, dagens dygnskurva timme för timme, samt{" "}
-              <Link href="/elpris-imorgon" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">morgondagens priser</Link>
+              <Link href="/elpris-imorgon" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elpris imorgon</Link>
               {" "}så snart de publiceras runt kl 13:15 varje dag. Du kan också ställa frågor
               till vår AI-assistent som hämtar färska prisdata och ger konkreta råd: när är
               det billigast att{" "}
