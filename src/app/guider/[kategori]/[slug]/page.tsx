@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords: frontmatter.keywords,
     alternates: { canonical: url },
     openGraph: {
-      title: frontmatter.metaTitle || frontmatter.title,
+      title: `${frontmatter.metaTitle || frontmatter.title} | elpris.ai`,
       description: frontmatter.description,
       url,
       type: 'article',
@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: frontmatter.metaTitle || frontmatter.title,
+      title: `${frontmatter.metaTitle || frontmatter.title} | elpris.ai`,
       description: frontmatter.description,
     },
   };
