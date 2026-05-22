@@ -41,6 +41,40 @@ const client = new Anthropic({
 
 const RETRY_DELAYS_MS = [1000, 2000, 4000];
 
+// Duck-typing i stället för instanceof Anthropic.APIError — instanceof failar i
+// prod-bundeln när Next.js råkar dra in både ESM- och CJS-kopior av SDK:n och
+// klass-identiteterna divergerar. err.status är källan-till-sanning.
+function getErrorStatus(err: unknown): number | undefined {
+  if (typeof err === 'object' && err !== null && 'status' in err) {
+    const s = (err as { status?: unknown }).status;
+    if (typeof s === 'number') return s;
+  }
+  return undefined;
+}
+
+function getRetryAfterMs(err: unknown): number | undefined {
+  if (typeof err !== 'object' || err === null || !('headers' in err)) return undefined;
+  const headers = (err as { headers?: unknown }).headers;
+  let raw: string | null | undefined;
+  if (headers && typeof (headers as Headers).get === 'function') {
+    raw = (headers as Headers).get('retry-after');
+  } else if (headers && typeof headers === 'object') {
+    raw = (headers as Record<string, string>)['retry-after'];
+  }
+  const n = raw ? Number(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? Math.min(n * 1000, 10_000) : undefined;
+}
+
+function isConnectionError(err: unknown): boolean {
+  // Best-effort instanceof först — funkar i lokal dev innan bundling delar klasser.
+  if (err instanceof Anthropic.APIConnectionError) return true;
+  if (!(err instanceof Error)) return false;
+  // Connection-fel saknar HTTP-status och har message som "Connection error." /
+  // "Request timed out." / fetch-relaterade meddelanden.
+  if (getErrorStatus(err) !== undefined) return false;
+  return /connection|timed? ?out|network|fetch fail|socket/i.test(err.message ?? '');
+}
+
 async function callAnthropicWithRetry(
   params: Anthropic.MessageCreateParamsNonStreaming,
 ): Promise<Anthropic.Message> {
@@ -52,31 +86,30 @@ async function callAnthropicWithRetry(
     } catch (err) {
       lastErr = err;
 
-      const isOverloaded = err instanceof Anthropic.APIError && (err.status === 429 || err.status === 529);
-      const isConnection =
-        err instanceof Anthropic.APIConnectionError || err instanceof Anthropic.APIConnectionTimeoutError;
+      const status = getErrorStatus(err);
+      const isOverloaded = status === 429 || status === 529;
+      const isConnection = isConnectionError(err);
 
-      if (!isOverloaded && !isConnection) throw err;
+      if (!isOverloaded && !isConnection) {
+        // Bonus-observability: lämna spår även när vi INTE retryar, så att
+        // tystnad i loggen inte är dubbeltydlig nästa gång.
+        const name = err instanceof Error ? err.name : typeof err;
+        console.warn(`[anthropic-retry] skip (status=${status ?? 'unknown'}, name=${name})`);
+        throw err;
+      }
 
       const isLastAttempt = attempt === RETRY_DELAYS_MS.length - 1;
       if (isLastAttempt) break;
 
       // Respektera Retry-After-header om Anthropic skickar en (vanligt vid 429).
-      let waitMs = RETRY_DELAYS_MS[attempt];
-      if (err instanceof Anthropic.APIError) {
-        const retryAfter = err.headers?.['retry-after'];
-        const retryAfterSec = retryAfter ? Number(retryAfter) : NaN;
-        if (Number.isFinite(retryAfterSec) && retryAfterSec > 0) {
-          waitMs = Math.min(retryAfterSec * 1000, 10_000);
-        }
-      }
+      const waitMs = getRetryAfterMs(err) ?? RETRY_DELAYS_MS[attempt];
       // Jitter ±20% för att undvika thundering herd vid samtidiga klienter.
       const jitter = waitMs * (0.8 + Math.random() * 0.4);
       const finalWait = Math.round(jitter);
 
-      const status = err instanceof Anthropic.APIError ? err.status : 'connection';
+      const statusLabel = status ?? 'connection';
       console.warn(
-        `[anthropic-retry] status=${status} attempt=${attempt + 1}/${RETRY_DELAYS_MS.length} waiting ${finalWait}ms`,
+        `[anthropic-retry] status=${statusLabel} attempt=${attempt + 1}/${RETRY_DELAYS_MS.length} waiting ${finalWait}ms`,
       );
 
       await new Promise((resolve) => setTimeout(resolve, finalWait));
@@ -355,8 +388,10 @@ export async function POST(request: Request) {
     console.error('Error in /api/chat:', err);
 
     // Aldrig läcka rå err.message till klienten — den kan innehålla
-    // hela Anthropic-response (t.ex. "529 {…}").
-    if (err instanceof Anthropic.APIError && (err.status === 429 || err.status === 529)) {
+    // hela Anthropic-response (t.ex. "529 {…}"). Duck-typing på err.status
+    // är robust mot bundling/ESM-CJS-dubbelladdning där instanceof failar.
+    const status = getErrorStatus(err);
+    if (status === 429 || status === 529) {
       return NextResponse.json(
         { error: 'Hoppsan, jag är lite upptagen just nu — försök igen om en liten stund.' },
         { status: 503 },
