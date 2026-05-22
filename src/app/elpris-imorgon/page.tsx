@@ -2,21 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import { supabase } from "@/lib/supabase";
-import { stockholmDayUTCRange } from "@/lib/time";
+import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
-type Area = (typeof AREAS)[number];
-
-interface HourEntry {
-  hour: number;
-  ore_per_kwh: number;
-}
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -25,58 +14,6 @@ export const metadata: Metadata = {
   description:
     "Se morgondagens elpriser för SE1, SE2, SE3 och SE4. Day-ahead-priser publiceras runt kl 13:15 varje dag. Planera tvätt, elbilsladdning och uppvärmning till de billigaste timmarna.",
 };
-
-// ─── Data fetching ────────────────────────────────────────────────────────────
-
-async function fetchTomorrowPrices(): Promise<Record<Area, HourEntry[]> | null> {
-  const tomorrow = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
-  const { from, to } = stockholmDayUTCRange(tomorrow);
-
-  const { data, error } = await supabase
-    .from("spot_prices")
-    .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", from)
-    .lte("delivery_period_start", to)
-    .order("delivery_period_start");
-
-  if (error || !data || data.length === 0) return null;
-
-  const grouped: Record<string, { sum: number; count: number }[]> = {};
-  for (const row of data) {
-    const hour = new Date(row.delivery_period_start).toLocaleString("sv-SE", {
-      timeZone: "Europe/Stockholm",
-      hour: "numeric",
-      hour12: false,
-    });
-    const h = parseInt(hour, 10);
-    if (!grouped[row.area]) grouped[row.area] = Array.from({ length: 24 }, () => ({ sum: 0, count: 0 }));
-    grouped[row.area][h].sum += row.ore_per_kwh;
-    grouped[row.area][h].count += 1;
-  }
-
-  const toEntries = (area: string): HourEntry[] =>
-    (grouped[area] ?? [])
-      .map((bucket, hour) =>
-        bucket.count > 0
-          ? { hour, ore_per_kwh: Math.round((bucket.sum / bucket.count) * 10) / 10 }
-          : null
-      )
-      .filter((e): e is HourEntry => e !== null);
-
-  if (!AREAS.every((a) => toEntries(a).length > 0)) return null;
-
-  return {
-    SE1: toEntries("SE1"),
-    SE2: toEntries("SE2"),
-    SE3: toEntries("SE3"),
-    SE4: toEntries("SE4"),
-  };
-}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -101,7 +38,8 @@ function fmt(price: number): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function ElprisImorgon() {
-  const areas = await fetchTomorrowPrices();
+  const tomorrowData = await loadTomorrowPrices();
+  const areas = tomorrowData?.areas ?? null;
 
   const tomorrow = new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Europe/Stockholm",
