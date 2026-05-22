@@ -32,7 +32,59 @@ const rateLimitDay = new Ratelimit({
   prefix: 'rl:chat:1d',
 });
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+  // Disable SDK:s inbyggda retry — vi sköter det själva i callAnthropicWithRetry()
+  // för att få exakt 1s/2s/4s backoff och egen logging.
+  maxRetries: 0,
+});
+
+const RETRY_DELAYS_MS = [1000, 2000, 4000];
+
+async function callAnthropicWithRetry(
+  params: Anthropic.MessageCreateParamsNonStreaming,
+): Promise<Anthropic.Message> {
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt < RETRY_DELAYS_MS.length; attempt++) {
+    try {
+      return await client.messages.create(params);
+    } catch (err) {
+      lastErr = err;
+
+      const isOverloaded = err instanceof Anthropic.APIError && (err.status === 429 || err.status === 529);
+      const isConnection =
+        err instanceof Anthropic.APIConnectionError || err instanceof Anthropic.APIConnectionTimeoutError;
+
+      if (!isOverloaded && !isConnection) throw err;
+
+      const isLastAttempt = attempt === RETRY_DELAYS_MS.length - 1;
+      if (isLastAttempt) break;
+
+      // Respektera Retry-After-header om Anthropic skickar en (vanligt vid 429).
+      let waitMs = RETRY_DELAYS_MS[attempt];
+      if (err instanceof Anthropic.APIError) {
+        const retryAfter = err.headers?.['retry-after'];
+        const retryAfterSec = retryAfter ? Number(retryAfter) : NaN;
+        if (Number.isFinite(retryAfterSec) && retryAfterSec > 0) {
+          waitMs = Math.min(retryAfterSec * 1000, 10_000);
+        }
+      }
+      // Jitter ±20% för att undvika thundering herd vid samtidiga klienter.
+      const jitter = waitMs * (0.8 + Math.random() * 0.4);
+      const finalWait = Math.round(jitter);
+
+      const status = err instanceof Anthropic.APIError ? err.status : 'connection';
+      console.warn(
+        `[anthropic-retry] status=${status} attempt=${attempt + 1}/${RETRY_DELAYS_MS.length} waiting ${finalWait}ms`,
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, finalWait));
+    }
+  }
+
+  throw lastErr;
+}
 
 function buildKnowledgeBlock(results: SearchResult[]): string {
   const intro = `Följande utdrag är från elpris.ai:s egna guideartiklar. Använd dem som primär källa när du svarar. Om frågan inte berörs av utdragen, svara med din generella kunskap men säg det öppet (exempel: "Det här täcks inte direkt av våra artiklar, men generellt..."). Länka till artikeln i ditt svar i naturlig text när det är relevant — använd formatet /guider/{kategori}/{slug}.`;
@@ -259,7 +311,7 @@ export async function POST(request: Request) {
 
     // Tool use loop — max 5 iterations to avoid runaway loops
     for (let i = 0; i < 5; i++) {
-      const response = await client.messages.create({
+      const response = await callAnthropicWithRetry({
         model: 'claude-haiku-4-5',
         max_tokens: 300,
         system: getSystemPrompt(knowledgeBlock),
@@ -301,8 +353,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ reply: 'Kunde inte hämta svar just nu. Försök igen.' });
   } catch (err) {
     console.error('Error in /api/chat:', err);
+
+    // Aldrig läcka rå err.message till klienten — den kan innehålla
+    // hela Anthropic-response (t.ex. "529 {…}").
+    if (err instanceof Anthropic.APIError && (err.status === 429 || err.status === 529)) {
+      return NextResponse.json(
+        { error: 'Hoppsan, jag är lite upptagen just nu — försök igen om en liten stund.' },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Internal server error' },
+      { error: 'Något gick fel just nu. Försök igen om en stund.' },
       { status: 500 },
     );
   }

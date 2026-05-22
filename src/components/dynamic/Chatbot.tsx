@@ -67,8 +67,14 @@ export default function Chatbot() {
       });
       const data = await res.json();
       if (!res.ok) {
-        const msg = data?.error ?? 'Något gick fel. Försök igen.';
-        setMessages((prev) => [...prev, { role: 'assistant', content: msg }]);
+        // Defensiv guard: visa bara om det ser ut som ren svensk text.
+        // Skydd mot att rå JSON / felkod (t.ex. "529 {…}") läcker till UI.
+        const raw = typeof data?.error === 'string' ? data.error : '';
+        const looksClean = raw && !raw.includes('{') && !/^\d{3}\s/.test(raw) && raw.length < 200;
+        const safe = looksClean
+          ? raw
+          : 'Hoppsan, något gick fel just nu. Försök igen om en liten stund.';
+        setMessages((prev) => [...prev, { role: 'assistant', content: safe }]);
       } else {
         setMessages((prev) => [
           ...prev,
