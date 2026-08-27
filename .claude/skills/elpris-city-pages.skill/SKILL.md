@@ -5,7 +5,7 @@ description: "Använd denna skill när elpris.ai-arbete involverar stadssidor (n
 
 # Stadssidor på elpris.ai — workflow och mall
 
-Stadssidor är vår starkaste återkommande tillväxtmekanism. Halland-klustret (Kungsbacka, Halmstad, Falkenberg, Laholm, Båstad) bevisade modellen i v1.14. Nästa steg är att skala till fler regioner i veckotakt.
+Stadssidor är vår starkaste återkommande tillväxtmekanism. Halland-klustret (Kungsbacka, Varberg, Halmstad, Falkenberg, Laholm, Båstad) bevisade modellen i v1.14. Nästa steg är att skala till fler regioner i veckotakt.
 
 ## Arkitektur — config-driven (KRITISKT)
 
@@ -47,6 +47,8 @@ Varje stad behöver dessa fält:
   ],
 }
 ```
+
+**`updatedAt` — skriv INTE för hand.** Stadsobjekt har ett valfritt fält `updatedAt?: string` (YYYY-MM-DD) som pre-commit-hooken sätter/bumpar automatiskt när DEN stadens text (uniqueIntro/uniqueFaqs/commonGridCompanies) ändras. Det härleder stadens `dateModified` (senaste av `MODIFIED_AT` i mallen och stadens `updatedAt`). Utelämna fältet när du skapar en ny stad.
 
 ### Steg 3: Skicka Claude Code-prompt enligt format (se elpris-claude-code-prompting-pattern nedan)
 
@@ -97,7 +99,9 @@ Minst 2 frågor per stad. Bra mönster:
 ✅ Sitemap-entry med priority 0.9
 ✅ FAQ-accordion via FaqAccordion-komponenten
 ✅ Listning på `/elomrade/[area]` i "Städer i SE3/SE4"-sektion
-✅ Pre-rendering vid build
+✅ SSR:ad prisdata i HTML (spotpris, timgraf, billigaste/dyraste timmar) via `loadTodayPrices()` + initialData-props — nya städer får detta automatiskt via mallen
+✅ Datumrad under H1: "Prisdata uppdaterad [datum + tid] · Publicerad [månad år] · Uppdaterad [månad år]"
+✅ Server-rendering per request (force-dynamic + revalidate=0) — priserna i HTML är alltid färska
 
 ## EXAMPLE_CITIES_BY_AREA — utöka, ej ersätta
 
@@ -154,12 +158,11 @@ GÖR INTE:
 
 ## Nästa städer i prioriteringsordning
 
-Baserat på Search Console-data + arkitektur-balans:
+Baserat på Search Console-data + arkitektur-balans (Varberg är byggd — Halland-klustret komplett):
 
-1. **Varberg** (SE3, Halland) — sista större Halland-staden, naturlig SE3-utbyggnad
-2. **Helsingborg** (SE4, Skåne) — stor SE4-stad, hög sökvolym
-3. **Malmö** (SE4, Skåne) — Sveriges 3:e största stad
-4. **Lund** (SE4, Skåne) — studentstad, hög elförbrukning per capita
-5. **Göteborg** (SE3, Västra Götaland) — Sveriges 2:a största, naturlig SE3-utbyggnad
+1. **Helsingborg** (SE4, Skåne) — stor SE4-stad, hög sökvolym
+2. **Malmö** (SE4, Skåne) — Sveriges 3:e största stad
+3. **Lund** (SE4, Skåne) — studentstad, hög elförbrukning per capita
+4. **Göteborg** (SE3, Västra Götaland) — Sveriges 2:a största, naturlig SE3-utbyggnad
 
 3-5 städer per vecka är hållbar takt.
