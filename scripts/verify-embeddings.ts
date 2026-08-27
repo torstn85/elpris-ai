@@ -102,7 +102,7 @@ async function main() {
   console.log(`Chunk-rader i DB:  ${rows.length}\n`);
 
   // ── Check 1: varje artikel på disk har minst en chunk i DB ──
-  const missing = [...diskSlugs].filter((s) => !dbSlugs.has(s)).sort();
+  const missing = Array.from(diskSlugs).filter((s) => !dbSlugs.has(s)).sort();
   if (missing.length === 0) {
     console.log(`1. Täckning: varje artikel på disk har ≥1 chunk        ✅ (${diskSlugs.size}/${diskSlugs.size})`);
   } else {
@@ -112,7 +112,7 @@ async function main() {
   }
 
   // ── Check 2: inga orphan-chunks (DB-slug utan fil på disk) ──
-  const orphans = [...dbSlugs].filter((s) => !diskSlugs.has(s)).sort();
+  const orphans = Array.from(dbSlugs).filter((s) => !diskSlugs.has(s)).sort();
   if (orphans.length === 0) {
     console.log(`2. Inga orphans: alla DB-slugs finns på disk           ✅`);
   } else {
@@ -138,7 +138,7 @@ async function main() {
   }
 
   // ── Check 5: varje artikels chunks delar samma content_hash ──
-  const splitHash = [...byArticle.entries()].filter(([, g]) => g.hashes.size > 1).map(([s]) => s).sort();
+  const splitHash = Array.from(byArticle.entries()).filter(([, g]) => g.hashes.size > 1).map(([s]) => s).sort();
   if (splitHash.length === 0) {
     console.log(`5. En content_hash per artikel (sync komplett)         ✅`);
   } else {
@@ -149,7 +149,7 @@ async function main() {
 
   // ── Per-artikel-översikt ──
   console.log(`\nChunks per artikel:`);
-  const sorted = [...byArticle.entries()].sort(([a], [b]) => a.localeCompare(b, 'sv'));
+  const sorted = Array.from(byArticle.entries()).sort(([a], [b]) => a.localeCompare(b, 'sv'));
   for (const [slug, g] of sorted) {
     const flag = g.hashes.size > 1 ? ' ⚠️ blandade hashar' : g.nullEmb ? ' ⚠️ null-emb' : '';
     console.log(`     ${slug.padEnd(36)} ${String(g.count).padStart(3)}${flag}`);
