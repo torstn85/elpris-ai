@@ -62,6 +62,18 @@ function getCity(stad: string): City | null {
   return CITIES[stad] ?? null;
 }
 
+/**
+ * Senaste ändringsdatum för en stad = det senaste av MODIFIED_AT (mallens
+ * gemensamma text, gäller alla städer) och city.updatedAt (stadsspecifik text).
+ * ISO-datum (YYYY-MM-DD) sorteras korrekt lexikografiskt.
+ */
+function cityDateModified(city: City): string {
+  const candidates = [MODIFIED_AT, city.updatedAt].filter(
+    (d): d is string => Boolean(d),
+  );
+  return candidates.sort().at(-1) ?? MODIFIED_AT;
+}
+
 export function generateStaticParams() {
   return Object.keys(CITIES).map((slug) => ({ stad: slug }));
 }
@@ -80,7 +92,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       url,
       type: 'article',
       publishedTime: PUBLISHED_AT,
-      modifiedTime: MODIFIED_AT,
+      modifiedTime: cityDateModified(city),
     },
   };
 }
@@ -131,7 +143,7 @@ export default async function StadPage({ params }: PageProps) {
     headline: `Elpris idag i ${city.name}`,
     description: buildDescription(city.name, city.area),
     datePublished: PUBLISHED_AT,
-    dateModified: MODIFIED_AT,
+    dateModified: cityDateModified(city),
     author: {
       '@type': 'Organization',
       name: 'elpris.ai-redaktionen',

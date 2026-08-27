@@ -6,11 +6,18 @@ export type City = {
   uniqueIntro: string;
   commonGridCompanies: string;
   uniqueFaqs: { question: string; answer: string }[];
+  /**
+   * Datum (YYYY-MM-DD) för senaste ändring av DENNA stads specifika text
+   * (uniqueIntro, uniqueFaqs, commonGridCompanies). Valfritt — saknas det
+   * faller sidan tillbaka på MODIFIED_AT (mallens gemensamma text).
+   */
+  updatedAt?: string;
 };
 
 export const CITIES: Record<string, City> = {
   bastad: {
     slug: 'bastad',
+    updatedAt: '2026-08-27',
     name: 'Båstad',
     area: 'SE4',
     region: 'Skåne',
@@ -33,6 +40,7 @@ export const CITIES: Record<string, City> = {
   },
   falkenberg: {
     slug: 'falkenberg',
+    updatedAt: '2026-08-27',
     name: 'Falkenberg',
     area: 'SE4',
     region: 'Halland',
@@ -55,6 +63,7 @@ export const CITIES: Record<string, City> = {
   },
   halmstad: {
     slug: 'halmstad',
+    updatedAt: '2026-08-27',
     name: 'Halmstad',
     area: 'SE4',
     region: 'Halland',
@@ -77,6 +86,7 @@ export const CITIES: Record<string, City> = {
   },
   kungsbacka: {
     slug: 'kungsbacka',
+    updatedAt: '2026-08-27',
     name: 'Kungsbacka',
     area: 'SE3',
     region: 'Halland',
@@ -99,6 +109,7 @@ export const CITIES: Record<string, City> = {
   },
   laholm: {
     slug: 'laholm',
+    updatedAt: '2026-08-27',
     name: 'Laholm',
     area: 'SE4',
     region: 'Halland',
@@ -121,6 +132,7 @@ export const CITIES: Record<string, City> = {
   },
   varberg: {
     slug: 'varberg',
+    updatedAt: '2026-08-27',
     name: 'Varberg',
     area: 'SE3',
     region: 'Halland',
