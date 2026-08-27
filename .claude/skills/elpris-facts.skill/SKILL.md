@@ -46,13 +46,28 @@ Skriv ALDRIG exakta kr-belopp för Grön teknik-besparing. Installatörens offer
 - Skatten sänktes **1 januari 2026** från 53,5 öre/kWh
 - Vissa kommuner och industri kan ha reducerad nivå — hänvisa till Skatteverket för exakt nivå
 
+## Nord Pool och prisbildning (kritisk — orsakade fel i två guideartiklar)
+
+Spotpriset **sätts en gång per dygn** i day-ahead-auktionen på Nord Pool — inte löpande under dagen.
+
+- Buden stänger **12:00**, priserna publiceras runt **13:15** (INTE 13:00)
+- Sedan **oktober 2025** anges priset i **15-minutersintervall** — 96 nivåer per dygn i stället för 24
+
+**KRITISK distinktion:** 15 minuter är prisets **upplösning**, inte hur ofta priset räknas om. Hela nästa dygn fastställs i en enda auktion.
+
+❌ FEL: "priset sätts / bestäms / uppdateras var 15:e minut på Nord Pool"
+✅ KORREKT (prisbildning): "priset sätts en gång per dygn i day-ahead-auktionen och anges i 15-minutersintervall"
+✅ KORREKT (data): "priserna på sajten uppdateras var 15:e minut" — beskriver datahämtning/visning, inte prisbildning
+
+**Modelltext för distinktionen:** `src/content/guider/elavtal/kvartspris-vs-timpris.mdx` och `src/content/guider/forsta-elpriset/nord-pool-forklarat.mdx` formulerar skillnaden korrekt — följ dem.
+
 ## SE3/SE4-gränsen genom Halland (kritisk lokal geografi)
 
 Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 
 | Stad | Elområde | Notering |
 |---|---|---|
-| **Kungsbacka** | SE3 | Nordligaste Halland — gränsstad till SE3 |
+| **Kungsbacka** | SE3 | Nordligaste Halland — tillhör SE3 (samma elområde som Göteborg), norr om SE3/SE4-gränsen |
 | **Varberg** | SE3 | Mellersta Halland — SE3:s sydligaste utpost |
 | **Falkenberg** | SE4 | SE3/SE4-gränsen går norr om Falkenberg |
 | **Halmstad** | SE4 | Mellersta södra Halland |
@@ -102,3 +117,5 @@ Använd dessa exakta termer, inte egna förenklingar.
 | "Halland" som elprisområde | Halland är delat — fråga alltid VILKEN stad |
 | Specifika nätbolag | Använd "bland de större finns..." istället för att lista som auktoritativt |
 | Exakta kr-belopp i Grön teknik-räkneexempel | Använd "betydande del av kostnaden" istället |
+| "Priset sätts/bestäms/uppdateras var 15:e minut på Nord Pool" | Fel — priset sätts EN gång/dygn i day-ahead. 15 min = upplösning. Se "Nord Pool och prisbildning" |
+| Publiceringstid för day-ahead-priser | Runt **13:15** (inte 13:00); buden stänger 12:00 |
