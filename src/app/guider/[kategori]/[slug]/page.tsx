@@ -14,16 +14,9 @@ import { mdxComponents } from '@/components/dynamic/mdxComponents';
 import FaqAccordion, { type FaqItem } from '@/components/dynamic/FaqAccordion';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { formatMonthYear } from '@/lib/time';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
-
-function formatMonthYear(iso: string): string {
-  const formatted = new Intl.DateTimeFormat('sv-SE', {
-    year: 'numeric',
-    month: 'long',
-  }).format(new Date(iso));
-  return formatted.charAt(0).toLowerCase() + formatted.slice(1);
-}
 
 interface PageProps {
   params: { kategori: string; slug: string };

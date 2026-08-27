@@ -9,7 +9,7 @@ import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
 import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
-import { stockholmHour, stockholmSlotLabel } from '@/lib/time';
+import { stockholmHour, stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -72,15 +72,6 @@ function cityDateModified(city: City): string {
     (d): d is string => Boolean(d),
   );
   return candidates.sort().at(-1) ?? MODIFIED_AT;
-}
-
-/** Full svensk datumform, t.ex. "27 augusti 2026". Matchar JSON-LD-datumet. */
-function formatFullDate(iso: string): string {
-  return new Intl.DateTimeFormat('sv-SE', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(iso));
 }
 
 export function generateStaticParams() {
@@ -249,7 +240,7 @@ export default async function StadPage({ params }: PageProps) {
               <>
                 {' · '}
                 <time dateTime={modifiedAt}>
-                  Uppdaterad {formatFullDate(modifiedAt)}
+                  Uppdaterad {formatMonthYear(modifiedAt)}
                 </time>
               </>
             )}

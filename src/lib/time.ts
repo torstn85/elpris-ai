@@ -44,6 +44,19 @@ export function currentSlotStartISO(): string {
 }
 
 /**
+ * Formats an ISO date as a Swedish "month year" label, e.g. "2026-08-27" →
+ * "augusti 2026". Shared by guide articles and city pages so the visible
+ * "Publicerad/Uppdaterad"-dates use one consistent format.
+ */
+export function formatMonthYear(iso: string): string {
+  const formatted = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "long",
+  }).format(new Date(iso));
+  return formatted.charAt(0).toLowerCase() + formatted.slice(1);
+}
+
+/**
  * Current 15-minute slot as a "HH:MM" label in Europe/Stockholm, floored.
  * e.g. at 15:11 Stockholm → "15:00". Safe to call on both server and client.
  */
