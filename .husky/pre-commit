@@ -1,0 +1,5 @@
+# Auto-stämplar publishedAt/updatedAt/MODIFIED_AT när innehåll ändrats och
+# stage:ar sin egen ändring så datumet hamnar i committen.
+# Blockerar aldrig — vid fel skrivs en varning och committen släpps igenom.
+# Kringgå hooken helt med:  git commit --no-verify
+node scripts/stamp-dates.mjs
