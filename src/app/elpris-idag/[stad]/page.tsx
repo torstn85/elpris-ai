@@ -8,6 +8,8 @@ import PriceGraph from '@/components/dynamic/PriceGraph';
 import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
 import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
+import { loadTodayPrices } from '@/lib/prices/today';
+import { stockholmHour } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -89,9 +91,16 @@ export function generateMetadata({ params }: PageProps): Metadata {
   };
 }
 
-export default function StadPage({ params }: PageProps) {
+export default async function StadPage({ params }: PageProps) {
   const city = getCity(params.stad);
   if (!city) notFound();
+
+  // SSR: hämta dagens priser för stadens elområde så pristalen finns i HTML
+  // redan vid första render. Klientkomponenterna tar sen över med live-uppdatering.
+  const today = await loadTodayPrices();
+  const areaHours = today?.areas[city.area] ?? null;
+  const currentPrice =
+    areaHours?.find((h) => h.hour === stockholmHour())?.ore_per_kwh ?? null;
 
   const others = otherCitiesInArea(city.name, city.area);
   const otherCitiesText =
@@ -222,7 +231,11 @@ export default function StadPage({ params }: PageProps) {
           </p>
 
           <div className="mb-10">
-            <LivePriceWidget area={city.area} showAreaSelector={false} />
+            <LivePriceWidget
+              area={city.area}
+              showAreaSelector={false}
+              initialPrice={currentPrice}
+            />
           </div>
 
           <p className="text-base text-[#e2eaf4] leading-relaxed mb-12">
@@ -245,7 +258,7 @@ export default function StadPage({ params }: PageProps) {
           </section>
 
           <section className="mb-12">
-            <PriceGraph area={city.area} />
+            <PriceGraph area={city.area} initialData={areaHours} />
           </section>
 
           <section className="mb-12">
@@ -256,10 +269,19 @@ export default function StadPage({ params }: PageProps) {
               {dailyAdviceLead}
             </p>
             <div className="mb-6">
-              <CheapestHoursToday area={city.area} count={3} format="detailed" />
+              <CheapestHoursToday
+                area={city.area}
+                count={3}
+                format="detailed"
+                initialData={areaHours}
+              />
             </div>
             <div className="mb-6">
-              <MostExpensiveHoursToday area={city.area} count={3} />
+              <MostExpensiveHoursToday
+                area={city.area}
+                count={3}
+                initialData={areaHours}
+              />
             </div>
             <p className="text-base text-[#8fafc9] leading-relaxed">
               {dailyAdviceTail}

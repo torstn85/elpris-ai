@@ -7,6 +7,10 @@ type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 interface Props {
   area?: Area;
   showAreaSelector?: boolean;
+  /** Server-side seed: current price (öre/kWh) for `area`, renders in HTML before hydration. */
+  initialPrice?: number | null;
+  /** Server-side seed: "HH:MM" slot label shown as "Uppdaterad …" before hydration. */
+  initialUpdatedLabel?: string;
 }
 
 interface PriceData {
@@ -16,13 +20,26 @@ interface PriceData {
   area: Area;
 }
 
+function toPriceData(price: number, area: Area): PriceData {
+  return {
+    price_ore_kwh: price,
+    price_with_vat: Math.round(price * 1.25 * 10) / 10,
+    time_start: '',
+    area,
+  };
+}
+
 export default function LivePriceWidget({
   area: initialArea = 'SE3',
   showAreaSelector = true,
+  initialPrice = null,
+  initialUpdatedLabel,
 }: Props) {
   const [area, setArea] = useState<Area>(initialArea);
-  const [data, setData] = useState<PriceData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<PriceData | null>(
+    initialPrice != null ? toPriceData(initialPrice, initialArea) : null,
+  );
+  const [loading, setLoading] = useState(initialPrice == null);
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
@@ -152,9 +169,9 @@ export default function LivePriceWidget({
             </span>
           </div>
 
-          {lastFetch && (
+          {(lastFetch || initialUpdatedLabel) && (
             <p className="mt-3 text-xs text-slate-500">
-              Uppdaterad {lastSlotTime()}
+              Uppdaterad {lastFetch ? lastSlotTime() : initialUpdatedLabel}
             </p>
           )}
         </>

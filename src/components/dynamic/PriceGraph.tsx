@@ -18,6 +18,8 @@ interface Props {
   area?: Area;
   height?: number;
   caption?: string;
+  /** Server-side seed: today's hourly entries for `area`, renders in HTML before hydration. */
+  initialData?: Array<{ hour: number; ore_per_kwh: number }> | null;
 }
 
 interface HourPrice {
@@ -26,15 +28,36 @@ interface HourPrice {
   price: number;
 }
 
+function toHourly(areaData: Array<{ hour: number; ore_per_kwh: number }>): HourPrice[] {
+  return areaData.map((item) => ({
+    hour: item.hour,
+    hourLabel: String(item.hour).padStart(2, '0'),
+    price: item.ore_per_kwh,
+  }));
+}
+
+function toStats(hourly: HourPrice[]): { avg: number; min: number; max: number } {
+  const prices = hourly.map((h) => h.price);
+  return {
+    avg: prices.reduce((s, p) => s + p, 0) / prices.length,
+    min: Math.min(...prices),
+    max: Math.max(...prices),
+  };
+}
+
 export default function PriceGraph({
   area = 'SE3',
   height = 280,
   caption,
+  initialData = null,
 }: Props) {
-  const [data, setData] = useState<HourPrice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const seed = initialData && initialData.length > 0 ? toHourly(initialData) : [];
+  const [data, setData] = useState<HourPrice[]>(seed);
+  const [loading, setLoading] = useState(seed.length === 0);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<{ avg: number; min: number; max: number } | null>(null);
+  const [stats, setStats] = useState<{ avg: number; min: number; max: number } | null>(
+    seed.length > 0 ? toStats(seed) : null,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -49,22 +72,11 @@ export default function PriceGraph({
         // Faktiskt format: { areas: { SE3: [{ hour, time_start, ore_per_kwh }] } }
         const areaData: Array<{ hour: number; ore_per_kwh: number }> =
           json.areas?.[area] || [];
-        const hourly: HourPrice[] = areaData.map((item) => ({
-          hour: item.hour,
-          hourLabel: String(item.hour).padStart(2, '0'),
-          price: item.ore_per_kwh,
-        }));
+        const hourly: HourPrice[] = toHourly(areaData);
 
         if (!cancelled) {
           setData(hourly);
-          if (hourly.length > 0) {
-            const prices = hourly.map((h) => h.price);
-            setStats({
-              avg: prices.reduce((s, p) => s + p, 0) / prices.length,
-              min: Math.min(...prices),
-              max: Math.max(...prices),
-            });
-          }
+          if (hourly.length > 0) setStats(toStats(hourly));
           setError(null);
         }
       } catch {

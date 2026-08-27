@@ -8,6 +8,8 @@ interface Props {
   area?: Area;
   count?: number;
   format?: 'compact' | 'detailed';
+  /** Server-side seed: today's hourly entries for `area`, renders in HTML before hydration. */
+  initialData?: Array<{ hour: number; ore_per_kwh: number }> | null;
 }
 
 interface HourPrice {
@@ -15,13 +17,26 @@ interface HourPrice {
   price: number;
 }
 
+function cheapest(
+  areaData: Array<{ hour: number; ore_per_kwh: number }>,
+  count: number,
+): HourPrice[] {
+  return areaData
+    .map((item) => ({ hour: item.hour, price: item.ore_per_kwh }))
+    .sort((a, b) => a.price - b.price)
+    .slice(0, count);
+}
+
 export default function CheapestHoursToday({
   area = 'SE3',
   count = 3,
   format = 'detailed',
+  initialData = null,
 }: Props) {
-  const [hours, setHours] = useState<HourPrice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const seed =
+    initialData && initialData.length > 0 ? cheapest(initialData, count) : [];
+  const [hours, setHours] = useState<HourPrice[]>(seed);
+  const [loading, setLoading] = useState(seed.length === 0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,15 +52,9 @@ export default function CheapestHoursToday({
         // Faktiskt format: { areas: { SE3: [{ hour, time_start, ore_per_kwh }] } }
         const areaData: Array<{ hour: number; ore_per_kwh: number }> =
           json.areas?.[area] || [];
-        const all: HourPrice[] = areaData.map((item) => ({
-          hour: item.hour,
-          price: item.ore_per_kwh,
-        }));
-
-        const sorted = [...all].sort((a, b) => a.price - b.price).slice(0, count);
 
         if (!cancelled) {
-          setHours(sorted);
+          setHours(cheapest(areaData, count));
           setError(null);
         }
       } catch {
