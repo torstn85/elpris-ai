@@ -9,7 +9,7 @@ import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
 import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
-import { stockholmHour } from '@/lib/time';
+import { stockholmHour, stockholmSlotLabel } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -22,6 +22,9 @@ interface PageProps {
 
 const PUBLISHED_AT = '2026-05-05';
 const PUBLISHED_LABEL = 'maj 2026';
+// Datum för senaste TEXTändring på sidan (denna commit) — används för
+// article:modified_time / dateModified. INTE request-tidsstämpeln.
+const MODIFIED_AT = '2026-08-27';
 
 const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
   SE1: ['Luleå', 'Kiruna'],
@@ -55,15 +58,6 @@ function joinSwedish(items: string[]): string {
   return `${items.slice(0, -1).join(', ')} och ${items[items.length - 1]}`;
 }
 
-function countWords(text: string): number {
-  return text.trim().split(/\s+/).filter(Boolean).length;
-}
-
-function readingMinutes(texts: string[]): number {
-  const total = texts.reduce((sum, t) => sum + countWords(t), 0);
-  return Math.max(1, Math.ceil(total / 200));
-}
-
 function getCity(stad: string): City | null {
   return CITIES[stad] ?? null;
 }
@@ -86,7 +80,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       url,
       type: 'article',
       publishedTime: PUBLISHED_AT,
-      modifiedTime: PUBLISHED_AT,
+      modifiedTime: MODIFIED_AT,
     },
   };
 }
@@ -101,6 +95,17 @@ export default async function StadPage({ params }: PageProps) {
   const areaHours = today?.areas[city.area] ?? null;
   const currentPrice =
     areaHours?.find((h) => h.hour === stockholmHour())?.ore_per_kwh ?? null;
+
+  // Server-side tidsstämpel för prisdatan (aktuellt 15-min-slot, Stockholm).
+  // Renderas i HTML både under H1 och i spotpris-boxen.
+  const slotLabel = stockholmSlotLabel();
+  const priceDateLabel = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Stockholm',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+  const priceUpdatedLabel = `${priceDateLabel} ${slotLabel}`;
 
   const others = otherCitiesInArea(city.name, city.area);
   const otherCitiesText =
@@ -118,18 +123,6 @@ export default async function StadPage({ params }: PageProps) {
 
   const gridExplainer = `Spotpriset är samma för hela ${city.area}, men nätavgiften — både den fasta delen och den rörliga delen per kilowattimme — sätts av ditt lokala nätbolag och kan skilja sig markant mellan kommuner.`;
 
-  const minutes = readingMinutes([
-    city.uniqueIntro,
-    para1,
-    para2,
-    para3,
-    dailyAdviceLead,
-    dailyAdviceTail,
-    city.commonGridCompanies,
-    gridExplainer,
-    ...city.uniqueFaqs.flatMap((f) => [f.question, f.answer]),
-  ]);
-
   const canonicalUrl = `https://www.elpris.ai/elpris-idag/${city.slug}`;
 
   const articleLd = {
@@ -138,7 +131,7 @@ export default async function StadPage({ params }: PageProps) {
     headline: `Elpris idag i ${city.name}`,
     description: buildDescription(city.name, city.area),
     datePublished: PUBLISHED_AT,
-    dateModified: PUBLISHED_AT,
+    dateModified: MODIFIED_AT,
     author: {
       '@type': 'Organization',
       name: 'elpris.ai-redaktionen',
@@ -227,7 +220,9 @@ export default async function StadPage({ params }: PageProps) {
             Elpris idag i {city.name} — timme för timme
           </h1>
           <p className="text-xs text-[#8fafc9] mb-8">
-            Publicerad {PUBLISHED_LABEL} · {minutes} min läsning
+            {areaHours
+              ? `Prisdata uppdaterad ${priceUpdatedLabel} · Publicerad ${PUBLISHED_LABEL}`
+              : `Publicerad ${PUBLISHED_LABEL}`}
           </p>
 
           <div className="mb-10">
@@ -235,6 +230,7 @@ export default async function StadPage({ params }: PageProps) {
               area={city.area}
               showAreaSelector={false}
               initialPrice={currentPrice}
+              initialUpdatedLabel={slotLabel}
             />
           </div>
 

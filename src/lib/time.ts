@@ -44,6 +44,24 @@ export function currentSlotStartISO(): string {
 }
 
 /**
+ * Current 15-minute slot as a "HH:MM" label in Europe/Stockholm, floored.
+ * e.g. at 15:11 Stockholm → "15:00". Safe to call on both server and client.
+ */
+export function stockholmSlotLabel(): string {
+  const fmt = (opts: Intl.DateTimeFormatOptions) =>
+    parseInt(
+      new Intl.DateTimeFormat("sv-SE", { timeZone: TZ, ...opts }).format(
+        new Date()
+      ),
+      10
+    );
+  const hour = fmt({ hour: "numeric", hour12: false });
+  const minute = fmt({ minute: "numeric" });
+  const slotMinute = Math.floor(minute / 15) * 15;
+  return `${String(hour).padStart(2, "0")}:${String(slotMinute).padStart(2, "0")}`;
+}
+
+/**
  * Extract the hour (0–23) in Europe/Stockholm from any ISO timestamp string.
  * Works correctly regardless of the offset embedded in the source string.
  */
