@@ -53,6 +53,8 @@ När vi pratar om olika aktörer (nätbolag, elavtals-jämförare, mätare):
 
 **Tekniska fakta måste verifieras mot officiella källor** (SVK för stödtjänster, elomraden.se för elområden, etc).
 
+**Nord Pool / prisbildning:** skilj alltid på att spotpriset *sätts en gång per dygn* (day-ahead) och att det *anges i 15-minutersintervall* — skriv aldrig att priset sätts/bestäms/uppdateras var 15:e minut på Nord Pool. Se elpris-facts.skill.
+
 ## Längd-mål per innehållstyp
 
 | Typ | Mål-längd |
@@ -74,48 +76,22 @@ Alla guideartiklar måste ha:
 - **H2-sektioner** i logisk progression
 - **FAQ-block** i frontmatter (`faqs:` array) — auto-renderas till FaqAccordion + FAQPage JSON-LD
 - **Internlänkar** ut till relaterade artiklar (3-7 stycken)
-- **updatedAt-datum** uppdateras vid VARJE ändring av artikeln (se egen sektion "updatedAt-disciplin" nedan)
+- **updatedAt / publishedAt** sätts automatiskt av pre-commit-hooken (se "Datumdisciplin" nedan) — skriv dem inte för hand
 
-## updatedAt-disciplin (etablerad maj 2026)
+## Datumdisciplin — automatiserad (pre-commit-hook)
 
-**HÅRD REGEL:** Varje gång en MDX-fil under `src/content/guider/` ändras — oavsett om det är brödtext, FAQ, frontmatter-fält, fakta-uppdatering eller bara typo-fix — ska `updatedAt` i frontmatter sättas till dagens datum (YYYY-MM-DD).
+**`publishedAt` och `updatedAt` sätts AUTOMATISKT** av pre-commit-hooken (`scripts/stamp-dates.mjs`). **Sätt dem inte för hand.**
 
-**Varför detta är kritiskt:**
+- Hooken **bumpar `updatedAt`** till dagens datum (Europe/Stockholm) när en MDX-fil under `src/content/guider/` får ändrad **brödtext**, och stage:ar ändringen så datumet hamnar i committen.
+- Hooken **sätter `publishedAt`** på en **ny** MDX-fil som saknar fältet.
+- Den bumpar INTE vid frontmatter-only-ändring, enbart whitespace, eller på nyskapade filer (updatedAt).
+
+**Varför datumet spelar roll:**
 - `updatedAt` mappas till `dateModified` i Article JSON-LD (`[slug]/page.tsx`)
 - Google använder `dateModified` som rankningssignal — nyare innehåll prioriteras
-- Sidan visar "Uppdaterad [datum]"-rad i UI:t — ger trovärdighet till läsare
-- Att skriva FAQ-block eller fixa fakta utan att uppdatera datum betyder att Google ser artikeln som "gammal" trots att den just förbättrats
+- Sidan visar "Uppdaterad [månad år]"-rad i UI:t — ger trovärdighet till läsare
 
-**Process vid VARJE artikel-ändring:**
-
-1. Gör innehållsändringen (brödtext, FAQ, fakta, typo, etc)
-2. **Innan commit:** uppdatera `updatedAt: 'YYYY-MM-DD'` till dagens datum
-3. Verifiera att fältet finns och har korrekt format
-4. Commit + push tillsammans
-
-**YAML-format:**
-
-```yaml
----
-title: '...'
-publishedAt: '2026-04-15'
-updatedAt: '2026-05-20'   # ALLTID dagens datum vid ändring
----
-```
-
-**Verifikation efter content-arbete:**
-
-```bash
-# Hitta filer som ändrats men där updatedAt INTE är dagens datum:
-TODAY=$(date +%Y-%m-%d)
-git diff --name-only HEAD | grep "\.mdx$" | while read f; do
-  if ! grep -q "updatedAt: '$TODAY'" "$f"; then
-    echo "⚠️  $f har ändrats men updatedAt är inte $TODAY"
-  fi
-done
-```
-
-**Vanlig fallgrop:** Att lägga till FAQ-block eller fixa en faktabugg utan att uppdatera datum. Det fångades efter en FAQ-tillägg på vad-ar-spotpris.mdx (maj 2026) där datum behövde retroaktiveras.
+Tidigare krävde detta manuell disciplin och missades ibland (t.ex. ett FAQ-tillägg på vad-ar-spotpris.mdx, maj 2026, där datumet behövde retroaktiveras). Hooken tar bort den risken — du behöver inte längre tänka på datumet. Vill du undantagsvis hoppa över stämplingen: `git commit --no-verify`.
 
 ## Pillar page-specifika krav
 
@@ -274,8 +250,8 @@ title: '[Meta title]'
 description: '[Meta description]'
 category: '[spara-el | elavtal | forsta-elpriset | teknik-och-trender]'
 slug: '[url-slug]'
-publishedAt: '2026-MM-DD'
-updatedAt: '2026-MM-DD'
+# publishedAt/updatedAt sätts av pre-commit-hooken — utelämna på ny fil,
+# hooken fyller i publishedAt och bumpar updatedAt vid textändring
 author: 'elpris.ai-redaktionen'
 faqs:
   - question: '[Fråga 1]'
