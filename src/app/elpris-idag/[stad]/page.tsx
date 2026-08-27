@@ -113,13 +113,13 @@ export default async function StadPage({ params }: PageProps) {
 
   const para1 = `${city.name} tillhör elområde ${city.area}, vilket betyder att timpriserna sätts gemensamt för hela det området. Du som bor i ${city.name} betalar samma spotpris per kilowattimme som alla andra hushåll i ${city.area}, oavsett hur långt mellan er det är geografiskt.`;
 
-  const para2 = `Spotpriset bestäms varje 15:e minut på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lägger bud för kommande timmar, och priset sätts där efterfrågan möter utbudet. Det är denna mekanism som ligger bakom prisrytmen du ser i grafen ovan.`;
+  const para2 = `Spotpriset sätts en gång per dygn i en day-ahead-auktion på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lämnar sina bud för nästa dygn innan buden stänger klockan 12:00, och priserna publiceras samma eftermiddag runt klockan 13:15. Priset räknas alltså inte om löpande under dagen. Det som ändras var 15:e minut är upplösningen: sedan oktober 2025 anges spotpriset per 15-minutersintervall i stället för per hel timme, vilket ger 96 prisnivåer över dygnet i stället för 24. Det är denna dygnsvisa auktion som ligger bakom prisrytmen du ser i grafen ovan.`;
 
   const para3 = `Alla städer i ${city.area} delar samma timpris. Förutom ${city.name} betalar exempelvis ${otherCitiesText} exakt samma per kilowattimme. Det som gör att din slutfaktura ändå skiljer sig från grannens i en annan stad är nätavgift, eventuellt påslag och elavtal — inte själva spotpriset.`;
 
   const dailyAdviceLead = `Dagens prisspridning visar var du tjänar mest på att flytta din förbrukning. Här är de tre billigaste och de tre dyraste timmarna just nu i ${city.area}:`;
 
-  const dailyAdviceTail = `Om du har möjlighet att flytta tvätt, diskmaskin eller elbilsladdning till de billigaste timmarna kan du spara mellan 30 och 80 kr per dygn — beroende på hur stor din flyttbara förbrukning är.`;
+  const dailyAdviceTail = `Om du har möjlighet att flytta tvätt, diskmaskin eller elbilsladdning till de billigaste timmarna sänker du din elkostnad — hur mycket beror på hur stor del av din förbrukning som är flyttbar och hur stor prisskillnaden mellan dygnets billigaste och dyraste timmar är.`;
 
   const gridExplainer = `Spotpriset är samma för hela ${city.area}, men nätavgiften — både den fasta delen och den rörliga delen per kilowattimme — sätts av ditt lokala nätbolag och kan skilja sig markant mellan kommuner.`;
 

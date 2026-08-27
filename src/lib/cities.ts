@@ -49,7 +49,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Hur mycket kan jag spara genom att flytta elförbrukning?',
         answer:
-          'I SE4, där Falkenberg ligger, varierar spotpriset typiskt 60–180 öre/kWh över ett dygn — större spridning än norrut. Genom att flytta tvätt, disk och elbilsladdning från dyra timmar (kvällar 17–20) till lågpristimmar (nätter 02–05 eller mitt på dagen) kan ett hushåll spara 800–3 000 kr per år beroende på förbrukning. Mest sparar villaägare med värmepump och elbil — i SE4 är besparingen ofta 30–50 % större än för en motsvarande villa i Stockholm.',
+          'I SE4, där Falkenberg ligger, varierar spotpriset typiskt 60–180 öre/kWh över ett dygn — större spridning än norrut. Genom att flytta tvätt, disk och elbilsladdning från dyra timmar (kvällar 17–20) till lågpristimmar (nätter 02–05 eller mitt på dagen) kan ett hushåll sänka sin elkostnad märkbart över året beroende på förbrukning. Mest sparar villaägare med värmepump och elbil — i SE4 är besparingen ofta 30–50 % större än för en motsvarande villa i Stockholm.',
       },
     ],
   },
