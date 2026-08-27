@@ -84,6 +84,28 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  helsingborg: {
+    slug: 'helsingborg',
+    name: 'Helsingborg',
+    area: 'SE4',
+    region: 'Skåne',
+    uniqueIntro:
+      'Helsingborg ligger vid Öresund i nordvästra Skåne, med Danmark synligt på andra sidan sundet, och är med runt 115 000 invånare en av Sveriges tio största städer. Staden tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde — där spotpriset konsekvent ligger 20–40 % högre än i SE3 (Stockholm och Göteborg) för samma timme. Helsingborg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i områden som Ödåkra, Ramlösa och Mörarp, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Eftersom SE4 har både högre prisnivå och större prisspridning över dygnet blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull här — varje flyttad kilowattimme är värd mer i Helsingborg än längre norrut.',
+    commonGridCompanies:
+      'I Helsingborg är Öresundskraft Elnät det största nätbolaget — det ägs av Helsingborgs stad och driver elnätet i staden med omnejd. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Helsingborg?',
+        answer:
+          'Helsingborg tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Malmö, Lund och Landskrona. Spotpriset är detsamma för alla i SE4 samma timme och ligger typiskt 20–40 % högre än i SE3 (Stockholm och Göteborg). Skillnaden beror på begränsad överföringskapacitet från de elrika norra elområdena och på att SE4 är tätt sammankopplat med det europeiska elnätet, vilket drar upp priset när kontinenten har hög efterfrågan.',
+      },
+      {
+        question: 'Hur påverkar närheten till Danmark elpriset i Helsingborg?',
+        answer:
+          'Helsingborg ligger vid Öresund, bara några kilometer från Danmark, och elområde SE4 är tätt sammankopplat med kontinenten via kraftförbindelser söderut — bland annat till Själland över Öresund och vidare till Tyskland och Polen. Det gör att priset i SE4, och därmed i Helsingborg, påverkas mer av den europeiska elmarknaden än vad norra Sverige gör: när efterfrågan och priserna är höga på kontinenten kan svenska producenter hellre exportera dyrt än sälja billigt hemma, vilket pressar upp spotpriset. Förbindelserna gäller hela SE4 — inte Helsingborgs lokala elnät specifikt — men de är en huvudorsak till att södra Sverige ofta har landets högsta elpriser.',
+      },
+    ],
+  },
   kungsbacka: {
     slug: 'kungsbacka',
     updatedAt: '2026-08-27',
