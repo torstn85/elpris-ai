@@ -61,6 +61,28 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  goteborg: {
+    slug: 'goteborg',
+    name: 'Göteborg',
+    area: 'SE3',
+    region: 'Västra Götaland',
+    uniqueIntro:
+      'Göteborg är Sveriges näst största stad med runt 600 000 invånare, belägen vid Göta älvs mynning på västkusten. Staden tillhör elområde SE3 — samma område som Stockholm och Uppsala, trots att det är över 40 mil emellan. Det förvånar många som tror att elpriset följer geografisk närhet: en göteborgare betalar samma spotpris per kilowattimme som en stockholmare samma timme, men konsekvent lägre än Malmö och Helsingborg i SE4 strax söderut. Göteborg har en blandad förbrukningsprofil med tät stadsbebyggelse och utbredd fjärrvärme i centrum, eluppvärmda villor i ytterområden som Torslanda, Askim och Säve, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Även om SE3 i snitt är billigare än SE4 varierar priset kraftigt över dygnet, så smart styrning av värmepump, tvätt och elbilsladdning lönar sig även här.',
+    commonGridCompanies:
+      'I Göteborg är Göteborg Energi Nät det största nätbolaget — det ägs av Göteborgs stad och driver elnätet i kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Göteborg?',
+        answer:
+          'Göteborg tillhör elområde SE3, samma område som Stockholm, Uppsala och Örebro. SE3 täcker södra Mellansverige, från västkusten till ostkusten. Spotpriset är detsamma för alla i SE3 samma timme — en göteborgare och en stockholmare betalar exakt samma pris per kilowattimme, trots avståndet. Det som skiljer din slutfaktura från en annan SE3-stads är nätavgift, påslag och elavtal, inte själva spotpriset. Jämfört med SE4 i söder (Malmö, Helsingborg) ligger SE3 typiskt lägre, eftersom mer elproduktion finns tillgänglig norrut och överföringen söderut är begränsad.',
+      },
+      {
+        question: 'Varför är elen billigare i Göteborg än i Malmö?',
+        answer:
+          'Göteborg ligger i SE3 och Malmö i SE4, och gränsen mellan elområdena går ungefär vid norra Skåne. SE4 har konsekvent 20–40 % högre spotpris än SE3 för samma timme. Orsaken är att större delen av Sveriges elproduktion — vattenkraft i norr och kärnkraft i Mellansverige — ligger i eller norr om SE3, medan överföringskapaciteten söderut till SE4 är begränsad. När efterfrågan är hög räcker kapaciteten inte för att pressa ner priset i söder, och SE4 är dessutom tätare kopplat till den dyrare kontinentala elmarknaden. Göteborg hamnar på den billigare sidan av flaskhalsen, medan Malmö och Helsingborg hamnar på den dyrare.',
+      },
+    ],
+  },
   halmstad: {
     slug: 'halmstad',
     updatedAt: '2026-08-27',
