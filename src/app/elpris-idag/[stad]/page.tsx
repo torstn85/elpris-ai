@@ -74,6 +74,15 @@ function cityDateModified(city: City): string {
   return candidates.sort().at(-1) ?? MODIFIED_AT;
 }
 
+/** Full svensk datumform, t.ex. "27 augusti 2026". Matchar JSON-LD-datumet. */
+function formatFullDate(iso: string): string {
+  return new Intl.DateTimeFormat('sv-SE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
 export function generateStaticParams() {
   return Object.keys(CITIES).map((slug) => ({ stad: slug }));
 }
@@ -109,7 +118,7 @@ export default async function StadPage({ params }: PageProps) {
     areaHours?.find((h) => h.hour === stockholmHour())?.ore_per_kwh ?? null;
 
   // Server-side tidsstämpel för prisdatan (aktuellt 15-min-slot, Stockholm).
-  // Renderas i HTML både under H1 och i spotpris-boxen.
+  // Renderas i HTML både under H1 och i spotpris-boxen (slotLabel = bara tiden).
   const slotLabel = stockholmSlotLabel();
   const priceDateLabel = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Europe/Stockholm',
@@ -118,6 +127,8 @@ export default async function StadPage({ params }: PageProps) {
     year: 'numeric',
   }).format(new Date());
   const priceUpdatedLabel = `${priceDateLabel} ${slotLabel}`;
+  // Artikeldatum: samma härledda värde som JSON-LD dateModified.
+  const modifiedAt = cityDateModified(city);
 
   const others = otherCitiesInArea(city.name, city.area);
   const otherCitiesText =
@@ -232,9 +243,16 @@ export default async function StadPage({ params }: PageProps) {
             Elpris idag i {city.name} — timme för timme
           </h1>
           <p className="text-xs text-[#8fafc9] mb-8">
-            {areaHours
-              ? `Prisdata uppdaterad ${priceUpdatedLabel} · Publicerad ${PUBLISHED_LABEL}`
-              : `Publicerad ${PUBLISHED_LABEL}`}
+            {areaHours && <>Prisdata uppdaterad {priceUpdatedLabel} · </>}
+            <time dateTime={PUBLISHED_AT}>Publicerad {PUBLISHED_LABEL}</time>
+            {modifiedAt !== PUBLISHED_AT && (
+              <>
+                {' · '}
+                <time dateTime={modifiedAt}>
+                  Uppdaterad {formatFullDate(modifiedAt)}
+                </time>
+              </>
+            )}
           </p>
 
           <div className="mb-10">
