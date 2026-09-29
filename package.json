@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "indexnow": "node scripts/indexnow-changed.mjs | node scripts/indexnow-ping.mjs",
+    "indexnow:dry": "node scripts/indexnow-changed.mjs --verbose | node scripts/indexnow-ping.mjs --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

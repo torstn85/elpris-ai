@@ -1,0 +1,32 @@
+# Pingar INTE IndexNow själv — sidan är inte deployad än när pushen går.
+# Skriver bara ut det färdiga kommandot med exakt rätt commit-intervall, så
+# att det går att köra när Vercel-deployen är grön.
+# Blockerar aldrig en push.
+
+ZERO=0000000000000000000000000000000000000000
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Bara main — feature-grenar deployas inte till produktion.
+  case "$remote_ref" in
+    */main) ;;
+    *) continue ;;
+  esac
+
+  # Grenradering: inget att pinga.
+  [ "$local_sha" = "$ZERO" ] && continue
+
+  if [ "$remote_sha" = "$ZERO" ]; then
+    range="$local_sha~1..$local_sha"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  count=$(node scripts/indexnow-changed.mjs "$range" 2>/dev/null | grep -c . || true)
+  [ "${count:-0}" -eq 0 ] 2>/dev/null && continue
+
+  printf '\n\033[36m[indexnow]\033[0m %s publik(a) sida(or) ändrade i denna push.\n' "$count"
+  printf '\033[36m[indexnow]\033[0m Kör detta när Vercel-deployen är grön:\n\n'
+  printf '    node scripts/indexnow-changed.mjs %s | node scripts/indexnow-ping.mjs\n\n' "$range"
+done
+
+exit 0
