@@ -174,6 +174,28 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  malmo: {
+    slug: 'malmo',
+    name: 'Malmö',
+    area: 'SE4',
+    region: 'Skåne',
+    uniqueIntro:
+      'Malmö är Sveriges tredje största stad med drygt 350 000 invånare i kommunen, och den överlägset största staden i elområde SE4. Här bor alltså fler människor med Sveriges högsta spotpriser än i någon annan kommun. Malmö ligger längst ned i Skåne, närmast den punkt där SE4 kopplas ihop med Danmark, Tyskland och Polen — och den kopplingen är en av huvudorsakerna till att södra Sverige betalar mer för elen än resten av landet. Förbrukningsprofilen skiljer sig från de mindre SE4-städerna: andelen lägenheter är hög och fjärrvärmen utbredd, så mindre av elen går till uppvärmning och mer till hushållsel, vitvaror och elbilsladdning. Det gör timingen viktigare än värmestyrningen — det är tvätt, disk och laddning som går att flytta här.',
+    commonGridCompanies:
+      'I Malmö är det E.ON Energidistribution som ansvarar för elnätet i huvuddelen av kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser på den här sidan.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Malmö?',
+        answer:
+          'Malmö tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Lund, Helsingborg och Landskrona. Spotpriset är detsamma för alla i SE4 under samma timme och ligger typiskt 20–40 % högre än i SE3, där Stockholm och Göteborg ligger. Som SE4:s största stad är Malmö den kommun där flest hushåll berörs av den prisskillnaden.',
+      },
+      {
+        question: 'Varför är elen dyrare i Malmö än i Stockholm?',
+        answer:
+          'Skillnaden handlar inte om städerna utan om elområdena. Malmö ligger i SE4 och Stockholm i SE3, och spotpriset sätts per elområde — inte per kommun. Två strukturella orsaker driver skillnaden. Dels är överföringskapaciteten från de elrika norra elområdena begränsad: all den el som produceras i norr kan inte transporteras söderut, så SE4 måste täcka en del av sin efterfrågan med import. Dels är SE4 tätt sammankopplat med det europeiska elnätet via förbindelser till Danmark, Tyskland och Polen, vilket gör att priset följer med uppåt när efterfrågan är hög på kontinenten. Resultatet är typiskt 20–40 % högre pris för samma timme. Det går inte att påverka genom att byta elhandelsbolag — men det gör varje flyttad kilowattimme värd mer i Malmö än i Stockholm.',
+      },
+    ],
+  },
   varberg: {
     slug: 'varberg',
     updatedAt: '2026-08-27',
