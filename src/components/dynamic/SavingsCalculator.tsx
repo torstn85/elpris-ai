@@ -21,7 +21,7 @@ const TYPE_CONFIG = {
     label: 'Tvätt',
     inputLabel: 'Antal tvättar per vecka',
     inputUnit: 'tvättar/vecka',
-    defaultValue: 4,
+    defaultValue: 3,
     min: 1,
     max: 20,
     step: 1,
