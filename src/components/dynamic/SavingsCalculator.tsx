@@ -25,8 +25,8 @@ const TYPE_CONFIG = {
     min: 1,
     max: 20,
     step: 1,
-    note: '1 kWh per tvätt × 52 veckor',
-    toYearlyKwh: (v: number) => v * 1.0 * 52,
+    note: '0,8 kWh per tvätt (normal 40°C) × 52 veckor',
+    toYearlyKwh: (v: number) => v * 0.8 * 52,
   },
   elbil: {
     emoji: '🚗',
