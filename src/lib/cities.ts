@@ -63,6 +63,7 @@ export const CITIES: Record<string, City> = {
   },
   goteborg: {
     slug: 'goteborg',
+    updatedAt: '2026-09-30',
     name: 'Göteborg',
     area: 'SE3',
     region: 'Västra Götaland',
@@ -79,7 +80,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Varför är elen billigare i Göteborg än i Malmö?',
         answer:
-          'Göteborg ligger i SE3 och Malmö i SE4, och gränsen mellan elområdena går ungefär vid norra Skåne. SE4 har konsekvent 20–40 % högre spotpris än SE3 för samma timme. Orsaken är att större delen av Sveriges elproduktion — vattenkraft i norr och kärnkraft i Mellansverige — ligger i eller norr om SE3, medan överföringskapaciteten söderut till SE4 är begränsad. När efterfrågan är hög räcker kapaciteten inte för att pressa ner priset i söder, och SE4 är dessutom tätare kopplat till den dyrare kontinentala elmarknaden. Göteborg hamnar på den billigare sidan av flaskhalsen, medan Malmö och Helsingborg hamnar på den dyrare.',
+          'Göteborg ligger i SE3 och Malmö i SE4. Gränsen mellan elområdena går genom Halland, mellan Varberg och Falkenberg — så redan Falkenberg, Halmstad och Laholm hamnar på den dyrare sidan. SE4 har konsekvent 20–40 % högre spotpris än SE3 för samma timme. Orsaken är att större delen av Sveriges elproduktion — vattenkraft i norr och kärnkraft i Mellansverige — ligger i eller norr om SE3, medan överföringskapaciteten söderut till SE4 är begränsad. När efterfrågan är hög räcker kapaciteten inte för att pressa ner priset i söder, och SE4 är dessutom tätare kopplat till den dyrare kontinentala elmarknaden. Göteborg hamnar på den billigare sidan av flaskhalsen, medan Malmö och Helsingborg hamnar på den dyrare.',
       },
     ],
   },
