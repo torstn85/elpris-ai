@@ -15,6 +15,7 @@ import FaqAccordion, { type FaqItem } from '@/components/dynamic/FaqAccordion';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import { formatMonthYear } from '@/lib/time';
+import { CATEGORY_LABELS } from '@/lib/guideCategories';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -117,6 +118,8 @@ export default function ArticlePage({ params }: PageProps) {
         }
       : null;
 
+  const categoryLabel = CATEGORY_LABELS[params.kategori] ?? params.kategori;
+
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -126,7 +129,7 @@ export default function ArticlePage({ params }: PageProps) {
       {
         '@type': 'ListItem',
         position: 3,
-        name: params.kategori.charAt(0).toUpperCase() + params.kategori.slice(1),
+        name: categoryLabel,
         item: `https://www.elpris.ai/guider/${params.kategori}`,
       },
       {
@@ -163,8 +166,8 @@ export default function ArticlePage({ params }: PageProps) {
             <span>/</span>
             <a href="/guider" className="hover:text-cyan-400 transition">Guider</a>
             <span>/</span>
-            <a href={`/guider/${params.kategori}`} className="hover:text-cyan-400 transition capitalize">
-              {params.kategori}
+            <a href={`/guider/${params.kategori}`} className="hover:text-cyan-400 transition">
+              {categoryLabel}
             </a>
           </nav>
 

@@ -9,16 +9,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { CATEGORY_LABELS } from '@/lib/guideCategories';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
-
-const CATEGORY_LABELS: Record<string, string> = {
-  elavtal: 'Elavtal',
-  'forsta-elpriset': 'Förstå elpriset',
-  'spara-el': 'Spara el',
-  elomraden: 'Elområden',
-  'teknik-och-trender': 'Teknik & trender',
-};
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   elavtal: 'Allt om elavtal — välj rätt avtal, byt smidigt och förstå skillnaden mellan rörligt, fast och kvartspris.',

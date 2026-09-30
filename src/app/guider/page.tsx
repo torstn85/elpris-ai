@@ -8,6 +8,7 @@ import matter from 'gray-matter';
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import { CATEGORY_LABELS } from '@/lib/guideCategories';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -25,14 +26,6 @@ interface ArticleMeta {
   publishedAt: string;
   readTime?: string;
 }
-
-const CATEGORY_LABELS: Record<string, string> = {
-  elavtal: 'Elavtal',
-  'forsta-elpriset': 'Förstå elpriset',
-  'spara-el': 'Spara el',
-  elomraden: 'Elområden',
-  'teknik-och-trender': 'Teknik & trender',
-};
 
 function getAllArticles(): ArticleMeta[] {
   if (!fs.existsSync(CONTENT_DIR)) return [];
