@@ -197,6 +197,28 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  stockholm: {
+    slug: 'stockholm',
+    name: 'Stockholm',
+    area: 'SE3',
+    region: 'Stockholm',
+    uniqueIntro:
+      'Stockholm är Sveriges största stad med runt en miljon invånare i kommunen och tillhör elområde SE3 — samma område som Göteborg, Uppsala och Örebro. Spotpriset är därför detsamma i Stockholm som i Göteborg vid samma tidpunkt, trots att det skiljer över 40 mil. Stockholm ligger på förbrukarsidan av det svenska elsystemet: mycket av vattenkraften produceras i norr, och överföringen söderut till SE3 har begränsad kapacitet. Samtidigt ligger kärnkraften i Forsmark, norr om Stockholm, i SE3, och när reaktorer står still för revision kan det märkas i priset. Förbrukningen i Stockholm är blandad. Innerstaden och stora delar av förorterna värms med fjärrvärme, medan villaområden som Bromma, Hässelby och Enskede ofta har värmepump eller direktverkande el. För lägenhetshushåll är elräkningen oftast liten. För villor med elvärme och för den som laddar elbil hemma gör det däremot skillnad att flytta förbrukningen till dygnets billigaste kvartar.',
+    commonGridCompanies:
+      'I Stockholms stad är det Ellevio som ansvarar för elnätet i huvuddelen av kommunen. Bor du i någon av kranskommunerna kan det se annorlunda ut — där finns bland andra Vattenfall Eldistribution och flera kommunägda nätbolag. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Varför är elen dyrare i Stockholm än i Norrland?',
+        answer:
+          'Stockholm ligger i SE3 och Norrland i SE1 och SE2. I norr finns stora mängder vattenkraft och relativt låg förbrukning, medan södra Mellansverige har de stora förbrukningscentrumen. Överföringskapaciteten från norr till söder är begränsad. När efterfrågan är hög kan inte tillräckligt mycket billig el flyttas söderut, och då blir priset högre i SE3. Vid andra tillfällen, när nätet inte är trångt, kan priset vara nästan detsamma i hela landet. Skillnaden är alltså inte konstant. Den beror på hur hårt belastade förbindelserna söderut är just då.',
+      },
+      {
+        question: 'Lönar det sig att följa elpriset om jag bor i lägenhet i Stockholm?',
+        answer:
+          'Det beror på vad du förbrukar. I en lägenhet med fjärrvärme går elen mest till belysning, vitvaror och elektronik, och då blir vinsten av att flytta förbrukningen begränsad i kronor. Har du timavtal eller kvartsavtal kan det ändå vara värt att köra tvätt och disk när priset är lågt, eftersom priset ofta skiljer sig mycket över dygnet. Laddar du elbil hemma, eller har tillgång till laddplats i föreningen, blir skillnaden betydligt större. Laddningen är en av de största förbrukningarna ett hushåll har och är lätt att schemalägga.',
+      },
+    ],
+  },
   varberg: {
     slug: 'varberg',
     updatedAt: '2026-08-27',
