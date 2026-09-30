@@ -7,6 +7,12 @@ export type City = {
   commonGridCompanies: string;
   uniqueFaqs: { question: string; answer: string }[];
   /**
+   * Datum (YYYY-MM-DD) då DENNA stadssida publicerades. Valfritt — saknas det
+   * faller sidan tillbaka på PUBLISHED_AT (mallens gemensamma datum). Sätts
+   * automatiskt av pre-commit-hooken när en ny stad läggs till.
+   */
+  publishedAt?: string;
+  /**
    * Datum (YYYY-MM-DD) för senaste ändring av DENNA stads specifika text
    * (uniqueIntro, uniqueFaqs, commonGridCompanies). Valfritt — saknas det
    * faller sidan tillbaka på MODIFIED_AT (mallens gemensamma text).
@@ -199,6 +205,7 @@ export const CITIES: Record<string, City> = {
   },
   stockholm: {
     slug: 'stockholm',
+    publishedAt: '2026-09-30',
     name: 'Stockholm',
     area: 'SE3',
     region: 'Stockholm',

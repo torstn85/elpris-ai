@@ -20,8 +20,8 @@ interface PageProps {
   params: { stad: string };
 }
 
+// Gemensamt publiceringsdatum för städer utan eget city.publishedAt.
 const PUBLISHED_AT = '2026-05-05';
-const PUBLISHED_LABEL = 'maj 2026';
 // Datum för senaste TEXTändring på sidan (denna commit) — används för
 // article:modified_time / dateModified. INTE request-tidsstämpeln.
 const MODIFIED_AT = '2026-08-27';
@@ -62,13 +62,20 @@ function getCity(stad: string): City | null {
   return CITIES[stad] ?? null;
 }
 
+/** Publiceringsdatum för en stad: city.publishedAt, annars mallens PUBLISHED_AT. */
+function cityDatePublished(city: City): string {
+  return city.publishedAt ?? PUBLISHED_AT;
+}
+
 /**
- * Senaste ändringsdatum för en stad = det senaste av MODIFIED_AT (mallens
- * gemensamma text, gäller alla städer) och city.updatedAt (stadsspecifik text).
+ * Senaste ändringsdatum för en stad = det senaste av stadens publiceringsdatum,
+ * MODIFIED_AT (mallens gemensamma text, gäller alla städer) och city.updatedAt
+ * (stadsspecifik text). Publiceringsdatumet ingår så att dateModified aldrig
+ * hamnar före datePublished för städer som tillkommit efter MODIFIED_AT.
  * ISO-datum (YYYY-MM-DD) sorteras korrekt lexikografiskt.
  */
 function cityDateModified(city: City): string {
-  const candidates = [MODIFIED_AT, city.updatedAt].filter(
+  const candidates = [cityDatePublished(city), MODIFIED_AT, city.updatedAt].filter(
     (d): d is string => Boolean(d),
   );
   return candidates.sort().at(-1) ?? MODIFIED_AT;
@@ -91,7 +98,7 @@ export function generateMetadata({ params }: PageProps): Metadata {
       description: buildDescription(city.name, city.area),
       url,
       type: 'article',
-      publishedTime: PUBLISHED_AT,
+      publishedTime: cityDatePublished(city),
       modifiedTime: cityDateModified(city),
     },
   };
@@ -118,7 +125,8 @@ export default async function StadPage({ params }: PageProps) {
     year: 'numeric',
   }).format(new Date());
   const priceUpdatedLabel = `${priceDateLabel} ${slotLabel}`;
-  // Artikeldatum: samma härledda värde som JSON-LD dateModified.
+  // Artikeldatum: samma härledda värden som JSON-LD datePublished/dateModified.
+  const publishedAt = cityDatePublished(city);
   const modifiedAt = cityDateModified(city);
 
   const others = otherCitiesInArea(city.name, city.area);
@@ -144,8 +152,8 @@ export default async function StadPage({ params }: PageProps) {
     '@type': 'Article',
     headline: `Elpris idag i ${city.name}`,
     description: buildDescription(city.name, city.area),
-    datePublished: PUBLISHED_AT,
-    dateModified: cityDateModified(city),
+    datePublished: publishedAt,
+    dateModified: modifiedAt,
     author: {
       '@type': 'Organization',
       name: 'elpris.ai-redaktionen',
@@ -235,8 +243,8 @@ export default async function StadPage({ params }: PageProps) {
           </h1>
           <p className="text-xs text-[#8fafc9] mb-8">
             {areaHours && <>Prisdata uppdaterad {priceUpdatedLabel} · </>}
-            <time dateTime={PUBLISHED_AT}>Publicerad {PUBLISHED_LABEL}</time>
-            {modifiedAt !== PUBLISHED_AT && (
+            <time dateTime={publishedAt}>Publicerad {formatMonthYear(publishedAt)}</time>
+            {modifiedAt !== publishedAt && (
               <>
                 {' · '}
                 <time dateTime={modifiedAt}>

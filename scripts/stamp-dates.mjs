@@ -15,6 +15,8 @@
  *   - src/lib/cities.ts                    → berörd stads updatedAt (om DEN
  *                                            stadens uniqueIntro/commonGrid-
  *                                            Companies/uniqueFaqs ändrats)
+ *   - src/lib/cities.ts  (ny stad)         → publishedAt (om den saknas; slug
+ *                                            som inte fanns i HEAD)
  *
  * Bumpar ALDRIG när bara datumfältet själv, kod/JSX/import/typer eller enbart
  * whitespace ändrats (datumfälten ingår aldrig i jämförelsen → inget loop-drev).
@@ -245,6 +247,16 @@ function bumpCityUpdatedAt(text, slugs, date) {
   });
 }
 
+/** Nya städer: sätt publishedAt efter slug-raden om fältet saknas. Rör INTE updatedAt. */
+function stampCityPublishedAt(text, slugs, date) {
+  return text.replace(CITY_BLOCK_RE, (full, key, body) => {
+    if (!slugs.has(key)) return full;
+    if (/^\s*publishedAt:/m.test(body)) return full;
+    const nextBody = body.replace(/^(\s*slug:\s*'[^']*',)$/m, `$1\n    publishedAt: '${date}',`);
+    return `  ${key}: {\n${nextBody}\n  },`;
+  });
+}
+
 function handleCities(file) {
   const work = readFile(file);
   const head = headContent(file);
@@ -253,16 +265,31 @@ function handleCities(file) {
   const headMap = cityTextMap(head);
   const workMap = cityTextMap(work);
   const changed = new Set();
+  const added = new Set();
   for (const [slug, text] of workMap) {
-    if (headMap.has(slug) && headMap.get(slug) !== text) changed.add(slug);
+    if (!headMap.has(slug)) added.add(slug);
+    else if (headMap.get(slug) !== text) changed.add(slug);
   }
-  if (changed.size === 0) return;
+  if (changed.size === 0 && added.size === 0) return;
 
-  const next = bumpCityUpdatedAt(work, changed, today());
+  let next = work;
+  if (added.size > 0) {
+    const stamped = stampCityPublishedAt(next, added, today());
+    if (stamped !== next) {
+      next = stamped;
+      notes.push(`publishedAt=${today()} satt på ny stad ${[...added].join(', ')} ${file}`);
+    }
+  }
+  if (changed.size > 0) {
+    const bumped = bumpCityUpdatedAt(next, changed, today());
+    if (bumped !== next) {
+      next = bumped;
+      notes.push(`updatedAt→${today()} för ${[...changed].join(', ')} (stadsspecifik text ändrad) ${file}`);
+    }
+  }
   if (next !== work) {
     writeFileSync(file, next);
     restage(file);
-    notes.push(`updatedAt→${today()} för ${[...changed].join(', ')} (stadsspecifik text ändrad) ${file}`);
   }
 }
 
