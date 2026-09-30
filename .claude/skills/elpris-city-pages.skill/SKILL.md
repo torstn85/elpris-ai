@@ -48,7 +48,9 @@ Varje stad behöver dessa fält:
 }
 ```
 
-**`updatedAt` — skriv INTE för hand.** Stadsobjekt har ett valfritt fält `updatedAt?: string` (YYYY-MM-DD) som pre-commit-hooken sätter/bumpar automatiskt när DEN stadens text (uniqueIntro/uniqueFaqs/commonGridCompanies) ändras. Det härleder stadens `dateModified` (senaste av `MODIFIED_AT` i mallen och stadens `updatedAt`). Utelämna fältet när du skapar en ny stad.
+**`updatedAt` — skriv INTE för hand.** Stadsobjekt har ett valfritt fält `updatedAt?: string` (YYYY-MM-DD) som pre-commit-hooken sätter/bumpar automatiskt när DEN stadens text (uniqueIntro/uniqueFaqs/commonGridCompanies) ändras. Det härleder stadens `dateModified` (senaste av stadens publiceringsdatum, `MODIFIED_AT` i mallen och stadens `updatedAt`). Utelämna fältet när du skapar en ny stad.
+
+**`publishedAt` — skriv INTE för hand.** Valfritt fält `publishedAt?: string` (YYYY-MM-DD) som pre-commit-hooken stämplar automatiskt (dagens datum, Europe/Stockholm) när en NY stad läggs till (slug som inte fanns i HEAD). Det styr "Publicerad …" i datumraden, JSON-LD `datePublished` och `article:published_time`; saknas det faller sidan tillbaka på `PUBLISHED_AT` i mallen (gäller bara Kungsbacka, publicerad 2026-05-05).
 
 ### Steg 3: Skicka Claude Code-prompt enligt format (se elpris-claude-code-prompting-pattern nedan)
 
