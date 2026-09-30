@@ -23,6 +23,7 @@ export type City = {
 export const CITIES: Record<string, City> = {
   bastad: {
     slug: 'bastad',
+    publishedAt: '2026-05-18',
     updatedAt: '2026-08-27',
     name: 'Båstad',
     area: 'SE4',
@@ -46,6 +47,7 @@ export const CITIES: Record<string, City> = {
   },
   falkenberg: {
     slug: 'falkenberg',
+    publishedAt: '2026-05-18',
     updatedAt: '2026-08-27',
     name: 'Falkenberg',
     area: 'SE4',
@@ -69,6 +71,7 @@ export const CITIES: Record<string, City> = {
   },
   goteborg: {
     slug: 'goteborg',
+    publishedAt: '2026-08-27',
     updatedAt: '2026-09-30',
     name: 'Göteborg',
     area: 'SE3',
@@ -92,6 +95,7 @@ export const CITIES: Record<string, City> = {
   },
   halmstad: {
     slug: 'halmstad',
+    publishedAt: '2026-05-18',
     updatedAt: '2026-08-27',
     name: 'Halmstad',
     area: 'SE4',
@@ -115,6 +119,7 @@ export const CITIES: Record<string, City> = {
   },
   helsingborg: {
     slug: 'helsingborg',
+    publishedAt: '2026-08-27',
     name: 'Helsingborg',
     area: 'SE4',
     region: 'Skåne',
@@ -160,6 +165,7 @@ export const CITIES: Record<string, City> = {
   },
   laholm: {
     slug: 'laholm',
+    publishedAt: '2026-05-18',
     updatedAt: '2026-08-27',
     name: 'Laholm',
     area: 'SE4',
@@ -183,6 +189,7 @@ export const CITIES: Record<string, City> = {
   },
   malmo: {
     slug: 'malmo',
+    publishedAt: '2026-09-29',
     name: 'Malmö',
     area: 'SE4',
     region: 'Skåne',
@@ -228,6 +235,7 @@ export const CITIES: Record<string, City> = {
   },
   varberg: {
     slug: 'varberg',
+    publishedAt: '2026-05-20',
     updatedAt: '2026-08-27',
     name: 'Varberg',
     area: 'SE3',
