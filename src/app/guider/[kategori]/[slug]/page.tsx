@@ -168,6 +168,10 @@ export default function ArticlePage({ params }: PageProps) {
             </a>
           </nav>
 
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            {frontmatter.title}
+          </h1>
+
           <div className="mb-6 flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-[#0F3460] border border-[#1E4976] flex items-center justify-center flex-shrink-0">
               <span className="text-[#00E5FF] font-extrabold text-base">e</span>
