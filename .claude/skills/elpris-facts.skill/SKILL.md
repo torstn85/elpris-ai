@@ -46,6 +46,27 @@ Skriv ALDRIG exakta kr-belopp för Grön teknik-besparing. Installatörens offer
 - Skatten sänktes **1 januari 2026** från 53,5 öre/kWh
 - Vissa kommuner och industri kan ha reducerad nivå — hänvisa till Skatteverket för exakt nivå
 
+## Skattereduktion för mikroproduktion (såld solel)
+
+- Skattereduktionen på **60 öre/kWh** för såld solel är **slopad från 1 januari 2026** (riksdagsbeslut)
+- Källa: Skatteverket, "Mikroproduktion av förnybar el"
+
+## Effekttariffer — status
+
+- Ei:s krav på effekttariff senast 1 januari 2027 är **stoppat av regeringen**. Ei har fått i uppdrag att upphäva föreskrifterna och ta fram en ny modell.
+- Fram till dess väljer **varje elnätsbolag själv** om det tar ut effektavgift.
+- Skriv ALDRIG "brett införda", "de flesta elnätsbolag" eller "obligatoriskt" om effekttariffer.
+- Källa: Energimarknadsbyrån, "Effekttariffer"
+
+## Batterilager — Boverkets 20 kWh-regel
+
+- Stationära batterilager **över 20 kWh** som installeras **inomhus** ska placeras i **egen brandcell**.
+- Utomhusbatterier godkända för utomhusbruk är undantagna.
+- I kraft **1 juli 2025**, övergångsperioden slut **30 juni 2026**.
+- Skriv inte "enkelt" om batterier under 20 kWh. Korrekt formulering: "kräver ingen egen brandcell".
+- Behörig elinstallatör krävs oavsett storlek.
+- Källa: Boverkets byggregler
+
 ## Nord Pool och prisbildning (kritisk — orsakade fel i två guideartiklar)
 
 Spotpriset **sätts en gång per dygn** i day-ahead-auktionen på Nord Pool — inte löpande under dagen.
