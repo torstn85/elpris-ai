@@ -187,6 +187,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  lulea: {
+    slug: 'lulea',
+    publishedAt: '2026-10-01',
+    name: 'Luleå',
+    area: 'SE1',
+    region: 'Norrbottens län',
+    uniqueIntro:
+      'Luleå är Norrbottens största stad och tillhör elområde SE1, Sveriges nordligaste elområde. SE1 kallas ibland "elområde Luleå" efter staden. Här finns mycket mer elproduktion än förbrukning, främst vattenkraft från de stora norrlandsälvarna, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt. Under kalla perioder, när efterfrågan är hög i hela Norden, kan det stiga även här. Luleå och Norrbotten är också mitt i en omfattande industrietablering, och regionnätet runt Luleå byggs ut för att klara energikrävande industrier och elektrifieringen. Hur det påverkar priset på sikt beror på hur snabbt produktion och överföring byggs ut i takt med efterfrågan. Förbrukningen i Luleå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Gammelstad och Råneå ofta värms med el. Där gör det störst skillnad att följa priset under vinterhalvåret.',
+    commonGridCompanies:
+      'I Luleå ansvarar det kommunägda Luleå Energi Elnät för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Varför är elen ofta billigast i Luleå?',
+        answer:
+          'Luleå ligger i SE1, där produktionen av el, främst vattenkraft, är mycket större än förbrukningen. Elen behöver transporteras söderut till de stora förbrukningscentrumen, men överföringskapaciteten är begränsad. När ledningarna är fullt belastade blir det ett överskott kvar i norr, och då pressas priset i SE1 ned. När nätet inte är trångt jämnas priserna ut och kan vara nästan desamma i hela landet. SE1 har därför ofta, men inte alltid, landets lägsta spotpris.',
+      },
+      {
+        question: 'Varför byggs elnätet runt Luleå ut?',
+        answer:
+          'Efterfrågan på el ökar kraftigt i regionen. Nya energikrävande industrier etableras i och omkring Luleå, och elektrifieringen av transporter och industri kräver mer kapacitet. Vattenfall Eldistribution, som driver regionnätet i området, förstärker det för att möjliggöra tillväxten och samtidigt säkra en stabil elleverans. Regionnätet är det överliggande nätet som för elen vidare till de lokala elnäten — i Luleå till största delen Luleå Energi Elnät. För dig som hushåll påverkar utbyggnaden inte spotpriset direkt, eftersom det sätts per elområde. Nätavgiften sätts däremot av ditt nätbolag och kan förändras över tid.',
+      },
+    ],
+  },
   malmo: {
     slug: 'malmo',
     publishedAt: '2026-09-29',
