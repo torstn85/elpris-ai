@@ -82,6 +82,12 @@ Spotpriset **sätts en gång per dygn** i day-ahead-auktionen på Nord Pool — 
 
 **Modelltext för distinktionen:** `src/content/guider/elavtal/kvartspris-vs-timpris.mdx` och `src/content/guider/forsta-elpriset/nord-pool-forklarat.mdx` formulerar skillnaden korrekt — följ dem.
 
+## Avtalstyp och flytt av förbrukning
+
+- Att flytta förbrukning till billiga timmar/kvartar ger besparing bara med **kvarts- eller timprisavtal**.
+- Med **rörligt månadspris** betalar du ett snittpris oavsett när du förbrukar.
+- Skriv ALDRIG "rörligt elavtal" som förutsättning för att flytta förbrukning eller för batteri-arbitrage.
+
 ## SE3/SE4-gränsen genom Halland (kritisk lokal geografi)
 
 Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
