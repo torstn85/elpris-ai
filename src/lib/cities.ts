@@ -215,7 +215,7 @@ export const CITIES: Record<string, City> = {
     publishedAt: '2026-09-30',
     name: 'Stockholm',
     area: 'SE3',
-    region: 'Stockholm',
+    region: 'Stockholms län',
     uniqueIntro:
       'Stockholm är Sveriges största stad med runt en miljon invånare i kommunen och tillhör elområde SE3 — samma område som Göteborg, Uppsala och Örebro. Spotpriset är därför detsamma i Stockholm som i Göteborg vid samma tidpunkt, trots att det skiljer över 40 mil. Stockholm ligger på förbrukarsidan av det svenska elsystemet: mycket av vattenkraften produceras i norr, och överföringen söderut till SE3 har begränsad kapacitet. Samtidigt ligger kärnkraften i Forsmark, norr om Stockholm, i SE3, och när reaktorer står still för revision kan det märkas i priset. Förbrukningen i Stockholm är blandad. Innerstaden och stora delar av förorterna värms med fjärrvärme, medan villaområden som Bromma, Hässelby och Enskede ofta har värmepump eller direktverkande el. För lägenhetshushåll är elräkningen oftast liten. För villor med elvärme och för den som laddar elbil hemma gör det däremot skillnad att flytta förbrukningen till dygnets billigaste kvartar.',
     commonGridCompanies:
@@ -230,6 +230,29 @@ export const CITIES: Record<string, City> = {
         question: 'Lönar det sig att följa elpriset om jag bor i lägenhet i Stockholm?',
         answer:
           'Det beror på vad du förbrukar. I en lägenhet med fjärrvärme går elen mest till belysning, vitvaror och elektronik, och då blir vinsten av att flytta förbrukningen begränsad i kronor. Har du timavtal eller kvartsavtal kan det ändå vara värt att köra tvätt och disk när priset är lågt, eftersom priset ofta skiljer sig mycket över dygnet. Laddar du elbil hemma, eller har tillgång till laddplats i föreningen, blir skillnaden betydligt större. Laddningen är en av de största förbrukningarna ett hushåll har och är lätt att schemalägga.',
+      },
+    ],
+  },
+  uppsala: {
+    slug: 'uppsala',
+    publishedAt: '2026-10-01',
+    name: 'Uppsala',
+    area: 'SE3',
+    region: 'Uppsala län',
+    uniqueIntro:
+      'Uppsala är Sveriges fjärde största kommun och tillhör elområde SE3 — samma område som Stockholm och Göteborg. Spotpriset i Uppsala är därför detsamma som i Stockholm vid samma tidpunkt. Uppsala har däremot blivit känt för en annan elfråga: brist på kapacitet i elnätet. Elnätets utbyggnad har inte hållit takt med den ökade elanvändningen, främst i transmissionsnätet som är stommen för alla elnät. Kommunen, regionen och nätbolaget samarbetar därför kring lösningar som batterilager och flexibel elanvändning, under namnet Uppsalaeffekten. Bristen handlar om hur mycket effekt nätet klarar att leverera samtidigt, inte om priset per kilowattimme. Förbrukningen i Uppsala är blandad. Stora delar av staden värms med fjärrvärme, och den stora studentbefolkningen bor ofta i mindre lägenheter med låg elförbrukning. I villaområden och i tätorter som Storvreta och Björklinge är värmepumpar och elvärme vanligare. Där gör det skillnad att flytta tung förbrukning till dygnets billigaste kvartar.',
+    commonGridCompanies:
+      'I Uppsala är det Vattenfall Eldistribution som ansvarar för elnätet i huvuddelen av kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Gör elnätsbristen i Uppsala elen dyrare?',
+        answer:
+          'Nej, inte spotpriset. Spotpriset sätts per elområde, och Uppsala har samma spotpris som Stockholm och resten av SE3 vid samma tidpunkt. Kapacitetsbristen handlar om hur mycket effekt elnätet klarar att leverera samtidigt. Den påverkar framför allt möjligheten att ansluta nya stora förbrukare, som industrier, fastigheter och laddinfrastruktur. Det är därför kommunen och nätbolaget satsar på batterilager och på att få stora förbrukare att flytta sin förbrukning när nätet är som mest belastat. Din elräkning består dessutom av nätavgift, som sätts av nätbolaget, och den kan förändras över tid oberoende av spotpriset.',
+      },
+      {
+        question: 'Kan jag som hushåll i Uppsala hjälpa elnätet?',
+        answer:
+          'Ja, och ofta tjänar du på det själv. Elnätet är som mest belastat när många förbrukar samtidigt, typiskt vardagskvällar under vintern. Det är också då spotpriset ofta är som högst. Om du flyttar tung förbrukning som elbilsladdning, tvätt och disk till natten eller mitt på dagen avlastar du nätet. Har du kvarts- eller timpris sänker du samtidigt din egen kostnad. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar, men belastningen på nätet minskar ändå.',
       },
     ],
   },
