@@ -233,6 +233,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  umea: {
+    slug: 'umea',
+    publishedAt: '2026-10-01',
+    name: 'Umeå',
+    area: 'SE2',
+    region: 'Västerbottens län',
+    uniqueIntro:
+      'Umeå är Norrlands största stad och tillhör elområde SE2 — inte SE1 som många tror, och inte SE3 som Stockholm. SE2 är ett av Sveriges elproducerande områden: här finns stora mängder vattenkraft, bland annat Stornorrfors vid Umeälven i Umeå kommun, ett av Sveriges större vattenkraftverk. Produktionen i norr är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Ofta ligger det på samma nivå som i SE1. Under kalla vinterdagar, när efterfrågan är hög i hela Norden, kan priset ändå stiga kraftigt även här. Förbrukningen i Umeå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Holmsund och Sävar ofta värms med värmepump eller direktverkande el. Där blir det extra värdefullt att flytta förbrukningen till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Umeå är det Umeå Energi Elnät som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Varför är elen ofta billigare i Umeå än i Stockholm?',
+        answer:
+          'Umeå ligger i SE2 och Stockholm i SE3. I norra Sverige produceras mer el än som förbrukas, främst vattenkraft, medan södra Mellansverige har de stora förbrukningscentrumen. Överföringskapaciteten söderut är begränsad. När ledningarna är fullt belastade stannar den billiga elen i norr, och då blir priset lägre i SE2 än i SE3. När nätet inte är trångt kan priserna i stället vara nästan desamma. Skillnaden varierar alltså från dag till dag och från timme till timme.',
+      },
+      {
+        question: 'Kan elpriset i Umeå bli högt?',
+        answer:
+          'Ja. SE2 har ofta låga priser, men inte alltid. Under kalla vinterperioder ökar efterfrågan i hela Norden samtidigt, och då kan priset stiga även i norr, särskilt om tillgången på vattenkraft är begränsad efter en torr period. Elvärmda villor förbrukar mest just när det är kallast. Därför gör det störst skillnad för dem att följa priset och flytta tung förbrukning till billigare kvartar under vintern.',
+      },
+    ],
+  },
   uppsala: {
     slug: 'uppsala',
     publishedAt: '2026-10-01',
