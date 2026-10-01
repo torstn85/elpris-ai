@@ -48,12 +48,12 @@ export const CITIES: Record<string, City> = {
   falkenberg: {
     slug: 'falkenberg',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-01',
     name: 'Falkenberg',
     area: 'SE4',
     region: 'Halland',
     uniqueIntro:
-      'Falkenberg ligger vid Atterhusån längs Hallandskusten och har cirka 48 000 invånare. Staden tillhör elområde SE4 — samma som södra Halland, Skåne och Blekinge. Med växande befolkning, många villaområden som Stafsinge och Skrea, samt aktiv industri har Falkenberg en blandad förbrukningsprofil. Eluppvärmda hus är vanliga, vilket gör vintermånaderna kostsamma — men också skapar stor potential för besparing genom smart styrning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Falkenberg-bor med rörligt avtal eller kvartspris kan sänka räkningen markant genom att flytta tvätt och elbilsladdning till lågpristimmar.',
+      'Falkenberg ligger vid Atterhusån längs Hallandskusten och har cirka 48 000 invånare. Staden tillhör elområde SE4 — samma som södra Halland, Skåne och Blekinge. Med växande befolkning, många villaområden som Stafsinge och Skrea, samt aktiv industri har Falkenberg en blandad förbrukningsprofil. Eluppvärmda hus är vanliga, vilket gör vintermånaderna kostsamma — men också skapar stor potential för besparing genom smart styrning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Falkenberg-bor med kvarts- eller timpris kan sänka räkningen markant genom att flytta tvätt och elbilsladdning till lågpristimmar.',
     commonGridCompanies:
       'Bland de större nätbolagen i Falkenberg finns Falkenberg Energi och Vattenfall Eldistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
