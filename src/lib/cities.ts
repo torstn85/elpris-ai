@@ -27,7 +27,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-08-27',
     name: 'Båstad',
     area: 'SE4',
-    region: 'Skåne',
+    region: 'Skåne län',
     uniqueIntro:
       'Båstad ligger på Bjärehalvön i nordvästra Skåne och tillhör elområde SE4 — samma område som södra Halland, övriga Skåne och Blekinge. Med cirka 16 000 invånare som ökar dramatiskt under sommarmånaderna är staden känd för tennistraditionen och kustnära livsstil. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Skillnaden beror på begränsad överföringskapacitet från norr och påverkan från det europeiska elnätet via Tyskland och Polen. För Båstad-bor blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — varje öre i prisspridning över dygnet ger mer tillbaka här än längre norrut.',
     commonGridCompanies:
@@ -51,7 +51,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-10-01',
     name: 'Falkenberg',
     area: 'SE4',
-    region: 'Halland',
+    region: 'Hallands län',
     uniqueIntro:
       'Falkenberg ligger vid Atterhusån längs Hallandskusten och har cirka 48 000 invånare. Staden tillhör elområde SE4 — samma som södra Halland, Skåne och Blekinge. Med växande befolkning, många villaområden som Stafsinge och Skrea, samt aktiv industri har Falkenberg en blandad förbrukningsprofil. Eluppvärmda hus är vanliga, vilket gör vintermånaderna kostsamma — men också skapar stor potential för besparing genom smart styrning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Falkenberg-bor med kvarts- eller timpris kan sänka räkningen markant genom att flytta tvätt och elbilsladdning till lågpristimmar.',
     commonGridCompanies:
@@ -75,7 +75,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-09-30',
     name: 'Göteborg',
     area: 'SE3',
-    region: 'Västra Götaland',
+    region: 'Västra Götalands län',
     uniqueIntro:
       'Göteborg är Sveriges näst största stad med runt 600 000 invånare, belägen vid Göta älvs mynning på västkusten. Staden tillhör elområde SE3 — samma område som Stockholm och Uppsala, trots att det är över 40 mil emellan. Det förvånar många som tror att elpriset följer geografisk närhet: en göteborgare betalar samma spotpris per kilowattimme som en stockholmare samma timme, men konsekvent lägre än Malmö och Helsingborg i SE4 strax söderut. Göteborg har en blandad förbrukningsprofil med tät stadsbebyggelse och utbredd fjärrvärme i centrum, eluppvärmda villor i ytterområden som Torslanda, Askim och Säve, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Även om SE3 i snitt är billigare än SE4 varierar priset kraftigt över dygnet, så smart styrning av värmepump, tvätt och elbilsladdning lönar sig även här.',
     commonGridCompanies:
@@ -99,7 +99,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-08-27',
     name: 'Halmstad',
     area: 'SE4',
-    region: 'Halland',
+    region: 'Hallands län',
     uniqueIntro:
       'Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg — typiskt 20–40 % mer för samma timme. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Kvällarna kl 17–20 är ofta upp till tre gånger dyrare än nätter kl 02–05 — och i SE4 svider den skillnaden mer än norrut.',
     commonGridCompanies:
@@ -122,7 +122,7 @@ export const CITIES: Record<string, City> = {
     publishedAt: '2026-08-27',
     name: 'Helsingborg',
     area: 'SE4',
-    region: 'Skåne',
+    region: 'Skåne län',
     uniqueIntro:
       'Helsingborg ligger vid Öresund i nordvästra Skåne, med Danmark synligt på andra sidan sundet, och är med runt 115 000 invånare en av Sveriges tio största städer. Staden tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde — där spotpriset konsekvent ligger 20–40 % högre än i SE3 (Stockholm och Göteborg) för samma timme. Helsingborg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i områden som Ödåkra, Ramlösa och Mörarp, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Eftersom SE4 har både högre prisnivå och större prisspridning över dygnet blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull här — varje flyttad kilowattimme är värd mer i Helsingborg än längre norrut.',
     commonGridCompanies:
@@ -145,7 +145,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-08-27',
     name: 'Kungsbacka',
     area: 'SE3',
-    region: 'Halland',
+    region: 'Hallands län',
     uniqueIntro:
       'Kungsbacka ligger i norra Halland och tillhör elområde SE3, samma område som Stockholm och Göteborg. Trots det geografiska avståndet betalar du som Kungsbackabo exakt samma spotpris som någon i Stockholm — det är hur den svenska elmarknaden är uppdelad. Däremot kan din slutliga elräkning skilja sig markant beroende på vilket nätbolag som driver elnätet i ditt område och vilket elavtal du har.',
     commonGridCompanies:
@@ -169,7 +169,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-08-27',
     name: 'Laholm',
     area: 'SE4',
-    region: 'Halland',
+    region: 'Hallands län',
     uniqueIntro:
       'Laholm ligger i södra Halland och tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde. Med cirka 26 000 invånare är staden känd för sin närhet till både kust och inland, vilket påverkar elförbrukningen säsongsmässigt. Många laholmsbor har eluppvärmda villor och högt varmvattenbehov, särskilt under sommarmånaderna när befolkningen mångdubblas i kustnära områden som Mellbystrand. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Det gör att smart styrning av tvätt, laddning och värmepump är extra värdefull här: varje sparad kWh är värd mer i Laholm än längre norrut.',
     commonGridCompanies:
@@ -192,7 +192,7 @@ export const CITIES: Record<string, City> = {
     publishedAt: '2026-09-29',
     name: 'Malmö',
     area: 'SE4',
-    region: 'Skåne',
+    region: 'Skåne län',
     uniqueIntro:
       'Malmö är Sveriges tredje största stad med drygt 350 000 invånare i kommunen, och den överlägset största staden i elområde SE4. Här bor alltså fler människor med Sveriges högsta spotpriser än i någon annan kommun. Malmö ligger längst ned i Skåne, närmast den punkt där SE4 kopplas ihop med Danmark, Tyskland och Polen — och den kopplingen är en av huvudorsakerna till att södra Sverige betalar mer för elen än resten av landet. Förbrukningsprofilen skiljer sig från de mindre SE4-städerna: andelen lägenheter är hög och fjärrvärmen utbredd, så mindre av elen går till uppvärmning och mer till hushållsel, vitvaror och elbilsladdning. Det gör timingen viktigare än värmestyrningen — det är tvätt, disk och laddning som går att flytta här.',
     commonGridCompanies:
@@ -285,7 +285,7 @@ export const CITIES: Record<string, City> = {
     updatedAt: '2026-08-27',
     name: 'Varberg',
     area: 'SE3',
-    region: 'Halland',
+    region: 'Hallands län',
     uniqueIntro:
       'Varberg är Hallands tredje största kommun med drygt 65 000 invånare och en av västkustens viktigaste hamnstäder. Staden tillhör elområde SE3 — samma område som Stockholm och Göteborg — och är den sydligaste SE3-staden i Halland innan elprisgränsen till SE4 vid Falkenberg. Det innebär att Varberg ofta har 20–40 % lägre spotpris än Halmstad bara 50 kilometer söderut. Varberg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i kustområden som Apelviken och Träslövsläge, samt industri och hamnverksamhet. SE3-tillhörigheten gör smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — du kan utnyttja både dygnsmönster och regionala prisskillnader.',
     commonGridCompanies:
