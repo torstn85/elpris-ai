@@ -5,7 +5,7 @@ category: "elavtal"
 description: "Sverige gick över från timpris till kvartspris i oktober 2025. Vi förklarar vad som faktiskt ändrades, varför EU krävde det och hur det påverkar din elräkning."
 metaTitle: "Kvartspris vs timpris – vad ändrades 2025?"
 publishedAt: "2026-04-23"
-updatedAt: "2026-09-29"
+updatedAt: "2026-10-01"
 author: "elpris.ai-redaktionen"
 keywords:
   - kvartspris vs timpris
@@ -16,7 +16,7 @@ keywords:
   - EU kvartspris
 faqs:
   - question: "Vad är skillnaden mellan kvartspris och timpris?"
-    answer: "Skillnaden ligger i hur ofta priset uppdateras. Med timpris (före oktober 2025) gällde samma pris i 60 minuter — 24 priser per dygn. Med kvartspris uppdateras priset var 15:e minut — 96 priser per dygn. Båda baseras på samma day-ahead-auktion på Nord Pool, men kvartspris ger en finare upplösning. Den största praktiska konsekvensen är att prisspridningen inom ett dygn ökar: fler tillfällen då elen är extremt billig (eller negativ) och fler korta toppar då den är extremt dyr."
+    answer: "Skillnaden ligger i hur långa prisperioderna är. Med timpris (före oktober 2025) gällde samma pris i 60 minuter — 24 priser per dygn. Med kvartspris gäller varje pris i 15 minuter — 96 priser per dygn. Båda baseras på samma day-ahead-auktion på Nord Pool, men kvartspris ger en finare upplösning. Den största praktiska konsekvensen är att prisspridningen inom ett dygn ökar: fler tillfällen då elen är extremt billig (eller negativ) och fler korta toppar då den är extremt dyr."
   - question: "Varför infördes kvartspris i Sverige?"
     answer: "Förändringen kom från ett EU-krav på kvartsmätning i alla medlemsländer från oktober 2025, som en del av integrationen av den europeiska elmarknaden. Två huvudskäl: mer förnybar el i systemet kräver finare prissignaler (en vindpark som startar 14:30 syns direkt med kvartspris, inte först nästa hela timme), och bättre prissignaler till konsumenter gör att smarta system som laddboxar och värmepumpar kan agera mer effektivt och minska belastningen på elnätet."
   - question: "Behöver jag en ny elmätare för kvartspris?"
@@ -37,9 +37,9 @@ import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToda
 import PriceComparisonByArea from '@/components/dynamic/PriceComparisonByArea';
 import AdSlot from '@/components/dynamic/AdSlot';
 
-I oktober 2025 byttes alla rörliga elavtal i Sverige från timpris till **kvartspris**. Du behövde inte göra något – bytet skedde automatiskt – men många undrar fortfarande vad det egentligen innebär.
+I oktober 2025 ersattes timprisavtalen i regel av **kvartspris** – rörligt månadspris finns kvar. Hade du timpris behövde du inte göra något – bytet skedde automatiskt – men många undrar fortfarande vad det egentligen innebär.
 
-Kort svar: ditt elpris uppdateras nu var **15:e minut** istället för var timme. Det skapar fler tillfällen att hitta riktigt billiga timmar – men också snabbare prisrörelser åt motsatt håll.
+Kort svar: ditt elpris sätts nu per **kvart** i stället för per timme. Det skapar fler tillfällen att hitta riktigt billiga timmar – men också snabbare prisrörelser åt motsatt håll.
 
 <LivePriceWidget />
 
@@ -49,7 +49,7 @@ Bilden ovan är inget mindre än kvartspris i praktiken: priset du ser är gilti
 
 | Egenskap                | Timpris (före okt 2025) | Kvartspris (från okt 2025) |
 | ----------------------- | ----------------------- | -------------------------- |
-| Prisuppdatering         | Var 60:e minut          | Var 15:e minut             |
+| Prisperiod              | 60 minuter              | 15 minuter                 |
 | Antal priser per dygn   | 24                      | 96                         |
 | Hur priset bestäms      | Day-ahead-auktion       | Day-ahead-auktion          |
 | Mätning hos kund        | Per timme               | Per kvart                  |
@@ -102,7 +102,7 @@ Skillnaden mellan billigaste och dyraste timmen idag avgör hur mycket du faktis
 
 ## Vilka elbolag erbjuder kvartspris?
 
-I praktiken **alla rörliga elavtal i Sverige är kvartsprisavtal sedan oktober 2025**. Det är inget du längre behöver välja aktivt. Dessa är de största aktörerna:
+**Timprisavtalen ersattes i regel av kvartspris i oktober 2025 – rörligt månadspris finns kvar.** Har du haft timprisavtal behöver du alltså inte välja något aktivt. Dessa är de största aktörerna:
 
 - **Stora etablerade:** Vattenfall, E.ON, Fortum, Bixia, Skellefteå Kraft, Jämtkraft
 - **Appdrivna aktörer:** utmärks av lågt eller inget påslag, timprisstyrning och appar som kan automatisera tunga laster
