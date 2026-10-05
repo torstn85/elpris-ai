@@ -69,6 +69,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  gavle: {
+    slug: 'gavle',
+    publishedAt: '2026-10-05',
+    name: 'Gävle',
+    area: 'SE3',
+    region: 'Gävleborgs län',
+    uniqueIntro:
+      'Gävle är Gävleborgs läns största stad och ligger precis där elområde SE3 möter SE2. Själva staden tillhör SE3 — samma område som Stockholm, Göteborg och Uppsala — men kommunen är delad: den norra delen, ungefär en femtedel av kommunens yta, ligger i SE2. Bor du i norra delen av kommunen kan du alltså tillhöra SE2 — kolla elområdet på din elräkning. Skillnaden spelar roll, eftersom SE2 ofta har lägre spotpris än SE3 när överföringen söderut är fullt belastad. När nätet inte är trångt kan priserna i stället vara nästan desamma. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Gävle är det Gävle Energi som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden ansvarar Ellevio eller Vattenfall. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Gävle?',
+        answer:
+          'Gävle stad tillhör elområde SE3, samma område som Stockholm, Göteborg och Uppsala. Kommunen ligger dock i två elområden: den norra delen, ungefär en femtedel av kommunens yta, tillhör SE2. Bor du i norra delen av kommunen kan du alltså tillhöra SE2 — kolla elområdet på din elräkning. Spotpriset är detsamma för alla i samma elområde vid samma tidpunkt, men kan skilja mellan SE2 och SE3.',
+      },
+      {
+        question: 'Är elen billigare i norra delen av Gävle kommun?',
+        answer:
+          'Ofta, men inte alltid. Norra delen av kommunen ligger i SE2, där det produceras mer el än som förbrukas. När överföringen söderut är fullt belastad blir priset i SE2 lägre än i SE3. När nätet inte är trångt kan priserna vara nästan desamma i båda områdena. Vilket elområde du tillhör bestäms av var du bor, inte av vilket elhandelsbolag du väljer. Nätavgiften sätts av ditt nätbolag och kan också skilja mellan olika delar av kommunen.',
+      },
+    ],
+  },
   goteborg: {
     slug: 'goteborg',
     publishedAt: '2026-08-27',

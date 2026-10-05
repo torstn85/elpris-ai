@@ -29,7 +29,7 @@ const MODIFIED_AT = '2026-08-27';
 const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
   SE1: ['Luleå', 'Kiruna'],
   SE2: ['Sundsvall', 'Östersund', 'Umeå'],
-  SE3: ['Stockholm', 'Göteborg', 'Uppsala', 'Kungsbacka', 'Varberg'],
+  SE3: ['Stockholm', 'Göteborg', 'Uppsala', 'Gävle', 'Kungsbacka', 'Varberg'],
   SE4: ['Malmö', 'Helsingborg', 'Halmstad', 'Falkenberg', 'Laholm', 'Båstad'],
 };
 
