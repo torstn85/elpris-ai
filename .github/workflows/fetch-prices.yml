@@ -3,6 +3,9 @@ name: Fetch electricity prices
 on:
   schedule:
     - cron: "*/15 * * * *"
+    # Dagligt keepalive-anrop mot Upstash (rate limit för chatten) så att
+    # databasen inte går i hibernation vid inaktivitet.
+    - cron: "7 4 * * *"
   workflow_dispatch: # allow manual trigger from GitHub UI
 
 jobs:
@@ -13,3 +16,20 @@ jobs:
         run: |
           curl --fail --silent --show-error \
             -X GET "${{ secrets.PRODUCTION_URL }}/api/cron/fetch-prices"
+
+  upstash-keepalive:
+    if: github.event.schedule == '7 4 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Upstash Redis
+        env:
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          if [ -z "$UPSTASH_REDIS_REST_URL" ] || [ -z "$UPSTASH_REDIS_REST_TOKEN" ]; then
+            echo "UPSTASH_REDIS_REST_URL eller UPSTASH_REDIS_REST_TOKEN saknas bland GitHub-secrets" >&2
+            exit 1
+          fi
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
+            "$UPSTASH_REDIS_REST_URL/ping"

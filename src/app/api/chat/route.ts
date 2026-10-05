@@ -295,7 +295,9 @@ export async function POST(request: Request) {
       );
     }
   } catch (err) {
-    console.error('[rate-limit] Upstash unavailable — failing closed:', err);
+    const name = err instanceof Error ? err.name : typeof err;
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[rate-limit] Upstash unavailable — failing closed: ${name}: ${message}`);
     return NextResponse.json(
       { error: 'Tjänsten är tillfälligt otillgänglig. Försök igen om en stund.' },
       { status: 503 },
