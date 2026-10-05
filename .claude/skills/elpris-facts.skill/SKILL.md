@@ -103,7 +103,7 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 
 **Tonalitet i text:** "Halland är delat mellan SE3 och SE4 — gränsen går mellan Varberg och Falkenberg. Det är ett av Sveriges tydligaste exempel på elprisgeografi som inte följer länsgränser."
 
-**Prisskillnad SE3 vs SE4:** SE4 har konsekvent 20-40 % högre spotpris än SE3 för samma timme. Skäl: begränsad överföringskapacitet från norr, koppling till europeiska elnätet via Tyskland och Polen.
+**Prisskillnad SE3 vs SE4:** SE4 har ofta högre spotpris än SE3. Skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Skriv ALDRIG "konsekvent" eller fasta procentintervall som "20–40 %" utan källa och räknesätt. Skäl till skillnaden: begränsad överföringskapacitet från norr, koppling till europeiska elnätet via Tyskland och Polen.
 
 ## Elnätsbolag — alltid öppen formulering
 
