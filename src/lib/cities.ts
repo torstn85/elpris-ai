@@ -256,6 +256,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  skelleftea: {
+    slug: 'skelleftea',
+    publishedAt: '2026-10-05',
+    name: 'Skellefteå',
+    area: 'SE1',
+    region: 'Västerbottens län',
+    uniqueIntro:
+      'Skellefteå ligger i Västerbottens län men tillhör elområde SE1 — Sveriges nordligaste elområde, samma som Luleå och Kiruna. Det överraskar många, eftersom Umeå i samma län ligger i SE2. Elområdesgränserna följer elnätets flaskhalsar, inte länsgränserna. I SE1 finns mycket mer elproduktion än förbrukning, främst vattenkraft, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt: när nätet inte är trångt jämnas priserna ut, och under kalla perioder med hög efterfrågan i hela Norden kan priset stiga även här. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Skellefteå är det Skellefteå Kraft Elnät som ansvarar för elnätet i huvuddelen av kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Varför ligger Skellefteå i SE1 när Umeå ligger i SE2?',
+        answer:
+          'Elområdena är dragna efter var elnätet har flaskhalsar, inte efter läns- eller kommungränser. Gränsen mellan SE1 och SE2 går genom Västerbotten, mellan Skellefteå och Umeå, så två städer i samma län kan tillhöra olika elområden. Det märks i priset när överföringen mellan SE1 och SE2 är fullt belastad — då kan spotpriset skilja mellan städerna. När nätet inte är trångt är priserna ofta desamma eller nästan desamma.',
+      },
+      {
+        question: 'Lönar det sig att följa elpriset i Skellefteå?',
+        answer:
+          'Ofta, särskilt på vintern. Även i SE1 varierar priset över dygnet, och under kalla perioder kan skillnaden mellan dygnets dyraste och billigaste kvartar bli stor. Med kvarts- eller timpris sänker du kostnaden genom att lägga elbilsladdning, tvätt och disk när priset är lågt. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar, och då ger flytten ingen direkt besparing. Mest gör det för villor med elvärme, eftersom de förbrukar mest just när det är kallt.',
+      },
+    ],
+  },
   stockholm: {
     slug: 'stockholm',
     publishedAt: '2026-09-30',
