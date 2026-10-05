@@ -256,6 +256,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  sundsvall: {
+    slug: 'sundsvall',
+    publishedAt: '2026-10-05',
+    name: 'Sundsvall',
+    area: 'SE2',
+    region: 'Västernorrlands län',
+    uniqueIntro:
+      'Sundsvall är Västernorrlands största stad och tillhör elområde SE2 — det område som ibland kallas "elområde Sundsvall" efter staden. SE2 omfattar stora delar av Norrland, med mycket vattenkraft från älvar som Indalsälven och Ljungan. Produktionen i området är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Det är inte alltid så: när nätet inte är trångt jämnas priserna ut, och under kalla vinterdagar med hög efterfrågan i hela Norden kan priset stiga även här. Förbrukningen i Sundsvall är blandad. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Sundsvall är det Sundsvall Elnät som ansvarar för elnätet i centralorten och på Alnö. I andra delar av kommunen ansvarar främst E.ON eller Härjeåns Nät. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Sundsvall?',
+        answer:
+          'Sundsvall tillhör elområde SE2, samma område som Umeå och Östersund. Spotpriset är detsamma för alla i SE2 vid samma tidpunkt. SE2 ligger mellan SE1 i norr och SE3 i söder, och priset ligger ofta nära SE1:s och lägre än i SE3 och SE4 — men skillnaden varierar med hur belastade förbindelserna söderut är. Det som skiljer din slutfaktura från en annan SE2-stads är nätavgift, påslag och elavtal, inte spotpriset.',
+      },
+      {
+        question: 'Lönar det sig att flytta förbrukning i Sundsvall när elen ofta är billig?',
+        answer:
+          'Ofta ja, men det beror på avtal och säsong. Även när snittpriset är lågt varierar priset över dygnet, och under vintern kan skillnaden mellan dygnets billigaste och dyraste kvartar bli stor. Med kvarts- eller timpris sänker du kostnaden genom att lägga elbilsladdning, tvätt och disk när priset är lågt. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar, och då ger flytten ingen direkt besparing. Har ditt nätbolag effektavgift kan det dessutom löna sig att undvika att flera tunga apparater går samtidigt.',
+      },
+    ],
+  },
   umea: {
     slug: 'umea',
     publishedAt: '2026-10-01',
