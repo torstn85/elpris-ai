@@ -24,12 +24,12 @@ export const CITIES: Record<string, City> = {
   bastad: {
     slug: 'bastad',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-05',
     name: 'Båstad',
     area: 'SE4',
     region: 'Skåne län',
     uniqueIntro:
-      'Båstad ligger på Bjärehalvön i nordvästra Skåne och tillhör elområde SE4 — samma område som södra Halland, övriga Skåne och Blekinge. Med cirka 16 000 invånare som ökar dramatiskt under sommarmånaderna är staden känd för tennistraditionen och kustnära livsstil. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Skillnaden beror på begränsad överföringskapacitet från norr och påverkan från det europeiska elnätet via Tyskland och Polen. För Båstad-bor blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — varje öre i prisspridning över dygnet ger mer tillbaka här än längre norrut.',
+      'Båstad ligger på Bjärehalvön i nordvästra Skåne och tillhör elområde SE4 — samma område som södra Halland, övriga Skåne och Blekinge. Med cirka 16 000 invånare som ökar dramatiskt under sommarmånaderna är staden känd för tennistraditionen och kustnära livsstil. SE4 har ofta högre spotpris än Stockholm och Göteborg (SE3) — skillnaden är störst när överföringen söderut är fullt belastad, och när nätet inte är trångt kan priserna vara nästan desamma. Skillnaden beror på begränsad överföringskapacitet från norr och påverkan från det europeiska elnätet via Tyskland och Polen. För Båstad-bor blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — varje öre i prisspridning över dygnet ger mer tillbaka här än längre norrut.',
     commonGridCompanies:
       'Bland de större nätbolagen i Båstad finns Södra Hallands Kraft och E.ON Energidistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
@@ -41,31 +41,31 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Varför är elen dyrare i Båstad än i Kungsbacka?',
         answer:
-          'Båstad tillhör SE4 medan Kungsbacka tillhör SE3 — och SE4 har historiskt 20–40 % högre spotpris än SE3. Skillnaden beror på två faktorer: begränsad kapacitet i stamnätet som ska transportera billig norrländsk vattenkraft söderut, och att SE4 är mer kopplat till det europeiska elnätet där gas- och kolkraft ofta sätter marginalpriset. Trots att städerna ligger relativt nära varandra i samma region går elprisgränsen mellan dem.',
+          'Båstad tillhör SE4 medan Kungsbacka tillhör SE3 — och SE4 har ofta högre spotpris än SE3. Skillnaden beror på två faktorer: begränsad kapacitet i stamnätet som ska transportera billig norrländsk vattenkraft söderut, och att SE4 är mer kopplat till det europeiska elnätet där gas- och kolkraft ofta sätter marginalpriset. Trots att städerna ligger relativt nära varandra i samma region går elprisgränsen mellan dem.',
       },
     ],
   },
   falkenberg: {
     slug: 'falkenberg',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-10-01',
+    updatedAt: '2026-10-05',
     name: 'Falkenberg',
     area: 'SE4',
     region: 'Hallands län',
     uniqueIntro:
-      'Falkenberg ligger vid Atterhusån längs Hallandskusten och har cirka 48 000 invånare. Staden tillhör elområde SE4 — samma som södra Halland, Skåne och Blekinge. Med växande befolkning, många villaområden som Stafsinge och Skrea, samt aktiv industri har Falkenberg en blandad förbrukningsprofil. Eluppvärmda hus är vanliga, vilket gör vintermånaderna kostsamma — men också skapar stor potential för besparing genom smart styrning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Falkenberg-bor med kvarts- eller timpris kan sänka räkningen markant genom att flytta tvätt och elbilsladdning till lågpristimmar.',
+      'Falkenberg ligger vid Atterhusån längs Hallandskusten och har cirka 48 000 invånare. Staden tillhör elområde SE4 — samma som södra Halland, Skåne och Blekinge. Med växande befolkning, många villaområden som Stafsinge och Skrea, samt aktiv industri har Falkenberg en blandad förbrukningsprofil. Eluppvärmda hus är vanliga, vilket gör vintermånaderna kostsamma — men också skapar stor potential för besparing genom smart styrning. SE4 har ofta högre spotpris än Stockholm och Göteborg (SE3) — skillnaden är störst när överföringen söderut är fullt belastad, och när nätet inte är trångt kan priserna vara nästan desamma. Falkenberg-bor med kvarts- eller timpris kan sänka räkningen markant genom att flytta tvätt och elbilsladdning till lågpristimmar.',
     commonGridCompanies:
       'Bland de större nätbolagen i Falkenberg finns Falkenberg Energi och Vattenfall Eldistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
       {
         question: 'Vilket elområde tillhör Falkenberg?',
         answer:
-          'Falkenberg tillhör elområde SE4 — Sveriges sydligaste elprisområde. Intressant nog går elprisgränsen mellan SE3 och SE4 just genom Halland: Kungsbacka och Varberg norrut är SE3, medan Falkenberg, Halmstad och Laholm söderut är SE4. Det innebär att grannstäder kan ha 20–40 % skillnad i spotpris för samma timme — en av Sveriges tydligaste exempel på elprisgeografi.',
+          'Falkenberg tillhör elområde SE4 — Sveriges sydligaste elprisområde. Intressant nog går elprisgränsen mellan SE3 och SE4 just genom Halland: Kungsbacka och Varberg norrut är SE3, medan Falkenberg, Halmstad och Laholm söderut är SE4. Det innebär att grannstäder kan ha olika spotpris samma timme — ett av Sveriges tydligaste exempel på elprisgeografi.',
       },
       {
         question: 'Hur mycket kan jag spara genom att flytta elförbrukning?',
         answer:
-          'I SE4, där Falkenberg ligger, varierar spotpriset typiskt 60–180 öre/kWh över ett dygn — större spridning än norrut. Genom att flytta tvätt, disk och elbilsladdning från dyra timmar (kvällar 17–20) till lågpristimmar (nätter 02–05 eller mitt på dagen) kan ett hushåll sänka sin elkostnad märkbart över året beroende på förbrukning. Mest sparar villaägare med värmepump och elbil — i SE4 är besparingen ofta 30–50 % större än för en motsvarande villa i Stockholm.',
+          'Det beror på hur mycket förbrukning du kan flytta och hur stor prisskillnaden är mellan dygnets dyra och billiga timmar. I SE4, där Falkenberg ligger, är skillnaden mellan dygnets dyraste och billigaste kvartar ofta större än längre norrut, eftersom priset här påverkas mer av det europeiska elnätet. Genom att flytta tvätt, disk och elbilsladdning från dyra timmar (ofta kvällar kl 17–20) till lågpristimmar (nätter eller mitt på dagen) sänker du kostnaden — förutsatt att du har kvarts- eller timpris. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar. Mest gör flytten för villaägare med värmepump och elbil, eftersom de har mest förbrukning att flytta. Din egen besparing räknar du ut som flyttade kWh × prisskillnaden mellan den dyra och den billiga tiden.',
       },
     ],
   },
@@ -95,12 +95,12 @@ export const CITIES: Record<string, City> = {
   goteborg: {
     slug: 'goteborg',
     publishedAt: '2026-08-27',
-    updatedAt: '2026-09-30',
+    updatedAt: '2026-10-05',
     name: 'Göteborg',
     area: 'SE3',
     region: 'Västra Götalands län',
     uniqueIntro:
-      'Göteborg är Sveriges näst största stad med runt 600 000 invånare, belägen vid Göta älvs mynning på västkusten. Staden tillhör elområde SE3 — samma område som Stockholm och Uppsala, trots att det är över 40 mil emellan. Det förvånar många som tror att elpriset följer geografisk närhet: en göteborgare betalar samma spotpris per kilowattimme som en stockholmare samma timme, men konsekvent lägre än Malmö och Helsingborg i SE4 strax söderut. Göteborg har en blandad förbrukningsprofil med tät stadsbebyggelse och utbredd fjärrvärme i centrum, eluppvärmda villor i ytterområden som Torslanda, Askim och Säve, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Även om SE3 i snitt är billigare än SE4 varierar priset kraftigt över dygnet, så smart styrning av värmepump, tvätt och elbilsladdning lönar sig även här.',
+      'Göteborg är Sveriges näst största stad med runt 600 000 invånare, belägen vid Göta älvs mynning på västkusten. Staden tillhör elområde SE3 — samma område som Stockholm och Uppsala, trots att det är över 40 mil emellan. Det förvånar många som tror att elpriset följer geografisk närhet: en göteborgare betalar samma spotpris per kilowattimme som en stockholmare samma timme, men ofta lägre än Malmö och Helsingborg i SE4 strax söderut. Göteborg har en blandad förbrukningsprofil med tät stadsbebyggelse och utbredd fjärrvärme i centrum, eluppvärmda villor i ytterområden som Torslanda, Askim och Säve, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Även om SE3 i snitt är billigare än SE4 varierar priset kraftigt över dygnet, så smart styrning av värmepump, tvätt och elbilsladdning lönar sig även här.',
     commonGridCompanies:
       'I Göteborg är Göteborg Energi Nät det största nätbolaget — det ägs av Göteborgs stad och driver elnätet i kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
@@ -112,26 +112,26 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Varför är elen billigare i Göteborg än i Malmö?',
         answer:
-          'Göteborg ligger i SE3 och Malmö i SE4. Gränsen mellan elområdena går genom Halland, mellan Varberg och Falkenberg — så redan Falkenberg, Halmstad och Laholm hamnar på den dyrare sidan. SE4 har konsekvent 20–40 % högre spotpris än SE3 för samma timme. Orsaken är att större delen av Sveriges elproduktion — vattenkraft i norr och kärnkraft i Mellansverige — ligger i eller norr om SE3, medan överföringskapaciteten söderut till SE4 är begränsad. När efterfrågan är hög räcker kapaciteten inte för att pressa ner priset i söder, och SE4 är dessutom tätare kopplat till den dyrare kontinentala elmarknaden. Göteborg hamnar på den billigare sidan av flaskhalsen, medan Malmö och Helsingborg hamnar på den dyrare.',
+          'Göteborg ligger i SE3 och Malmö i SE4. Gränsen mellan elområdena går genom Halland, mellan Varberg och Falkenberg — så redan Falkenberg, Halmstad och Laholm hamnar på den dyrare sidan. SE4 har ofta högre spotpris än SE3, och skillnaden är störst när överföringen söderut är fullt belastad. Orsaken är att större delen av Sveriges elproduktion — vattenkraft i norr och kärnkraft i Mellansverige — ligger i eller norr om SE3, medan överföringskapaciteten söderut till SE4 är begränsad. När efterfrågan är hög räcker kapaciteten inte för att pressa ner priset i söder, och SE4 är dessutom tätare kopplat till den dyrare kontinentala elmarknaden. Göteborg hamnar på den billigare sidan av flaskhalsen, medan Malmö och Helsingborg hamnar på den dyrare.',
       },
     ],
   },
   halmstad: {
     slug: 'halmstad',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-05',
     name: 'Halmstad',
     area: 'SE4',
     region: 'Hallands län',
     uniqueIntro:
-      'Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har konsekvent högre spotpris än Stockholm och Göteborg — typiskt 20–40 % mer för samma timme. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Kvällarna kl 17–20 är ofta upp till tre gånger dyrare än nätter kl 02–05 — och i SE4 svider den skillnaden mer än norrut.',
+      'Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har ofta högre spotpris än Stockholm och Göteborg — skillnaden är störst när överföringen söderut är fullt belastad. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Kvällarna kl 17–20 är ofta betydligt dyrare än natten — och i SE4, där prisspridningen över dygnet ofta är större, svider den skillnaden mer än norrut.',
     commonGridCompanies:
       'Bland de större nätbolagen i Halmstad finns Halmstads Energi och Miljö Nät (HEM) och Vattenfall Eldistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
       {
         question: 'Vilket elområde tillhör Halmstad?',
         answer:
-          'Halmstad tillhör elområde SE4, Sveriges sydligaste elprisområde. SE4 omfattar södra Halland, Skåne och Blekinge. Området har historiskt 20–40 % högre snittpris än SE3 (Stockholm, Göteborg) på grund av flaskhalsar i stamnätet och påverkan från det europeiska elnätet. SE3/SE4-gränsen går faktiskt genom Halland — Kungsbacka och Varberg är SE3 medan Falkenberg och Halmstad är SE4.',
+          'Halmstad tillhör elområde SE4, Sveriges sydligaste elprisområde. SE4 omfattar södra Halland, Skåne och Blekinge. Området har ofta högre spotpris än SE3 (Stockholm, Göteborg) på grund av flaskhalsar i stamnätet och påverkan från det europeiska elnätet. SE3/SE4-gränsen går faktiskt genom Halland — Kungsbacka och Varberg är SE3 medan Falkenberg och Halmstad är SE4.',
       },
       {
         question: 'När är elen billigast i Halmstad?',
@@ -142,19 +142,20 @@ export const CITIES: Record<string, City> = {
   },
   helsingborg: {
     slug: 'helsingborg',
+    updatedAt: '2026-10-05',
     publishedAt: '2026-08-27',
     name: 'Helsingborg',
     area: 'SE4',
     region: 'Skåne län',
     uniqueIntro:
-      'Helsingborg ligger vid Öresund i nordvästra Skåne, med Danmark synligt på andra sidan sundet, och är med runt 115 000 invånare en av Sveriges tio största städer. Staden tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde — där spotpriset konsekvent ligger 20–40 % högre än i SE3 (Stockholm och Göteborg) för samma timme. Helsingborg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i områden som Ödåkra, Ramlösa och Mörarp, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Eftersom SE4 har både högre prisnivå och större prisspridning över dygnet blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull här — varje flyttad kilowattimme är värd mer i Helsingborg än längre norrut.',
+      'Helsingborg ligger vid Öresund i nordvästra Skåne, med Danmark synligt på andra sidan sundet, och är med runt 115 000 invånare en av Sveriges tio största städer. Staden tillhör elområde SE4 — Sveriges sydligaste och oftast dyraste elprisområde — där spotpriset ofta ligger högre än i SE3 (Stockholm och Göteborg), särskilt när överföringen söderut är fullt belastad. Helsingborg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i områden som Ödåkra, Ramlösa och Mörarp, samt hamn- och industriverksamhet med hög dagtidsförbrukning. Eftersom SE4 har både högre prisnivå och större prisspridning över dygnet blir smart styrning av värmepump, tvätt och elbilsladdning extra värdefull här — varje flyttad kilowattimme är värd mer i Helsingborg än längre norrut.',
     commonGridCompanies:
       'I Helsingborg är Öresundskraft Elnät det största nätbolaget — det ägs av Helsingborgs stad och driver elnätet i staden med omnejd. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
       {
         question: 'Vilket elområde tillhör Helsingborg?',
         answer:
-          'Helsingborg tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Malmö, Lund och Landskrona. Spotpriset är detsamma för alla i SE4 samma timme och ligger typiskt 20–40 % högre än i SE3 (Stockholm och Göteborg). Skillnaden beror på begränsad överföringskapacitet från de elrika norra elområdena och på att SE4 är tätt sammankopplat med det europeiska elnätet, vilket drar upp priset när kontinenten har hög efterfrågan.',
+          'Helsingborg tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Malmö, Lund och Landskrona. Spotpriset är detsamma för alla i SE4 samma timme och ligger ofta högre än i SE3 (Stockholm och Göteborg). Skillnaden beror på begränsad överföringskapacitet från de elrika norra elområdena och på att SE4 är tätt sammankopplat med det europeiska elnätet, vilket drar upp priset när kontinenten har hög efterfrågan.',
       },
       {
         question: 'Hur påverkar närheten till Danmark elpriset i Helsingborg?',
@@ -165,7 +166,7 @@ export const CITIES: Record<string, City> = {
   },
   kungsbacka: {
     slug: 'kungsbacka',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-05',
     name: 'Kungsbacka',
     area: 'SE3',
     region: 'Hallands län',
@@ -177,7 +178,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Tillhör Kungsbacka SE3 eller SE4?',
         answer:
-          'Kungsbacka tillhör elområde SE3 (Mellansverige). Elprisgränsen mellan SE3 och SE4 går faktiskt genom Halland — Kungsbacka och Varberg ligger i SE3, medan Falkenberg, Halmstad och Laholm söderut tillhör SE4. Det innebär att Kungsbacka har lägre spotpris än grannstäderna i södra Halland — typiskt 20–40 % billigare för samma timme. Frågan är vanlig eftersom Halland uppfattas som en sammanhängande region, men elprisgeografin följer stamnätets flaskhalsar snarare än länsgränserna.',
+          'Kungsbacka tillhör elområde SE3 (Mellansverige). Elprisgränsen mellan SE3 och SE4 går faktiskt genom Halland — Kungsbacka och Varberg ligger i SE3, medan Falkenberg, Halmstad och Laholm söderut tillhör SE4. Det innebär att Kungsbacka ofta har lägre spotpris än grannstäderna i södra Halland, särskilt när överföringen söderut är fullt belastad. Frågan är vanlig eftersom Halland uppfattas som en sammanhängande region, men elprisgeografin följer stamnätets flaskhalsar snarare än länsgränserna.',
       },
       {
         question: 'Kan elpriset i Kungsbacka skilja sig från elpriset i Göteborg?',
@@ -189,19 +190,19 @@ export const CITIES: Record<string, City> = {
   laholm: {
     slug: 'laholm',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-05',
     name: 'Laholm',
     area: 'SE4',
     region: 'Hallands län',
     uniqueIntro:
-      'Laholm ligger i södra Halland och tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde. Med cirka 26 000 invånare är staden känd för sin närhet till både kust och inland, vilket påverkar elförbrukningen säsongsmässigt. Många laholmsbor har eluppvärmda villor och högt varmvattenbehov, särskilt under sommarmånaderna när befolkningen mångdubblas i kustnära områden som Mellbystrand. SE4 har konsekvent högre spotpris än Stockholm och Göteborg (SE3) — typiskt 20–40 % mer för samma timme. Det gör att smart styrning av tvätt, laddning och värmepump är extra värdefull här: varje sparad kWh är värd mer i Laholm än längre norrut.',
+      'Laholm ligger i södra Halland och tillhör elområde SE4 — Sveriges sydligaste och dyraste elprisområde. Med cirka 26 000 invånare är staden känd för sin närhet till både kust och inland, vilket påverkar elförbrukningen säsongsmässigt. Många laholmsbor har eluppvärmda villor och högt varmvattenbehov, särskilt under sommarmånaderna när befolkningen mångdubblas i kustnära områden som Mellbystrand. SE4 har ofta högre spotpris än Stockholm och Göteborg (SE3) — skillnaden är störst när överföringen söderut är fullt belastad, och när nätet inte är trångt kan priserna vara nästan desamma. Det gör att smart styrning av tvätt, laddning och värmepump är extra värdefull här: varje sparad kWh är värd mer i Laholm än längre norrut.',
     commonGridCompanies:
       'Bland de större nätbolagen i Laholm finns Södra Hallands Kraft och Vattenfall Eldistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser på den här sidan.',
     uniqueFaqs: [
       {
         question: 'Vilket elområde tillhör Laholm?',
         answer:
-          'Laholm tillhör elområde SE4, som omfattar södra Sverige inklusive Malmö, Helsingborg och hela södra Halland. SE4 har historiskt 20–40 % högre snittpris än Stockholm och Göteborg (SE3), främst på grund av begränsad överföringskapacitet från norra Sveriges vattenkraft och koppling till det europeiska elnätet via Tyskland och Polen.',
+          'Laholm tillhör elområde SE4, som omfattar södra Sverige inklusive Malmö, Helsingborg och hela södra Halland. SE4 har ofta högre spotpris än Stockholm och Göteborg (SE3), främst på grund av begränsad överföringskapacitet från norra Sveriges vattenkraft och koppling till det europeiska elnätet via Tyskland och Polen.',
       },
       {
         question: 'Är elen dyrare i Laholm än i Halmstad?',
@@ -235,6 +236,7 @@ export const CITIES: Record<string, City> = {
   },
   malmo: {
     slug: 'malmo',
+    updatedAt: '2026-10-05',
     publishedAt: '2026-09-29',
     name: 'Malmö',
     area: 'SE4',
@@ -247,12 +249,12 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Vilket elområde tillhör Malmö?',
         answer:
-          'Malmö tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Lund, Helsingborg och Landskrona. Spotpriset är detsamma för alla i SE4 under samma timme och ligger typiskt 20–40 % högre än i SE3, där Stockholm och Göteborg ligger. Som SE4:s största stad är Malmö den kommun där flest hushåll berörs av den prisskillnaden.',
+          'Malmö tillhör elområde SE4, Sveriges sydligaste och dyraste elprisområde. SE4 täcker södra Sverige — hela Skåne, Blekinge, södra Halland och delar av Småland — och här ligger även Lund, Helsingborg och Landskrona. Spotpriset är detsamma för alla i SE4 under samma timme och ligger ofta högre än i SE3, där Stockholm och Göteborg ligger. Som SE4:s största stad är Malmö den kommun där flest hushåll berörs av den prisskillnaden.',
       },
       {
         question: 'Varför är elen dyrare i Malmö än i Stockholm?',
         answer:
-          'Skillnaden handlar inte om städerna utan om elområdena. Malmö ligger i SE4 och Stockholm i SE3, och spotpriset sätts per elområde — inte per kommun. Två strukturella orsaker driver skillnaden. Dels är överföringskapaciteten från de elrika norra elområdena begränsad: all den el som produceras i norr kan inte transporteras söderut, så SE4 måste täcka en del av sin efterfrågan med import. Dels är SE4 tätt sammankopplat med det europeiska elnätet via förbindelser till Danmark, Tyskland och Polen, vilket gör att priset följer med uppåt när efterfrågan är hög på kontinenten. Resultatet är typiskt 20–40 % högre pris för samma timme. Det går inte att påverka genom att byta elhandelsbolag — men det gör varje flyttad kilowattimme värd mer i Malmö än i Stockholm.',
+          'Skillnaden handlar inte om städerna utan om elområdena. Malmö ligger i SE4 och Stockholm i SE3, och spotpriset sätts per elområde — inte per kommun. Två strukturella orsaker driver skillnaden. Dels är överföringskapaciteten från de elrika norra elområdena begränsad: all den el som produceras i norr kan inte transporteras söderut, så SE4 måste täcka en del av sin efterfrågan med import. Dels är SE4 tätt sammankopplat med det europeiska elnätet via förbindelser till Danmark, Tyskland och Polen, vilket gör att priset följer med uppåt när efterfrågan är hög på kontinenten. Resultatet är att SE4 ofta har högre pris än SE3 samma timme, särskilt när efterfrågan är hög. Det går inte att påverka genom att byta elhandelsbolag — men det gör varje flyttad kilowattimme värd mer i Malmö än i Stockholm.',
       },
     ],
   },
@@ -374,12 +376,12 @@ export const CITIES: Record<string, City> = {
   varberg: {
     slug: 'varberg',
     publishedAt: '2026-05-20',
-    updatedAt: '2026-08-27',
+    updatedAt: '2026-10-05',
     name: 'Varberg',
     area: 'SE3',
     region: 'Hallands län',
     uniqueIntro:
-      'Varberg är Hallands tredje största kommun med drygt 65 000 invånare och en av västkustens viktigaste hamnstäder. Staden tillhör elområde SE3 — samma område som Stockholm och Göteborg — och är den sydligaste SE3-staden i Halland innan elprisgränsen till SE4 vid Falkenberg. Det innebär att Varberg ofta har 20–40 % lägre spotpris än Halmstad bara 50 kilometer söderut. Varberg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i kustområden som Apelviken och Träslövsläge, samt industri och hamnverksamhet. SE3-tillhörigheten gör smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — du kan utnyttja både dygnsmönster och regionala prisskillnader.',
+      'Varberg är Hallands tredje största kommun med drygt 65 000 invånare och en av västkustens viktigaste hamnstäder. Staden tillhör elområde SE3 — samma område som Stockholm och Göteborg — och är den sydligaste SE3-staden i Halland innan elprisgränsen till SE4 vid Falkenberg. Det innebär att Varberg ofta har lägre spotpris än Halmstad bara 50 kilometer söderut. Varberg har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i kustområden som Apelviken och Träslövsläge, samt industri och hamnverksamhet. SE3-tillhörigheten gör smart styrning av värmepump, tvätt och elbilsladdning extra värdefull — du kan utnyttja både dygnsmönster och regionala prisskillnader.',
     commonGridCompanies:
       'Bland de större nätbolagen i Varberg finns Varberg Energi och Varbergsortens Elkraft, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
@@ -391,7 +393,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Är elen billigare i Varberg än i Falkenberg?',
         answer:
-          'Ja, ofta. Varberg tillhör SE3 och Falkenberg tillhör SE4, trots att städerna ligger knappt 30 kilometer ifrån varandra. SE4 har konsekvent högre spotpris än SE3 — typiskt 20–40 % mer för samma timme. Skillnaden beror på begränsad överföringskapacitet i elnätet och kopplingen till europeiska elnätet via Tyskland och Polen.',
+          'Ja, ofta. Varberg tillhör SE3 och Falkenberg tillhör SE4, trots att städerna ligger knappt 30 kilometer ifrån varandra. SE4 har ofta högre spotpris än SE3, och skillnaden är störst när överföringen söderut är fullt belastad. Skillnaden beror på begränsad överföringskapacitet i elnätet och kopplingen till europeiska elnätet via Tyskland och Polen.',
       },
     ],
   },
