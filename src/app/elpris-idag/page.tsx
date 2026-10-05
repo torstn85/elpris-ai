@@ -195,7 +195,7 @@ export default async function ElprisIdag() {
                 name: "Varför är elen dyrare i södra Sverige?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "SE4 (södra Sverige) har ofta 20-40 % högre spotpris än SE1-SE3. Det beror på begränsad överföringskapacitet från norra Sverige och kopplingen till europeiska elnätet via Tyskland och Polen.",
+                  text: "SE4 (södra Sverige) har ofta högre spotpris än SE1-SE3. Skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Det beror på begränsad överföringskapacitet från norra Sverige och kopplingen till europeiska elnätet via Tyskland och Polen.",
                 },
               },
               {
