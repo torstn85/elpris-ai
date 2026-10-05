@@ -372,4 +372,27 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  vasteras: {
+    slug: 'vasteras',
+    publishedAt: '2026-10-05',
+    name: 'Västerås',
+    area: 'SE3',
+    region: 'Västmanlands län',
+    uniqueIntro:
+      'Västerås är Västmanlands läns största stad och tillhör elområde SE3 — samma område som Stockholm, Göteborg och Uppsala. Spotpriset i Västerås är därför detsamma som i Stockholm vid samma tidpunkt. SE3 ligger på förbrukarsidan av det svenska elsystemet: mycket av vattenkraften produceras i norr, och överföringen söderut har begränsad kapacitet. När förbindelserna är fullt belastade blir priset i SE3 högre än i SE1 och SE2, och när nätet inte är trångt kan priset vara nästan detsamma i hela landet. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Västerås är det Mälarenergi Elnät som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden ansvarar Vattenfall. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Västerås?',
+        answer:
+          'Västerås tillhör elområde SE3, samma område som Stockholm, Göteborg, Uppsala och Gävle. Spotpriset är detsamma för alla i SE3 vid samma tidpunkt. SE3 har ofta högre spotpris än SE1 och SE2 i norr men lägre än SE4 i söder — skillnaden beror på hur belastade överföringsförbindelserna är. Det som skiljer din slutfaktura från en annan SE3-stads är nätavgift, påslag och elavtal, inte spotpriset.',
+      },
+      {
+        question: 'Har Västerås samma elpris som Stockholm?',
+        answer:
+          'Spotpriset är detsamma, eftersom båda ligger i SE3. Det som kan skilja är nätavgiften. I Västerås är det främst Mälarenergi Elnät som ansvarar för elnätet, i vissa ytterområden Vattenfall, och varje nätbolag sätter sina egna avgifter. Påslag och avtalsform beror på vilket elhandelsbolag och avtal du väljer. För att jämföra din totala kostnad behöver du alltså titta på spotpris, nätavgift och elavtal tillsammans.',
+      },
+    ],
+  },
 };
