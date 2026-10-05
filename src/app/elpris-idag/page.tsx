@@ -13,6 +13,33 @@ export const revalidate = 0;
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
 
+// FAQ:er delas av den synliga sektionen "Vanliga frågor om elpriset" och
+// FAQPage-JSON-LD så att texterna inte glider isär. READ_PRICES_FAQ visas inte
+// som egen FAQ — dess innehåll står i sektionen "Hur ska jag läsa dagens priser?".
+const READ_PRICES_FAQ = {
+  question: "Hur ska jag läsa dagens elpriser?",
+  answer:
+    "Spotpriset sätts per kvart — varje pris gäller i 15 minuter — men i tabellen visas timsnitt för enklare överblick. Färgmarkeringarna visar när det är värt att förbruka el (grönt = billigt, rött = dyrt) och när det lönar sig att vänta.",
+};
+
+const FAQS = [
+  {
+    question: "Vilka elområden finns i Sverige?",
+    answer:
+      "Sverige är indelat i fyra elprisområden: SE1 (Luleå), SE2 (Sundsvall), SE3 (Stockholm) och SE4 (Malmö). Priset varierar mellan områdena beroende på produktion, förbrukning och överföringskapacitet.",
+  },
+  {
+    question: "Varför är elen dyrare i södra Sverige?",
+    answer:
+      "SE4 (södra Sverige) har ofta högre spotpris än SE1-SE3. Skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Det beror på begränsad överföringskapacitet från norra Sverige och kopplingen till europeiska elnätet via Tyskland och Polen.",
+  },
+  {
+    question: "Var kommer prisdatan ifrån?",
+    answer:
+      "Priserna är spotpriser från den nordiska elbörsen Nord Pool. Vi hämtar datan via elprisetjustnu.se och uppdaterar automatiskt.",
+  },
+];
+
 interface HourEntry {
   hour: number;
   ore_per_kwh: number;
@@ -173,40 +200,14 @@ export default async function ElprisIdag() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: [
-              {
-                "@type": "Question",
-                name: "Hur ska jag läsa dagens elpriser?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Elpriset uppdateras varje kvart, men i tabellen visas timsnitt för enklare överblick. Färgmarkeringarna visar när det är värt att förbruka el (grönt = billigt, rött = dyrt) och när det lönar sig att vänta.",
-                },
+            mainEntity: [READ_PRICES_FAQ, ...FAQS].map((f) => ({
+              "@type": "Question",
+              name: f.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: f.answer,
               },
-              {
-                "@type": "Question",
-                name: "Vilka elområden finns i Sverige?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Sverige är indelat i fyra elprisområden: SE1 (Luleå), SE2 (Sundsvall), SE3 (Stockholm) och SE4 (Malmö). Priset varierar mellan områdena beroende på produktion, förbrukning och överföringskapacitet.",
-                },
-              },
-              {
-                "@type": "Question",
-                name: "Varför är elen dyrare i södra Sverige?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "SE4 (södra Sverige) har ofta högre spotpris än SE1-SE3. Skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Det beror på begränsad överföringskapacitet från norra Sverige och kopplingen till europeiska elnätet via Tyskland och Polen.",
-                },
-              },
-              {
-                "@type": "Question",
-                name: "Var kommer prisdatan ifrån?",
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: "Priserna är spotpriser från den nordiska elbörsen Nord Pool. Vi hämtar datan via elprisetjustnu.se och uppdaterar automatiskt.",
-                },
-              },
-            ],
+            })),
           }),
         }}
       />
@@ -240,8 +241,8 @@ export default async function ElprisIdag() {
                 Hur ska jag läsa dagens priser?
               </h2>
               <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                Elpriset uppdateras varje kvart, men i tabellen visas timsnitt för enklare
-                överblick. Färgmarkeringarna hjälper dig snabbt se när det är värt att
+                Spotpriset sätts per kvart — varje pris gäller i 15 minuter — men i tabellen
+                visas timsnitt för enklare överblick. Färgmarkeringarna hjälper dig snabbt se när det är värt att
                 förbruka el och när det lönar sig att vänta:
               </p>
               <ul className="space-y-2 text-base text-[#8fafc9] leading-relaxed mb-4">
@@ -393,25 +394,30 @@ export default async function ElprisIdag() {
               <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
                 Att titta på dagens timpriser är ett sätt att spara pengar utan att förändra
                 hur mycket el du använder — bara <strong className="text-white">när</strong>{" "}
-                du använder den. Tre konkreta saker du kan göra idag:
+                du använder den. Att flytta förbrukning lönar sig bara med kvarts- eller
+                timprisavtal — med rörligt månadspris betalar du samma snittpris oavsett när.
+                Tre konkreta saker du kan göra idag:
               </p>
               <ol className="space-y-3 text-base text-[#8fafc9] leading-relaxed mb-4 list-decimal list-inside">
                 <li>
                   <strong className="text-white">Planera tvätt och disk</strong> till de
-                  billigaste timmarna. Med kvartspris och en modern maskin med fördröjd start
-                  kan du ofta halvera kostnaden för en tvätt jämfört med att köra direkt.
+                  billigaste timmarna. Med en maskin med fördröjd start betalar du det lägre
+                  priset för hela programmet i stället för det högre — skillnaden blir störst
+                  de dagar prisspridningen över dygnet är stor.
                 </li>
                 <li>
                   <strong className="text-white">Ladda elbilen i bästa fönstret.</strong>{" "}
-                  En full laddning av en typisk elbil kostar ofta 30–80 kronor mer på dyraste
-                  tiden jämfört med billigaste — varje dag.
+                  Laddningen är en av hushållets största förbrukningar och lätt att flytta i
+                  tid. Kostnaden är laddade kWh gånger priset när du laddar, så att lägga den i
+                  dygnets billigaste timmar gör stor skillnad.
                 </li>
                 <li>
                   <strong className="text-white">Värm proaktivt om du har värmepump
                   eller elvärme.</strong>{" "}
                   Höj temperaturen någon grad under billiga timmar och låt den sjunka under
-                  dyra. För ett genomsnittligt hus innebär det 1 500–3 000 kr i besparing
-                  per år.
+                  dyra. Huset fungerar som ett värmelager, så en del av uppvärmningen flyttas
+                  till billigare tider utan att det blir märkbart kallare. Hur mycket det ger
+                  beror på husets värmetröghet och prisspridningen över dygnet.
                 </li>
               </ol>
               <p className="text-base text-[#8fafc9] leading-relaxed">
@@ -452,6 +458,23 @@ export default async function ElprisIdag() {
                 Vill du veta hur prisbildningen fungerar, läs{" "}
                 <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">vad är spotpris</Link>.
               </p>
+            </div>
+          </section>
+
+          {/* ── Vanliga frågor (samma innehåll som FAQPage-JSON-LD) ── */}
+          <section>
+            <div className="max-w-3xl">
+              <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
+                Vanliga frågor om elpriset
+              </h2>
+              <div className="space-y-6">
+                {FAQS.map((f) => (
+                  <div key={f.question}>
+                    <h3 className="font-semibold text-lg text-white mb-2">{f.question}</h3>
+                    <p className="text-base text-[#8fafc9] leading-relaxed">{f.answer}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
