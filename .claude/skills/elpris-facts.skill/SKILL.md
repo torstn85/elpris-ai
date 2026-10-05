@@ -32,6 +32,7 @@ Dessa fakta måste alltid vara korrekta. Vi har historiskt gjort fel på dem fle
 - Avdraget gäller **arbete + material** — INTE projektering, frakt eller andra kringkostnader
 - Avdrag dras direkt på fakturan av installatören (privatperson behöver inte ansöka)
 - ROT-avdrag och Grön teknik kan INTE kombineras på SAMMA åtgärd
+- Isolering, fönster, värmepump och FTX ger ROT-avdrag, inte Grön teknik. Payback-formel: offert efter avdrag (ROT eller Grön teknik) ÷ årligt mervärde.
 
 **KRITISK regel — exakta belopp:**
 
