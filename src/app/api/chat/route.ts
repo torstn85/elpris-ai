@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 import { searchKnowledge, type SearchResult } from '@/lib/rag/search';
+import { CITIES } from '@/lib/cities';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -139,6 +140,33 @@ ${utdrag}
 </kunskapsbas>`;
 }
 
+/**
+ * Sajtens egna sidor och funktioner — RAG täcker bara guiderna. Stadslistan
+ * byggs från CITIES så att boten inte länkar till städer som saknar sida.
+ */
+function getSiteFeatures(): string {
+  const cities = Object.values(CITIES)
+    .map((c) => `${c.name} /elpris-idag/${c.slug}`)
+    .join(', ');
+  const elduellen =
+    process.env.NEXT_PUBLIC_GAMES_ENABLED === 'true'
+      ? `
+- Elduellen (/elduellen): ett dagligt spel med fem dueller där man väljer vilket av två alternativ som kostar mest i el, till exempel att basta en kväll eller ladda elbilen vid två olika klockslag eller i två olika städer. Räknas på dagens riktiga spotpriser, alla spelar samma dueller och nya kommer vid midnatt. Efter kl 13:15, när morgondagens priser publicerats, öppnar en bonusduell om morgondagen. Kostnaden räknas som kWh × (spotpris + energiskatt) × 1,25 i moms, exklusive nätavgift och elhandlarens påslag.`
+      : '';
+  return `
+
+Sajtens egna sidor (länka med relativa URL:er i naturlig text när det hjälper användaren):
+- Elpriset idag för alla elområden: /elpris-idag. Stadssidor med dagens pris kvart för kvart: ${cities}.
+- Morgondagens priser: /elpris-imorgon (publiceras kl 13:15).
+- Elområden: /elomrade, och /elomrade/se1, /elomrade/se2, /elomrade/se3, /elomrade/se4.${elduellen}
+Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.${
+    elduellen
+      ? `
+Nämn Elduellen när användaren frågar vad något kostar i el, jämför vad olika saker drar, eller verkar nyfiken eller lekfull — som ett kort tips i slutet, till exempel "Testa dagens Elduellen på /elduellen". Nämn den inte annars, och aldrig mer än en gång per samtal.`
+      : ''
+  }`;
+}
+
 function getSystemPrompt(knowledgeBlock?: string | null): string {
   const now = new Intl.DateTimeFormat('sv-SE', {
     timeZone: 'Europe/Stockholm',
@@ -152,7 +180,8 @@ function getSystemPrompt(knowledgeBlock?: string | null): string {
 
   const base = `Just nu är det: ${now}. Du är elpris.ai:s AI-assistent. Du hjälper svenska användare förstå elpriser och spara pengar. Du svarar alltid på svenska, kort och konkret (max 3-4 meningar). När användaren frågar om aktuellt pris, billigaste timmar, eller liknande - använd get_current_price eller get_today_prices function calls. För frågor om morgondagen - använd get_tomorrow_prices. Day-ahead-priserna för imorgon släpps kl 13:15 varje dag. Kontrollera den aktuella tiden som står i början av denna prompt innan du säger att det är för tidigt eller sent. Om available: false returneras, förklara vänligt att priserna släpps kl 13:15 varje dag. Gissa ALDRIG priser - hämta alltid live-data via funktionerna. Om frågan inte handlar om el, säg vänligt att du bara hjälper med elprisfrågor. Använd ALDRIG markdown-formattering (ingen fet text med **asterisker**, inga listor med bindestreck, inga rubriker). Skriv bara ren text. Du får gärna använda emojis sparsamt när det passar.`;
 
-  if (!knowledgeBlock) return base;
+  const withSite = base + getSiteFeatures();
+  if (!knowledgeBlock) return withSite;
 
   const ragRules = `
 
@@ -164,7 +193,7 @@ Du har tillgång till en kunskapsbas i <kunskapsbas>-blocket nedan. Följ dessa 
 
 ${knowledgeBlock}`;
 
-  return base + ragRules;
+  return withSite + ragRules;
 }
 
 const TOOLS: Anthropic.Tool[] = [
