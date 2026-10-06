@@ -4,7 +4,12 @@ import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 import { searchKnowledge, type SearchResult } from '@/lib/rag/search';
 import { CITIES } from '@/lib/cities';
-import { calculateCost, type CostToolInput } from '@/lib/costTool';
+import {
+  ACTIVITY_CATALOG,
+  ACTIVITY_IDS,
+  calculateCost,
+  type CostToolInput,
+} from '@/lib/costTool';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -162,10 +167,13 @@ Sajtens egna sidor (länka med relativa URL:er i naturlig text när det hjälper
 - Elområden: /elomrade, och /elomrade/se1, /elomrade/se2, /elomrade/se3, /elomrade/se4.${elduellen}
 Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.
 
-Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när du anger vad något kostar i el. Räkna aldrig själv, och presentera siffrorna exakt som verktyget returnerar dem (spotpris, energiskatt, pris per kWh, kostnad och uträkning), utan egen avrundning.
+Påstå aldrig att negativt spotpris ger konsumenten pengar — energiskatt, moms och nätavgift tillkommer, så elen kostar ändå. Generalisera aldrig ett enskilt dygns billigaste eller dyraste timmar till "alltid"; säg att det gäller idag.
+
+Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när du anger vad något kostar i el. Räkna aldrig själv.
+- Ange activity när aktiviteten finns i verktygets bibliotek. Ange kWh bara när den saknas där, och skriv då ut ditt kWh-antagande i svaret.
+- Återge verktygets fält calculation ordagrant i svaret, till exempel "0,6 kWh × (100,1 öre spot + 36 öre energiskatt) × 1,25 moms ≈ 1,02 kr". Ändra inga siffror och avrunda inte.
 - Skicka med staden om användaren nämnt en, då används rätt elområde och nedsatt energiskatt där den gäller. Annars elområde.
 - Har användaren inte angett stad eller elområde: ställ ingen motfråga först, räkna direkt med SE3 som exempel och säg att det är ett exempel.
-- Förbrukningen i kWh är ditt antagande och ska sägas som det. Typiska värden: bastu en kväll 10 kWh, tvätt på 60 grader 1 kWh (40 grader 0,6 kWh), ladda elbilen för 10 mil 20 kWh, ladda elbilen från 10 till 80 procent 46 kWh.
 - Säg att beloppet är exkl. nätavgift och elhandlarens påslag, som tillkommer och varierar mellan bolag. Hitta aldrig på belopp för nätavgift eller påslag.
 - Om verktyget anger nedsatt energiskatt, nämn det kort.
 - Om du räknat med SE3 som exempel, avsluta med frågan "Vill du att jag räknar på ditt elområde?". Tipset om Elduellen kommer i så fall före den frågan.${
@@ -209,11 +217,22 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: 'calculate_cost',
     description:
-      'Räknar vad en förbrukning kostar i el idag: kWh × (dagens snittspotpris + energiskatt) × 1,25 moms, exkl. nätavgift och elhandlarens påslag. Använd alltid detta för kostnadsberäkningar. Ange stad om användaren nämnt en (ger rätt elområde och nedsatt energiskatt där den gäller), annars elområde.',
+      `Räknar vad en förbrukning kostar i el idag: kWh × (dagens snittspotpris + energiskatt) × 1,25 moms, exkl. nätavgift och elhandlarens påslag. Använd alltid detta för kostnadsberäkningar. Ange activity när aktiviteten finns i biblioteket nedan (då används bibliotekets kWh och antagande); ange kWh bara när den saknas. Ange stad om användaren nämnt en (ger rätt elområde och nedsatt energiskatt där den gäller), annars elområde.
+
+Aktivitetsbiblioteket (id: aktivitet):
+${ACTIVITY_CATALOG}`,
     input_schema: {
       type: 'object',
       properties: {
-        kWh: { type: 'number', description: 'Förbrukning i kWh, t.ex. 10 för en bastukväll.' },
+        activity: {
+          type: 'string',
+          enum: ACTIVITY_IDS,
+          description: 'Id ur aktivitetsbiblioteket. Föredras framför kWh.',
+        },
+        kWh: {
+          type: 'number',
+          description: 'Fri förbrukning i kWh — bara när aktiviteten saknas i biblioteket.',
+        },
         area: {
           type: 'string',
           enum: ['SE1', 'SE2', 'SE3', 'SE4'],
@@ -221,7 +240,7 @@ const TOOLS: Anthropic.Tool[] = [
         },
         city: { type: 'string', description: 'Stad som användaren nämnt, t.ex. "Kiruna".' },
       },
-      required: ['kWh'],
+      required: [],
     },
   },
   {

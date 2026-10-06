@@ -3,6 +3,7 @@
 // Undantaget från elpris-facts regel om totalt inköpspris gäller båda.
 
 import { CITIES } from "@/lib/cities";
+import { ACTIVITIES } from "@/lib/elduellen/activities";
 import { COST_FOOTNOTE, formatKwh, priceFor } from "@/lib/elduellen/cost";
 import { AREAS, loadDayPrices, type Area } from "@/lib/elduellen/prices";
 import { stockholmISODate } from "@/lib/time";
@@ -20,16 +21,36 @@ const taxNf = new Intl.NumberFormat("sv-SE", { maximumFractionDigits: 1 });
 const normalize = (s: string) =>
   s.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
+/** "basta-kvall: basta en kväll" per rad — för verktygsbeskrivningen. */
+export const ACTIVITY_CATALOG = ACTIVITIES.map(
+  (a) => `${a.id}: ${a.label}`,
+).join("\n");
+export const ACTIVITY_IDS = ACTIVITIES.map((a) => a.id);
+
 export interface CostToolInput {
-  kWh: number;
+  /** Id ur aktivitetsbiblioteket. Har företräde framför kWh. */
+  activity?: string;
+  /** Fritt kWh-värde — bara när aktiviteten saknas i biblioteket. */
+  kWh?: number;
   area?: string;
   city?: string;
 }
 
 export async function calculateCost(input: CostToolInput): Promise<object> {
-  const kWh = Number(input.kWh);
+  const activity = input.activity
+    ? ACTIVITIES.find((a) => a.id === input.activity)
+    : undefined;
+  if (input.activity && !activity && input.kWh === undefined) {
+    return {
+      error: `Aktiviteten ${input.activity} finns inte i biblioteket. Ange kWh och skriv ut ditt antagande.`,
+    };
+  }
+  const kWh = activity ? activity.kWh : Number(input.kWh);
   if (!Number.isFinite(kWh) || kWh <= 0 || kWh > 100_000) {
-    return { error: "Ange förbrukningen som ett positivt antal kWh." };
+    return {
+      error:
+        "Ange en aktivitet ur biblioteket eller förbrukningen som ett positivt antal kWh.",
+    };
   }
 
   const city = input.city
@@ -69,7 +90,12 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
     area,
     city: city?.name ?? null,
     city_not_found: input.city && !city ? input.city : undefined,
+    activity: activity?.label ?? null,
     kwh: `${formatKwh(kWh)} kWh`,
+    kwh_source: activity
+      ? "aktivitetsbiblioteket"
+      : "ditt eget antagande — skriv ut det i svaret",
+    assumption: activity?.assumption ?? null,
     spot_daily_average: `${nf(1).format(r.spotOre)} öre/kWh`,
     energy_tax: `${taxNf.format(r.taxOre)} öre/kWh`,
     reduced_energy_tax: reduced,
