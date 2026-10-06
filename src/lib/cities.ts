@@ -18,6 +18,11 @@ export type City = {
    * faller sidan tillbaka på MODIFIED_AT (mallens gemensamma text).
    */
   updatedAt?: string;
+  /**
+   * Hushåll i kommunen har nedsatt energiskatt (se energyTax.ts och elpris-facts).
+   * Används av räkneexempel, t.ex. Elduellen. Utelämna = normalnivå.
+   */
+  reducedEnergyTax?: true;
 };
 
 export const CITIES: Record<string, City> = {
@@ -170,6 +175,7 @@ export const CITIES: Record<string, City> = {
     name: 'Kiruna',
     area: 'SE1',
     region: 'Norrbottens län',
+    reducedEnergyTax: true,
     uniqueIntro:
       'Kiruna är Sveriges nordligaste stad och tillhör elområde SE1 — samma område som Luleå och Skellefteå. I SE1 finns mycket mer elproduktion än förbrukning, främst vattenkraft, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt: när nätet inte är trångt jämnas priserna ut, och under kalla perioder med hög efterfrågan i hela Norden kan priset stiga även här. Vintrarna i Kiruna är långa och kalla, och det är då förbrukningen är som högst. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
@@ -241,6 +247,7 @@ export const CITIES: Record<string, City> = {
     name: 'Luleå',
     area: 'SE1',
     region: 'Norrbottens län',
+    reducedEnergyTax: true,
     uniqueIntro:
       'Luleå är Norrbottens största stad och tillhör elområde SE1, Sveriges nordligaste elområde. SE1 kallas ibland "elområde Luleå" efter staden. Här finns mycket mer elproduktion än förbrukning, främst vattenkraft från de stora norrlandsälvarna, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt. Under kalla perioder, när efterfrågan är hög i hela Norden, kan det stiga även här. Luleå och Norrbotten är också mitt i en omfattande industrietablering, och regionnätet runt Luleå byggs ut för att klara energikrävande industrier och elektrifieringen. Hur det påverkar priset på sikt beror på hur snabbt produktion och överföring byggs ut i takt med efterfrågan. Förbrukningen i Luleå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Gammelstad och Råneå ofta värms med el. Där gör det störst skillnad att följa priset under vinterhalvåret.',
     commonGridCompanies:
@@ -288,6 +295,7 @@ export const CITIES: Record<string, City> = {
     name: 'Östersund',
     area: 'SE2',
     region: 'Jämtlands län',
+    reducedEnergyTax: true,
     uniqueIntro:
       'Östersund är Jämtlands läns största stad och tillhör elområde SE2 — samma område som Sundsvall och Umeå. SE2 omfattar stora delar av Norrland och har mycket vattenkraft. Produktionen i området är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Det är inte alltid så: när nätet inte är trångt jämnas priserna ut, och under kalla vinterdagar med hög efterfrågan i hela Norden kan priset stiga även här. Östersund har långa, kalla vintrar, och det är då förbrukningen är som högst. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
@@ -312,6 +320,7 @@ export const CITIES: Record<string, City> = {
     name: 'Skellefteå',
     area: 'SE1',
     region: 'Västerbottens län',
+    reducedEnergyTax: true,
     uniqueIntro:
       'Skellefteå ligger i Västerbottens län men tillhör elområde SE1 — Sveriges nordligaste elområde, samma som Luleå och Kiruna. Det överraskar många, eftersom Umeå i samma län ligger i SE2. Elområdesgränserna följer elnätets flaskhalsar, inte länsgränserna. I SE1 finns mycket mer elproduktion än förbrukning, främst vattenkraft, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt: när nätet inte är trångt jämnas priserna ut, och under kalla perioder med hög efterfrågan i hela Norden kan priset stiga även här. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
@@ -382,6 +391,7 @@ export const CITIES: Record<string, City> = {
     name: 'Umeå',
     area: 'SE2',
     region: 'Västerbottens län',
+    reducedEnergyTax: true,
     uniqueIntro:
       'Umeå är Norrlands största stad och tillhör elområde SE2 — inte SE1 som många tror, och inte SE3 som Stockholm. SE2 är ett av Sveriges elproducerande områden: här finns stora mängder vattenkraft, bland annat Stornorrfors vid Umeälven i Umeå kommun, ett av Sveriges större vattenkraftverk. Produktionen i norr är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Ofta ligger det på samma nivå som i SE1. Under kalla vinterdagar, när efterfrågan är hög i hela Norden, kan priset ändå stiga kraftigt även här. Förbrukningen i Umeå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Holmsund och Sävar ofta värms med värmepump eller direktverkande el. Där blir det extra värdefullt att flytta förbrukningen till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
