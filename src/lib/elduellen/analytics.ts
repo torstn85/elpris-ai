@@ -11,7 +11,10 @@ declare global {
 }
 
 export type ElduellenEvent =
-  "elduellen_start" | "elduellen_complete" | "elduellen_share";
+  | "elduellen_start"
+  | "elduellen_complete"
+  | "elduellen_share"
+  | "elduellen_shared_visit";
 
 export function track(event: ElduellenEvent, params: GtagParams = {}): void {
   try {
@@ -19,4 +22,22 @@ export function track(event: ElduellenEvent, params: GtagParams = {}): void {
   } catch {
     // Analys får aldrig störa spelet.
   }
+}
+
+/**
+ * Som track(), men väntar upp till `timeoutMs` på att gtag laddats — för event
+ * vid sidladdning, när gtag-skriptet (afterInteractive) kanske inte körts än.
+ * Utan samtycke dyker gtag aldrig upp och inget skickas.
+ */
+export function trackWhenReady(
+  event: ElduellenEvent,
+  params: GtagParams = {},
+  timeoutMs = 10_000,
+): void {
+  const started = Date.now();
+  const attempt = () => {
+    if (typeof window.gtag === "function") return track(event, params);
+    if (Date.now() - started < timeoutMs) window.setTimeout(attempt, 250);
+  };
+  attempt();
 }

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { COST_FOOTNOTE, formatCostShort } from "@/lib/elduellen/cost";
-import { track } from "@/lib/elduellen/analytics";
+import { track, trackWhenReady } from "@/lib/elduellen/analytics";
 import {
   MIN_PLAYERS_FOR_PERCENTILE,
   MIN_PLAYERS_FOR_SHARES,
@@ -512,6 +512,20 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
     },
     [date, loadStats],
   );
+
+  // Besök via en delad länk (?n=<pusselnr>). En gång per flik och pussel.
+  useEffect(() => {
+    try {
+      const n = new URLSearchParams(window.location.search).get("n");
+      if (!n || !/^\d{1,5}$/.test(n)) return;
+      const key = `elduellen:shared-visit:${n}`;
+      if (window.sessionStorage.getItem(key)) return;
+      window.sessionStorage.setItem(key, "1");
+      trackWhenReady("elduellen_shared_visit", { n: Number(n) });
+    } catch {
+      // Mätning får aldrig störa spelet.
+    }
+  }, []);
 
   // Återställ dagens progress vid första renderingen i webbläsaren.
   useEffect(() => {

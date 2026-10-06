@@ -14,7 +14,7 @@ const shortDate = (iso: string) =>
     .replace(".", "");
 
 /**
- * "⚡ Elduellen #14 — 4/5 🟩🟩🟥🟩🟩\nBättre än 72 % idag. Slå mig: www.elpris.ai/elduellen"
+ * "⚡ Elduellen #14 — 4/5 🟩🟩🟥🟩🟩\nBättre än 72 % idag. Slå mig: www.elpris.ai/elduellen?n=14"
  * Procentraden tas bara med när tillräckligt många har spelat.
  */
 export function shareText(opts: {
@@ -33,7 +33,9 @@ export function shareText(opts: {
     opts.betterThanPct !== null && opts.players >= MIN_PLAYERS_FOR_PERCENTILE
       ? `Bättre än ${opts.betterThanPct} % idag. `
       : "";
-  return `${head}\n${pct}Slå mig: ${SHARE_URL}`;
+  // ?n= mäter besök från delningar (elduellen_shared_visit). Canonical är /elduellen.
+  const link = opts.number ? `${SHARE_URL}?n=${opts.number}` : SHARE_URL;
+  return `${head}\n${pct}Slå mig: ${link}`;
 }
 
 export type ShareOutcome = "shared" | "copied" | "cancelled" | "failed";
