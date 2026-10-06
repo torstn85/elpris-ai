@@ -37,6 +37,13 @@ export function formatKwh(kWh: number): string {
   );
 }
 
+/** Kort kostnad för spelet: "78 öre" under 1 kr, annars "7,56 kr". */
+export function formatCostShort(kr: number): string {
+  const ore = Math.round(kr * 100);
+  if (Math.abs(ore) < 100) return `${ore} öre`;
+  return `${nf(2).format(kr)} kr`;
+}
+
 /** Kostnad för visning: kronor med två decimaler, under 1 kr även i öre. */
 export function formatCost(kr: number): string {
   const ore = Math.round(kr * 100);
