@@ -3,21 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { COST_FOOTNOTE, formatCostShort } from "@/lib/elduellen/cost";
+import { scoreComment, verdict } from "@/lib/elduellen/copy";
+import {
+  capitalize,
+  duelQuestion,
+  optionHeadline,
+  optionShortName,
+  summaryLine,
+} from "@/lib/elduellen/present";
 import type { Duel, Option, Pick, Puzzle } from "@/lib/elduellen/types";
 
 type Phase = "start" | "duel" | "facit" | "done" | "bonus" | "bonus-facit";
 
 const nf1 = new Intl.NumberFormat("sv-SE", { maximumFractionDigits: 1 });
-
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function when(o: Option): string {
-  return o.hour === null
-    ? `i ${o.cityName}`
-    : `kl ${String(o.hour).padStart(2, "0")} i ${o.cityName}`;
-}
 
 function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("sv-SE", {
@@ -75,30 +73,37 @@ function Progress({ picks, duels }: { picks: Pick[]; duels: Duel[] }) {
 }
 
 function OptionButton({
+  duel,
   option,
   letter,
   onPick,
 }: {
+  duel: Duel;
   option: Option;
   letter: Pick;
   onPick: (p: Pick) => void;
 }) {
+  const h = optionHeadline(duel, option);
   return (
     <button
       type="button"
       onClick={() => onPick(letter)}
       className="group flex w-full items-center gap-4 rounded-2xl border-2 border-muted bg-surface p-4 text-left transition-colors hover:border-accent focus:outline-none focus-visible:border-accent active:scale-[0.99] sm:p-5"
     >
-      <span className="text-4xl leading-none sm:text-5xl" aria-hidden>
-        {option.emoji}
-      </span>
+      {h.emoji && (
+        <span className="text-4xl leading-none sm:text-5xl" aria-hidden>
+          {h.emoji}
+        </span>
+      )}
       <span className="flex-1">
-        <span className="block font-semibold text-white sm:text-lg">
-          {capitalize(option.label)}
+        <span
+          className={`block text-white ${h.emoji ? "font-semibold sm:text-lg" : "font-tight text-3xl font-bold"}`}
+        >
+          {h.main}
         </span>
-        <span className="mt-1 block text-sm text-[#8fafc9]">
-          {capitalize(when(option))}
-        </span>
+        {h.sub && (
+          <span className="mt-1 block text-sm text-[#8fafc9]">{h.sub}</span>
+        )}
       </span>
       <span
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-muted font-tight font-bold text-[#8fafc9] group-hover:border-accent group-hover:text-accent"
@@ -119,6 +124,7 @@ function DuelView({
   title: string;
   onPick: (p: Pick) => void;
 }) {
+  const q = duelQuestion(duel);
   return (
     <section aria-labelledby="duel-title" className="flex flex-col gap-4">
       <div className="text-center">
@@ -127,47 +133,58 @@ function DuelView({
         </p>
         <h2
           id="duel-title"
-          className="mt-1 font-tight text-2xl font-bold sm:text-3xl"
+          className="mt-1 text-balance font-tight text-2xl font-bold sm:text-3xl"
         >
-          Vad kostar mest?
+          {q.lead ? (
+            <>
+              {q.lead} — {q.question}
+            </>
+          ) : (
+            q.question
+          )}
         </h2>
       </div>
-      <OptionButton option={duel.a} letter="A" onPick={onPick} />
+      <OptionButton duel={duel} option={duel.a} letter="A" onPick={onPick} />
       <p
         className="text-center text-sm font-semibold uppercase tracking-widest text-[#8fafc9]"
         aria-hidden
       >
         eller
       </p>
-      <OptionButton option={duel.b} letter="B" onPick={onPick} />
+      <OptionButton duel={duel} option={duel.b} letter="B" onPick={onPick} />
     </section>
   );
 }
 
 function CostCard({
+  duel,
   option,
   letter,
   isAnswer,
   isPick,
 }: {
+  duel: Duel;
   option: Option;
   letter: Pick;
   isAnswer: boolean;
   isPick: boolean;
 }) {
+  const h = optionHeadline(duel, option);
   return (
     <div
       className={`rounded-2xl border-2 bg-surface p-4 sm:p-5 ${isAnswer ? "border-cta" : "border-muted"}`}
     >
       <div className="flex items-start gap-3">
-        <span className="text-3xl leading-none" aria-hidden>
-          {option.emoji}
-        </span>
+        {h.emoji && (
+          <span className="text-3xl leading-none" aria-hidden>
+            {h.emoji}
+          </span>
+        )}
         <div className="flex-1">
           <p className="font-semibold text-white">
-            {letter}. {capitalize(option.label)}
+            {letter}. {h.main}
           </p>
-          <p className="text-sm text-[#8fafc9]">{capitalize(when(option))}</p>
+          {h.sub && <p className="text-sm text-[#8fafc9]">{h.sub}</p>}
         </div>
         <div className="flex flex-col items-end gap-1">
           {isAnswer && (
@@ -216,34 +233,45 @@ function CostCard({
 function FacitView({
   duel,
   pick,
+  verdictText,
   nextLabel,
   onNext,
 }: {
   duel: Duel;
   pick: Pick;
+  verdictText: string;
   nextLabel: string;
   onNext: () => void;
 }) {
   const right = pick === duel.answer;
+  const q = duelQuestion(duel);
+  const answerName = optionShortName(
+    duel,
+    duel.answer === "A" ? duel.a : duel.b,
+    duel.answer,
+  );
   return (
     <section aria-live="polite" className="flex flex-col gap-4">
       <div
         className={`rounded-2xl p-4 text-center ${right ? "bg-cta/15 text-cta" : "bg-danger/15 text-danger"}`}
       >
-        <p className="font-tight text-2xl font-bold">
-          {right ? "Rätt! ⚡" : "Inte riktigt"}
-        </p>
+        <p className="font-tight text-2xl font-bold">{verdictText}</p>
         <p className="mt-1 text-sm text-[#cfe0f0]">
-          {duel.answer} kostar {nf1.format(duel.ratio)} gånger så mycket.
+          {answerName} kostar {nf1.format(duel.ratio)} gånger så mycket.
         </p>
       </div>
+      {q.lead && (
+        <p className="text-center font-semibold text-white">{q.lead}</p>
+      )}
       <CostCard
+        duel={duel}
         option={duel.a}
         letter="A"
         isAnswer={duel.answer === "A"}
         isPick={pick === "A"}
       />
       <CostCard
+        duel={duel}
         option={duel.b}
         letter="B"
         isAnswer={duel.answer === "B"}
@@ -335,6 +363,11 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
           <FacitView
             duel={duel}
             pick={picks[index]}
+            verdictText={verdict(
+              puzzle.date,
+              String(index),
+              picks[index] === duel.answer,
+            )}
             nextLabel={
               index + 1 < duels.length ? "Nästa duell" : "Se resultatet"
             }
@@ -363,6 +396,7 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
       <FacitView
         duel={bonus}
         pick={bonusPick}
+        verdictText={verdict(puzzle.date, "bonus", bonusPick === bonus.answer)}
         nextLabel="Tillbaka till resultatet"
         onNext={() => setPhase("done")}
       />
@@ -382,24 +416,28 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
       >
         {duels.map((d, i) => (picks[i] === d.answer ? "🟩" : "🟥")).join("")}
       </p>
-      <p className="max-w-sm text-[#cfe0f0]">
-        {score === duels.length
-          ? "Fullpott! Du har koll på elpriset."
-          : score >= 3
-            ? "Snyggt! Elpriset är inte alltid lätt att gissa."
-            : "Elpriset överraskar — det är just därför det lönar sig att följa det."}
-      </p>
+      <p className="max-w-sm text-[#cfe0f0]">{scoreComment(score)}</p>
       <ol className="flex w-full flex-col gap-2 text-left">
-        {duels.map((d, i) => {
+        {[
+          ...duels.map((d, i) => ({ duel: d, pick: picks[i], isBonus: false })),
+          ...(bonus && bonusPick
+            ? [{ duel: bonus, pick: bonusPick, isBonus: true }]
+            : []),
+        ].map(({ duel: d, pick, isBonus }, i) => {
           const pricier = d.answer === "A" ? d.a : d.b;
           return (
             <li
               key={i}
-              className="flex items-center gap-3 rounded-xl border border-muted bg-surface px-4 py-3 text-sm"
+              className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${isBonus ? "border-accent/50 bg-accent/5" : "border-muted bg-surface"}`}
             >
-              <span aria-hidden>{picks[i] === d.answer ? "✅" : "❌"}</span>
+              <span aria-hidden>{pick === d.answer ? "✅" : "❌"}</span>
               <span className="flex-1 text-[#cfe0f0]">
-                {capitalize(pricier.label)} {when(pricier)} var dyrast
+                {isBonus && (
+                  <span className="mr-2 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
+                    Bonus
+                  </span>
+                )}
+                {summaryLine(d, { tomorrow: isBonus })}
               </span>
               <span className="font-semibold text-white">
                 {formatCostShort(pricier.costKr)}
