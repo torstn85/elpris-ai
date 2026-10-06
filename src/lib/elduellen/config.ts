@@ -4,7 +4,7 @@
  * Lanseringsdatum (svensk tid, YYYY-MM-DD) = pussel #1. Sätts när
  * NEXT_PUBLIC_GAMES_ENABLED slås på. `null` = inget pusselnummer visas än.
  */
-export const LAUNCH_DATE: string | null = null;
+export const LAUNCH_DATE: string | null = "2026-10-06";
 
 export const DUELS_PER_DAY = 5;
 

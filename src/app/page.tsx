@@ -371,6 +371,21 @@ export default function Home() {
           <Link href="/elpris-idag" className="text-sm text-[#00E5FF] hover:underline mt-1">
             → Se timtabell för alla elområden
           </Link>
+          {process.env.NEXT_PUBLIC_GAMES_ENABLED === "true" && (
+            <Link
+              href="/elduellen"
+              className="group mt-2 flex w-full max-w-md items-center gap-3 rounded-2xl border border-[#00E5FF]/40 bg-[#0F3460] px-4 py-3 text-left transition-colors hover:border-[#00E5FF]"
+            >
+              <span className="text-2xl" aria-hidden>⚡</span>
+              <span className="flex-1 text-sm leading-snug">
+                <span className="block font-semibold text-white">Dagens Elduellen</span>
+                <span className="text-[#8fafc9]">Vad kostar mest i el idag?</span>
+              </span>
+              <span className="whitespace-nowrap text-sm font-semibold text-[#00E5FF] group-hover:underline">
+                Spela →
+              </span>
+            </Link>
+          )}
           {cheap && (
             <div className="flex flex-wrap justify-center gap-3 mt-2">
               <Link

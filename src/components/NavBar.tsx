@@ -7,6 +7,9 @@ const LINKS = [
   { href: '/elpris-idag', label: 'Elpris idag' },
   { href: '/elpris-imorgon', label: 'Elpris imorgon' },
   { href: '/elomrade', label: 'Elområden' },
+  ...(process.env.NEXT_PUBLIC_GAMES_ENABLED === 'true'
+    ? [{ href: '/elduellen', label: 'Elduellen' }]
+    : []),
   { href: '/guider', label: 'Guider' },
   { href: '/om-oss', label: 'Om oss' },
 ];

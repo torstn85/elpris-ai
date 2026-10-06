@@ -71,6 +71,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    ...(process.env.NEXT_PUBLIC_GAMES_ENABLED === "true"
+      ? [
+          {
+            url: `${BASE_URL}/elduellen`,
+            lastModified: now,
+            changeFrequency: "daily" as const,
+            priority: 0.7,
+          },
+        ]
+      : []),
     {
       url: `${BASE_URL}/elomrade`,
       lastModified: now,
