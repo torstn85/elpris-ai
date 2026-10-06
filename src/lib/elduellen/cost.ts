@@ -51,7 +51,8 @@ export function formatCost(kr: number): string {
   return `${nf(2).format(kr)} kr`;
 }
 
-function priceFor(
+/** Kostnad för `kWh` vid ett givet spotpris. Används även av chatbotens calculate_cost. */
+export function priceFor(
   spotOre: number,
   reducedTax: boolean,
   kWh: number,

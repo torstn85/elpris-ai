@@ -4,6 +4,7 @@ import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 import { searchKnowledge, type SearchResult } from '@/lib/rag/search';
 import { CITIES } from '@/lib/cities';
+import { calculateCost, type CostToolInput } from '@/lib/costTool';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -161,11 +162,13 @@ Sajtens egna sidor (länka med relativa URL:er i naturlig text när det hjälper
 - Elområden: /elomrade, och /elomrade/se1, /elomrade/se2, /elomrade/se3, /elomrade/se4.${elduellen}
 Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.
 
-När användaren frågar vad något kostar i el utan att ange elområde: ställ ingen motfråga först. Räkna direkt ett exempel för SE3 med dagens snittpris (hämta med get_today_prices för SE3) och visa antagandena i texten:
-- Förbrukning i kWh för aktiviteten, till exempel bastu en kväll ungefär 10 kWh. Säg att det är ett antagande.
-- Totalt pris per kWh = (spotpris + 5 öre påslag + 36 öre energiskatt + 30 öre rörlig nätavgift) × 1,25 i moms. Påslag och nätavgift är antaganden som varierar mellan elavtal och nätbolag.
-- Skriv ut uträkningen, till exempel "10 kWh × 1,20 kr/kWh ≈ 12 kr".
-Avsluta svaret med frågan "Vill du att jag räknar på ditt elområde?". Tipset om Elduellen kommer i så fall före den frågan.${
+Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när du anger vad något kostar i el. Räkna aldrig själv, och presentera siffrorna exakt som verktyget returnerar dem (spotpris, energiskatt, pris per kWh, kostnad och uträkning), utan egen avrundning.
+- Skicka med staden om användaren nämnt en, då används rätt elområde och nedsatt energiskatt där den gäller. Annars elområde.
+- Har användaren inte angett stad eller elområde: ställ ingen motfråga först, räkna direkt med SE3 som exempel och säg att det är ett exempel.
+- Förbrukningen i kWh är ditt antagande och ska sägas som det. Typiska värden: bastu en kväll 10 kWh, tvätt på 60 grader 1 kWh (40 grader 0,6 kWh), ladda elbilen för 10 mil 20 kWh, ladda elbilen från 10 till 80 procent 46 kWh.
+- Säg att beloppet är exkl. nätavgift och elhandlarens påslag, som tillkommer och varierar mellan bolag. Hitta aldrig på belopp för nätavgift eller påslag.
+- Om verktyget anger nedsatt energiskatt, nämn det kort.
+- Om du räknat med SE3 som exempel, avsluta med frågan "Vill du att jag räknar på ditt elområde?". Tipset om Elduellen kommer i så fall före den frågan.${
     elduellen
       ? `
 Nämn Elduellen när användaren frågar vad något kostar i el, jämför vad olika saker drar, eller verkar nyfiken eller lekfull. Använd då exakt den här meningen: "Testa dagens Elduellen på /elduellen och se om du kan gissa vad som kostar mest i el idag!" Nämn den inte annars, och aldrig mer än en gång per samtal.`
@@ -203,6 +206,24 @@ ${knowledgeBlock}`;
 }
 
 const TOOLS: Anthropic.Tool[] = [
+  {
+    name: 'calculate_cost',
+    description:
+      'Räknar vad en förbrukning kostar i el idag: kWh × (dagens snittspotpris + energiskatt) × 1,25 moms, exkl. nätavgift och elhandlarens påslag. Använd alltid detta för kostnadsberäkningar. Ange stad om användaren nämnt en (ger rätt elområde och nedsatt energiskatt där den gäller), annars elområde.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        kWh: { type: 'number', description: 'Förbrukning i kWh, t.ex. 10 för en bastukväll.' },
+        area: {
+          type: 'string',
+          enum: ['SE1', 'SE2', 'SE3', 'SE4'],
+          description: 'Elområde. Används om ingen stad anges.',
+        },
+        city: { type: 'string', description: 'Stad som användaren nämnt, t.ex. "Kiruna".' },
+      },
+      required: ['kWh'],
+    },
+  },
   {
     name: 'get_current_price',
     description: 'Hämtar aktuellt 15-minuterspris (öre/kWh) för ett elområde.',
@@ -258,6 +279,9 @@ async function executeTool(
   baseUrl: string,
 ): Promise<string> {
   try {
+    if (name === 'calculate_cost') {
+      return JSON.stringify(await calculateCost(input as unknown as CostToolInput));
+    }
     if (name === 'get_current_price') {
       const res = await fetch(`${baseUrl}/api/prices/current`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
