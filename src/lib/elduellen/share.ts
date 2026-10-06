@@ -2,7 +2,7 @@
 
 import { MIN_PLAYERS_FOR_PERCENTILE } from "./config";
 
-export const SHARE_URL = "elpris.ai/elduellen";
+export const SHARE_URL = "www.elpris.ai/elduellen";
 
 const shortDate = (iso: string) =>
   new Intl.DateTimeFormat("sv-SE", {
@@ -14,7 +14,7 @@ const shortDate = (iso: string) =>
     .replace(".", "");
 
 /**
- * "⚡ Elduellen #14 — 4/5 🟩🟩🟥🟩🟩\nBättre än 72 % idag. Slå mig: elpris.ai/elduellen"
+ * "⚡ Elduellen #14 — 4/5 🟩🟩🟥🟩🟩\nBättre än 72 % idag. Slå mig: www.elpris.ai/elduellen"
  * Procentraden tas bara med när tillräckligt många har spelat.
  */
 export function shareText(opts: {
