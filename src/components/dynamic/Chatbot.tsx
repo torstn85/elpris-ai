@@ -147,7 +147,7 @@ export default function Chatbot() {
             <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-[#22C55E] text-xs font-bold">AI</span>
             </div>
-            <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-sm">
+            <div className="whitespace-pre-line bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs sm:max-w-sm">
               {msg.content}
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function Chatbot() {
                     <div className="w-8 h-8 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-[#22C55E] text-xs font-bold">AI</span>
                     </div>
-                    <div className="bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
+                    <div className="whitespace-pre-line bg-[#0A2540] border border-[#1E4976] rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-[#e2eaf4] max-w-xs">
                       {msg.content}
                     </div>
                   </div>

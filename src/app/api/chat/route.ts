@@ -8,6 +8,7 @@ import {
   ACTIVITY_CATALOG,
   ACTIVITY_IDS,
   calculateCost,
+  costFooter,
   type CostToolInput,
 } from '@/lib/costTool';
 
@@ -165,18 +166,14 @@ Sajtens egna sidor (länka med relativa URL:er i naturlig text när det hjälper
 - Elpriset idag för alla elområden: /elpris-idag. Stadssidor med dagens pris kvart för kvart: ${cities}.
 - Morgondagens priser: /elpris-imorgon (publiceras kl 13:15).
 - Elområden: /elomrade, och /elomrade/se1, /elomrade/se2, /elomrade/se3, /elomrade/se4.${elduellen}
-Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.
+Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser. Guiderna är artiklar med allmänna råd. Påstå aldrig att en sida visar dagens priser eller live-data, utom /elpris-idag, stadssidorna, elområdessidorna, /elpris-imorgon och /elduellen.
 
 Påstå aldrig att negativt spotpris ger konsumenten pengar — energiskatt, moms och nätavgift tillkommer, så elen kostar ändå. Generalisera aldrig ett enskilt dygns billigaste eller dyraste timmar till "alltid"; säg att det gäller idag.
 
-Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när du anger vad något kostar i el. Räkna aldrig själv.
-- Ange activity när aktiviteten finns i verktygets bibliotek. Ange kWh bara när den saknas där, och skriv då ut ditt kWh-antagande i svaret.
-- Återge verktygets fält calculation ordagrant i svaret, till exempel "0,6 kWh × (100,1 öre spot + 36 öre energiskatt) × 1,25 moms ≈ 1,02 kr". Ändra inga siffror och avrunda inte.
-- Skicka med staden om användaren nämnt en, då används rätt elområde och nedsatt energiskatt där den gäller. Annars elområde.
-- Har användaren inte angett stad eller elområde: ställ ingen motfråga först, räkna direkt med SE3 som exempel och säg att det är ett exempel.
-- Säg att beloppet är exkl. nätavgift och elhandlarens påslag, som tillkommer och varierar mellan bolag. Hitta aldrig på belopp för nätavgift eller påslag.
-- Om verktyget anger nedsatt energiskatt, nämn det kort.
-- Om du räknat med SE3 som exempel, avsluta med frågan "Vill du att jag räknar på ditt elområde?". Tipset om Elduellen kommer i så fall före den frågan.${
+Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när användaren frågar vad något kostar i el. Räkna aldrig själv.
+- Ange activity när aktiviteten finns i verktygets bibliotek. Ange kWh bara när den saknas där, och skriv då ut ditt kWh-antagande i texten.
+- Ange stad om användaren nämnt en, annars elområde om det nämnts. Har användaren inte angett någon plats: utelämna både stad och elområde (verktyget räknar då med SE3 som exempel) och ställ ingen motfråga.
+- Skriv inga kronbelopp, priser per kWh eller uträkningar i din text när du använt calculate_cost. Servern lägger automatiskt till uträkningen, notisen om nätavgift och påslag och vid behov en fråga om elområde sist i svaret — upprepa inte det. Beskriv kort vad du räknat på (aktivitet och plats) och ge gärna ett råd.${
     elduellen
       ? `
 Nämn Elduellen när användaren frågar vad något kostar i el, jämför vad olika saker drar, eller verkar nyfiken eller lekfull. Använd då exakt den här meningen: "Testa dagens Elduellen på /elduellen och se om du kan gissa vad som kostar mest i el idag!" Nämn den inte annars, och aldrig mer än en gång per samtal.`
@@ -217,7 +214,7 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: 'calculate_cost',
     description:
-      `Räknar vad en förbrukning kostar i el idag: kWh × (dagens snittspotpris + energiskatt) × 1,25 moms, exkl. nätavgift och elhandlarens påslag. Använd alltid detta för kostnadsberäkningar. Ange activity när aktiviteten finns i biblioteket nedan (då används bibliotekets kWh och antagande); ange kWh bara när den saknas. Ange stad om användaren nämnt en (ger rätt elområde och nedsatt energiskatt där den gäller), annars elområde.
+      `Räknar vad en förbrukning kostar i el idag: kWh × (dagens snittspotpris + energiskatt) × 1,25 moms, exkl. nätavgift och elhandlarens påslag. Använd alltid detta för kostnadsberäkningar. Ange activity när aktiviteten finns i biblioteket nedan (då används bibliotekets kWh och antagande); ange kWh bara när den saknas. Ange stad om användaren nämnt en (ger rätt elområde och nedsatt energiskatt där den gäller), annars elområde. Utelämna båda om användaren inte angett plats — då räknas SE3 som exempel.
 
 Aktivitetsbiblioteket (id: aktivitet):
 ${ACTIVITY_CATALOG}`,
@@ -422,6 +419,9 @@ export async function POST(request: Request) {
       }
     }
 
+    // calculate_cost-resultat — servern lägger uträkningen sist i svaret.
+    const costResults: unknown[] = [];
+
     // Tool use loop — max 5 iterations to avoid runaway loops
     for (let i = 0; i < 5; i++) {
       const response = await callAnthropicWithRetry({
@@ -436,7 +436,9 @@ export async function POST(request: Request) {
         const textBlock = response.content.find(
           (b): b is Anthropic.TextBlock => b.type === 'text',
         );
-        return NextResponse.json({ reply: textBlock?.text ?? '' });
+        const footer = costFooter(costResults);
+        const text = (textBlock?.text ?? '').trim();
+        return NextResponse.json({ reply: footer ? `${text}\n\n${footer}` : text });
       }
 
       // Append assistant turn (including tool_use blocks)
@@ -451,6 +453,13 @@ export async function POST(request: Request) {
             block.input as { area: Area },
             baseUrl,
           );
+          if (block.name === 'calculate_cost') {
+            try {
+              costResults.push(JSON.parse(result));
+            } catch {
+              // ogiltig JSON — ingen footer för detta anrop
+            }
+          }
           toolResults.push({
             type: 'tool_result',
             tool_use_id: block.id,

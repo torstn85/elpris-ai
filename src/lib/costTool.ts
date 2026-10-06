@@ -63,9 +63,12 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
   const requestedArea = input.area?.toUpperCase();
   const isArea = (v?: string): v is Area =>
     (AREAS as readonly string[]).includes(v ?? "");
-  // Staden avgör elområdet; annars det angivna elområdet.
-  const area: Area | undefined =
-    city?.area ?? (isArea(requestedArea) ? requestedArea : undefined);
+  // Staden avgör elområdet; annars det angivna elområdet. Ingen plats alls =
+  // SE3 som exempel.
+  const example = !input.city && !input.area;
+  const area: Area | undefined = example
+    ? "SE3"
+    : (city?.area ?? (isArea(requestedArea) ? requestedArea : undefined));
   if (!area) {
     return {
       error: input.city
@@ -88,6 +91,7 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
   return {
     date,
     area,
+    example,
     city: city?.name ?? null,
     city_not_found: input.city && !city ? input.city : undefined,
     activity: activity?.label ?? null,
@@ -106,4 +110,52 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
     basis: "dagens snittpris (dygnssnitt)",
     excludes: COST_FOOTNOTE,
   };
+}
+
+/** Det som footern behöver ur ett lyckat calculate_cost-svar. */
+interface CostLine {
+  area: string;
+  example: boolean;
+  city: string | null;
+  reduced_energy_tax: boolean;
+  calculation: string;
+}
+
+function isCostLine(v: unknown): v is CostLine {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    typeof (v as CostLine).calculation === "string"
+  );
+}
+
+/**
+ * Text som servern lägger sist i chattsvaret när calculate_cost använts:
+ * uträkningsraden ordagrant, notisen om nätavgift och påslag och — om SE3
+ * räknades som exempel — frågan om användarens elområde. Tom sträng om inget
+ * lyckat resultat finns.
+ */
+export function costFooter(toolResults: unknown[]): string {
+  const seen = new Set<string>();
+  const lines = toolResults.filter(isCostLine).filter((r) => {
+    if (seen.has(r.calculation)) return false;
+    seen.add(r.calculation);
+    return true;
+  });
+  if (lines.length === 0) return "";
+  const rows = lines.map((r) => {
+    const where = r.example
+      ? " (exempel för SE3)"
+      : r.city
+        ? ` för ${r.city}${r.reduced_energy_tax ? " (nedsatt energiskatt)" : ""}`
+        : ` för ${r.area}`;
+    return `Uträkning${where}: ${r.calculation}`;
+  });
+  const parts = [
+    ...rows,
+    `Räknat på dagens snittpris, ${COST_FOOTNOTE}, som tillkommer och varierar mellan bolag.`,
+  ];
+  if (lines.some((r) => r.example))
+    parts.push("Vill du att jag räknar på ditt elområde?");
+  return parts.join("\n");
 }
