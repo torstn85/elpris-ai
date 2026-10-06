@@ -25,6 +25,7 @@ import {
   EMERGENCY_MIN_EXPENSIVE_KR,
   ACTIVITY_REPEAT_WINDOW_DAYS,
 } from "./config";
+import { addDays, daysBetween } from "./dates";
 import { linkForDuel } from "./links";
 import type { Area, DayPrices, Quarter } from "./prices";
 import { createRng, shuffle, type Rng } from "./rng";
@@ -67,17 +68,7 @@ const DAY_VARIANTS = 20;
 
 // ─── Datum ────────────────────────────────────────────────────────────────────
 
-export function daysBetween(fromIso: string, toIso: string): number {
-  const ms =
-    Date.parse(`${toIso}T12:00:00Z`) - Date.parse(`${fromIso}T12:00:00Z`);
-  return Math.round(ms / 86_400_000);
-}
-
-export function addDays(iso: string, days: number): string {
-  const d = new Date(`${iso}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+export { addDays, daysBetween } from "./dates";
 
 export function puzzleNumber(date: string): number | null {
   return LAUNCH_DATE ? daysBetween(LAUNCH_DATE, date) + 1 : null;

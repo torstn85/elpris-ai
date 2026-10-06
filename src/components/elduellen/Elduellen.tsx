@@ -1,9 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { COST_FOOTNOTE, formatCostShort } from "@/lib/elduellen/cost";
+import { track } from "@/lib/elduellen/analytics";
+import {
+  MIN_PLAYERS_FOR_PERCENTILE,
+  MIN_PLAYERS_FOR_SHARES,
+} from "@/lib/elduellen/config";
 import { scoreComment, verdict } from "@/lib/elduellen/copy";
+import { shareResult, shareText } from "@/lib/elduellen/share";
+import {
+  getPlayerId,
+  loadHistory,
+  loadProgress,
+  recordHistory,
+  saveProgress,
+  streakFor,
+} from "@/lib/elduellen/storage";
 import {
   capitalize,
   duelQuestion,
@@ -234,12 +248,15 @@ function FacitView({
   duel,
   pick,
   verdictText,
+  crowdLine,
   nextLabel,
   onNext,
 }: {
   duel: Duel;
   pick: Pick;
   verdictText: string;
+  /** "63 % valde samma som du" — bara när tillräckligt många spelat. */
+  crowdLine?: string | null;
   nextLabel: string;
   onNext: () => void;
 }) {
@@ -259,6 +276,9 @@ function FacitView({
         <p className="mt-1 text-sm text-[#cfe0f0]">
           {answerName} kostar {nf1.format(duel.ratio)} gånger så mycket.
         </p>
+        {crowdLine && (
+          <p className="mt-1 text-sm font-medium text-white">👥 {crowdLine}</p>
+        )}
       </div>
       {q.lead && (
         <p className="text-center font-semibold text-white">{q.lead}</p>
@@ -300,17 +320,227 @@ function FacitView({
   );
 }
 
+// ─── Resultatdelar ────────────────────────────────────────────────────────────
+
+/** Statistik från GET /api/elduellen/stats. */
+interface Stats {
+  players: number;
+  scores: number[];
+  shareA: (number | null)[];
+}
+
+function pct(n: number): string {
+  return `${Math.round(n * 100)} %`;
+}
+
+/** Andel som valde A i duellen, från MIN_PLAYERS_FOR_SHARES spelare. */
+function shareAFor(stats: Stats | null, index: number): number | null {
+  if (!stats || stats.players < MIN_PLAYERS_FOR_SHARES) return null;
+  const a = stats.shareA[index];
+  return a === null || a === undefined ? null : a;
+}
+
+/** Facit: "63 % valde samma som du". */
+function sameAsYouLine(
+  stats: Stats | null,
+  index: number,
+  pick: Pick,
+): string | null {
+  const a = shareAFor(stats, index);
+  return a === null
+    ? null
+    : `${pct(pick === "A" ? a : 1 - a)} valde samma som du`;
+}
+
+/** Sammanställningen: "35 % hade rätt". */
+function rightShareLine(
+  stats: Stats | null,
+  index: number,
+  duel: Duel,
+): string | null {
+  const a = shareAFor(stats, index);
+  return a === null
+    ? null
+    : `${pct(duel.answer === "A" ? a : 1 - a)} hade rätt`;
+}
+
+/** Andel spelare med lägre poäng än `score`, i hela procent. */
+function betterThan(stats: Stats, score: number): number {
+  if (stats.players === 0) return 0;
+  const below = stats.scores.slice(0, score).reduce((s, n) => s + n, 0);
+  return Math.round((below / stats.players) * 100);
+}
+
+function ScoreChart({ stats, score }: { stats: Stats; score: number }) {
+  const max = Math.max(1, ...stats.scores);
+  return (
+    <figure className="w-full">
+      <figcaption className="mb-3 text-sm text-[#8fafc9]">
+        Dagens poäng — {stats.players} spelare
+      </figcaption>
+      <div
+        className="flex h-32 items-end gap-2"
+        role="img"
+        aria-label={`Poängfördelning: ${stats.scores.map((n, i) => `${n} spelare fick ${i}`).join(", ")}`}
+      >
+        {stats.scores.map((n, i) => (
+          <div
+            key={i}
+            className="flex flex-1 flex-col items-center justify-end gap-1"
+          >
+            <span className="text-xs text-[#8fafc9]">{n}</span>
+            <div
+              className={`w-full rounded-t-md ${i === score ? "bg-cta" : "bg-muted"}`}
+              style={{ height: `${Math.max(4, (n / max) * 96)}px` }}
+            />
+            <span
+              className={`text-sm font-semibold ${i === score ? "text-cta" : "text-[#cfe0f0]"}`}
+            >
+              {i}
+            </span>
+          </div>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+function ShareButton({ text }: { text: string }) {
+  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
+  return (
+    <div className="flex w-full flex-col items-center gap-2">
+      <button
+        type="button"
+        onClick={async () => {
+          const outcome = await shareResult(text);
+          if (outcome === "shared" || outcome === "copied") {
+            track("elduellen_share", {
+              method: outcome === "shared" ? "native" : "clipboard",
+            });
+          }
+          if (outcome === "copied") setStatus("copied");
+          else if (outcome === "failed") setStatus("failed");
+          if (outcome === "copied" || outcome === "failed") {
+            window.setTimeout(() => setStatus("idle"), 2500);
+          }
+        }}
+        className="w-full rounded-full bg-cta px-6 py-3.5 font-semibold text-white shadow-md shadow-cta/30 transition-colors hover:bg-[#16a34a]"
+      >
+        Dela resultatet
+      </button>
+      <p className="h-5 text-sm font-medium text-cta" aria-live="polite">
+        {status === "copied"
+          ? "Kopierat!"
+          : status === "failed"
+            ? "Kunde inte kopiera — markera texten nedan."
+            : ""}
+      </p>
+      {status === "failed" && (
+        <textarea
+          readOnly
+          value={text}
+          className="w-full rounded-xl border border-muted bg-surface p-3 text-sm text-white"
+          rows={3}
+        />
+      )}
+    </div>
+  );
+}
+
 // ─── Spelet ───────────────────────────────────────────────────────────────────
 
 export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
-  const { duels, bonus } = puzzle;
+  const { duels, bonus, date } = puzzle;
   const [phase, setPhase] = useState<Phase>("start");
   const [picks, setPicks] = useState<Pick[]>([]);
   const [bonusPick, setBonusPick] = useState<Pick | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [streak, setStreak] = useState(0);
+  const submitting = useRef(false);
 
   const index = phase === "facit" ? picks.length - 1 : picks.length;
   const score = picks.filter((p, i) => p === duels[i].answer).length;
   const heading = `Elduellen${puzzle.number ? ` #${puzzle.number}` : ""}`;
+  const complete = picks.length === duels.length;
+
+  /** `fresh` = förbi CDN-cachen, så att ens eget nyss inskickade resultat räknas med. */
+  const loadStats = useCallback(
+    async (fresh = false) => {
+      try {
+        const res = await fetch(
+          `/api/elduellen/stats?date=${date}${fresh ? `&t=${Date.now()}` : ""}`,
+        );
+        if (res.ok) setStats((await res.json()) as Stats);
+      } catch {
+        // Ingen statistik — spelet fungerar ändå.
+      }
+    },
+    [date],
+  );
+
+  /** Skicka resultatet en gång. 409 (redan inskickat) och fel hanteras tyst. */
+  const submit = useCallback(
+    async (finalPicks: Pick[]) => {
+      if (submitting.current) return;
+      submitting.current = true;
+      let accepted = false;
+      try {
+        const res = await fetch("/api/elduellen/result", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            date,
+            playerId: getPlayerId(),
+            picks: finalPicks,
+          }),
+        });
+        if (res.status === 201 || res.status === 409) {
+          accepted = true;
+          const prev = loadProgress(date);
+          saveProgress(date, {
+            ...(prev ?? { picks: finalPicks }),
+            picks: finalPicks,
+            submitted: true,
+          });
+        }
+      } catch {
+        // Försöks igen vid nästa besök.
+      } finally {
+        submitting.current = false;
+        void loadStats(accepted);
+      }
+    },
+    [date, loadStats],
+  );
+
+  // Återställ dagens progress vid första renderingen i webbläsaren.
+  useEffect(() => {
+    const saved = loadProgress(date);
+    if (saved && saved.picks.length > 0) {
+      const restored = saved.picks.slice(0, duels.length);
+      setPicks(restored);
+      if (saved.bonusPick) setBonusPick(saved.bonusPick);
+      setPhase(restored.length >= duels.length ? "done" : "duel");
+      if (restored.length >= duels.length && !saved.submitted)
+        void submit(restored);
+    }
+    setStreak(streakFor(loadHistory(), date));
+    void loadStats();
+  }, [date, duels.length, loadStats, submit]);
+
+  function pickMain(p: Pick) {
+    const next = [...picks, p];
+    setPicks(next);
+    setPhase("facit");
+    const prev = loadProgress(date);
+    saveProgress(date, { ...(prev ?? {}), picks: next });
+    if (next.length === duels.length) {
+      const finalScore = next.filter((x, i) => x === duels[i].answer).length;
+      setStreak(streakFor(recordHistory(date, finalScore), date));
+      track("elduellen_complete", { score: finalScore });
+      void submit(next);
+    }
+  }
 
   if (phase === "start") {
     return (
@@ -322,9 +552,7 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
           <h1 className="font-tight text-4xl font-black tracking-tight sm:text-5xl">
             {heading}
           </h1>
-          <p className="mt-2 text-[#8fafc9]">
-            {capitalize(formatDate(puzzle.date))}
-          </p>
+          <p className="mt-2 text-[#8fafc9]">{capitalize(formatDate(date))}</p>
         </div>
         <p className="max-w-sm text-lg leading-relaxed text-[#cfe0f0]">
           Fem dueller. Välj det som kostar mest i el — med dagens riktiga
@@ -336,7 +564,10 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
         </ul>
         <button
           type="button"
-          onClick={() => setPhase("duel")}
+          onClick={() => {
+            track("elduellen_start");
+            setPhase("duel");
+          }}
           className="w-full max-w-xs rounded-full bg-cta px-6 py-4 text-lg font-semibold text-white shadow-md shadow-cta/30 transition-colors hover:bg-[#16a34a]"
         >
           Starta dagens duell
@@ -354,20 +585,18 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
           <DuelView
             duel={duel}
             title={`Duell ${index + 1} av ${duels.length}`}
-            onPick={(p) => {
-              setPicks([...picks, p]);
-              setPhase("facit");
-            }}
+            onPick={pickMain}
           />
         ) : (
           <FacitView
             duel={duel}
             pick={picks[index]}
             verdictText={verdict(
-              puzzle.date,
+              date,
               String(index),
               picks[index] === duel.answer,
             )}
+            crowdLine={sameAsYouLine(stats, index, picks[index])}
             nextLabel={
               index + 1 < duels.length ? "Nästa duell" : "Se resultatet"
             }
@@ -386,6 +615,8 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
         onPick={(p) => {
           setBonusPick(p);
           setPhase("bonus-facit");
+          const prev = loadProgress(date);
+          saveProgress(date, { ...(prev ?? { picks }), bonusPick: p });
         }}
       />
     );
@@ -396,14 +627,28 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
       <FacitView
         duel={bonus}
         pick={bonusPick}
-        verdictText={verdict(puzzle.date, "bonus", bonusPick === bonus.answer)}
+        verdictText={verdict(date, "bonus", bonusPick === bonus.answer)}
         nextLabel="Tillbaka till resultatet"
         onNext={() => setPhase("done")}
       />
     );
   }
 
-  // Slutskärm
+  // ─── Slutskärm ──────────────────────────────────────────────────────────────
+  const results = duels.map((d, i) => picks[i] === d.answer);
+  const showPercentile =
+    stats !== null && stats.players >= MIN_PLAYERS_FOR_PERCENTILE;
+  const better = showPercentile ? betterThan(stats, score) : null;
+  const text = shareText({
+    number: puzzle.number,
+    date,
+    score,
+    total: duels.length,
+    results,
+    betterThanPct: better,
+    players: stats?.players ?? 0,
+  });
+
   return (
     <section className="flex flex-col items-center gap-6 py-4 text-center">
       <h1 className="font-tight text-3xl font-black sm:text-4xl">{heading}</h1>
@@ -414,20 +659,50 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
         className="text-3xl tracking-widest"
         aria-label={`${score} rätt av ${duels.length}`}
       >
-        {duels.map((d, i) => (picks[i] === d.answer ? "🟩" : "🟥")).join("")}
+        {results.map((r) => (r ? "🟩" : "🟥")).join("")}
       </p>
       <p className="max-w-sm text-[#cfe0f0]">{scoreComment(score)}</p>
+      {streak > 0 && (
+        <p className="rounded-full bg-[#F97316]/15 px-4 py-1.5 font-semibold text-[#FDBA74]">
+          {streak >= 2
+            ? `🔥 ${streak} dagar i rad`
+            : "🔥 Dag 1 — kom tillbaka imorgon och bygg en streak"}
+        </p>
+      )}
+      {complete && (
+        <div className="w-full rounded-2xl border border-muted bg-surface p-4">
+          {showPercentile ? (
+            <>
+              <p className="mb-4 font-tight text-xl font-bold text-white">
+                Bättre än {better} % idag
+              </p>
+              <ScoreChart stats={stats} score={score} />
+            </>
+          ) : (
+            <p className="text-[#cfe0f0]">
+              Du är en av de första som spelar idag 🎉
+            </p>
+          )}
+        </div>
+      )}
+      <ShareButton text={text} />
       <ol className="flex w-full flex-col gap-2 text-left">
         {[
-          ...duels.map((d, i) => ({ duel: d, pick: picks[i], isBonus: false })),
+          ...duels.map((d, i) => ({
+            duel: d,
+            pick: picks[i],
+            isBonus: false,
+            i,
+          })),
           ...(bonus && bonusPick
-            ? [{ duel: bonus, pick: bonusPick, isBonus: true }]
+            ? [{ duel: bonus, pick: bonusPick, isBonus: true, i: -1 }]
             : []),
-        ].map(({ duel: d, pick, isBonus }, i) => {
+        ].map(({ duel: d, pick, isBonus, i }, key) => {
           const pricier = d.answer === "A" ? d.a : d.b;
+          const crowd = isBonus ? null : rightShareLine(stats, i, d);
           return (
             <li
-              key={i}
+              key={key}
               className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${isBonus ? "border-accent/50 bg-accent/5" : "border-muted bg-surface"}`}
             >
               <span aria-hidden>{pick === d.answer ? "✅" : "❌"}</span>
@@ -438,6 +713,11 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
                   </span>
                 )}
                 {summaryLine(d, { tomorrow: isBonus })}
+                {crowd && (
+                  <span className="mt-0.5 block text-xs text-[#8fafc9]">
+                    👥 {crowd}
+                  </span>
+                )}
               </span>
               <span className="font-semibold text-white">
                 {formatCostShort(pricier.costKr)}
@@ -454,6 +734,14 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
         >
           Spela bonusduellen om morgondagen (räknas inte)
         </button>
+      )}
+      {!bonus && (
+        <div className="w-full rounded-2xl border-2 border-dashed border-muted p-4 text-[#8fafc9]">
+          <p className="font-semibold text-[#cfe0f0]">
+            🔒 Bonusduell om morgondagens priser öppnar efter kl 13:15.
+          </p>
+          <p className="mt-1 text-sm">Kom tillbaka och testa!</p>
+        </div>
       )}
       <p className="text-sm text-[#8fafc9]">
         Nya dueller varje dag vid midnatt.
