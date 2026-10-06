@@ -159,10 +159,16 @@ Sajtens egna sidor (länka med relativa URL:er i naturlig text när det hjälper
 - Elpriset idag för alla elområden: /elpris-idag. Stadssidor med dagens pris kvart för kvart: ${cities}.
 - Morgondagens priser: /elpris-imorgon (publiceras kl 13:15).
 - Elområden: /elomrade, och /elomrade/se1, /elomrade/se2, /elomrade/se3, /elomrade/se4.${elduellen}
-Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.${
+Länka bara till sidorna ovan och guider från kunskapsbasen, uppfinn aldrig andra adresser.
+
+När användaren frågar vad något kostar i el utan att ange elområde: ställ ingen motfråga först. Räkna direkt ett exempel för SE3 med dagens snittpris (hämta med get_today_prices för SE3) och visa antagandena i texten:
+- Förbrukning i kWh för aktiviteten, till exempel bastu en kväll ungefär 10 kWh. Säg att det är ett antagande.
+- Totalt pris per kWh = (spotpris + 5 öre påslag + 36 öre energiskatt + 30 öre rörlig nätavgift) × 1,25 i moms. Påslag och nätavgift är antaganden som varierar mellan elavtal och nätbolag.
+- Skriv ut uträkningen, till exempel "10 kWh × 1,20 kr/kWh ≈ 12 kr".
+Avsluta svaret med frågan "Vill du att jag räknar på ditt elområde?". Tipset om Elduellen kommer i så fall före den frågan.${
     elduellen
       ? `
-Nämn Elduellen när användaren frågar vad något kostar i el, jämför vad olika saker drar, eller verkar nyfiken eller lekfull — som ett kort tips i slutet, till exempel "Testa dagens Elduellen på /elduellen". Nämn den inte annars, och aldrig mer än en gång per samtal.`
+Nämn Elduellen när användaren frågar vad något kostar i el, jämför vad olika saker drar, eller verkar nyfiken eller lekfull. Använd då exakt den här meningen: "Testa dagens Elduellen på /elduellen och se om du kan gissa vad som kostar mest i el idag!" Nämn den inte annars, och aldrig mer än en gång per samtal.`
       : ''
   }`;
 }
