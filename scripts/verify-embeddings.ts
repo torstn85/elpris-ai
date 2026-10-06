@@ -5,6 +5,7 @@
 // Förväntade tal härleds från disk + invarianter, inga hårdkodade summor.
 
 import fs from 'fs';
+import { fetchAllPages } from '../src/lib/supabasePaging';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
@@ -66,11 +67,14 @@ async function main() {
 
   const diskSlugs = discoverSlugs();
 
-  const { data, error } = await client
-    .from('article_chunks')
-    .select('article_slug, content_hash, embedding');
-  if (error) throw error;
-  const rows = (data ?? []) as Row[];
+  // Paginerat: Supabase trunkerar tyst vid ~1 000 rader.
+  const rows = await fetchAllPages<Row>((from, to) =>
+    client
+      .from('article_chunks')
+      .select('article_slug, content_hash, embedding')
+      .order('id')
+      .range(from, to),
+  );
 
   // Gruppera per artikel
   const byArticle = new Map<string, { count: number; hashes: Set<string>; nullEmb: number; badDim: number }>();

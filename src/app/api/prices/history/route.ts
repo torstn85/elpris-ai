@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { fetchAllPages } from "@/lib/supabasePaging";
 import { stockholmISODate, stockholmDayUTCRange } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
@@ -59,19 +60,25 @@ export async function GET(request: Request) {
     const { from } = stockholmDayUTCRange(sevenDaysAgo);
     const { to } = stockholmDayUTCRange(yesterday);
 
-    const { data, error } = await supabase
-      .from("spot_prices")
-      .select("area, delivery_period_start, ore_per_kwh")
-      .in("area", areas)
-      .gte("delivery_period_start", from)
-      .lte("delivery_period_start", to)
-      .order("delivery_period_start");
+    // 7 dygn × 4 områden × 96 kvartar ≈ 2 700 rader — över Supabase radgräns
+    // (1 000), så frågan pagineras. Unik sortering krävs: tid + id.
+    const data = await fetchAllPages<{
+      area: Area;
+      delivery_period_start: string;
+      ore_per_kwh: number;
+    }>((rangeFrom, rangeTo) =>
+      supabase
+        .from("spot_prices")
+        .select("area, delivery_period_start, ore_per_kwh")
+        .in("area", areas)
+        .gte("delivery_period_start", from)
+        .lte("delivery_period_start", to)
+        .order("delivery_period_start")
+        .order("id")
+        .range(rangeFrom, rangeTo),
+    );
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    if (!data || data.length === 0) {
+    if (data.length === 0) {
       return NextResponse.json({ days: [] });
     }
 

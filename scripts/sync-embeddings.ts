@@ -10,6 +10,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { chunkArticle, type Chunk } from '../src/lib/rag/chunk';
+import { fetchAllPages } from '../src/lib/supabasePaging';
 import { embedTexts } from '../src/lib/rag/embed';
 
 // ─── Env loader (tsx läser inte .env.local automatiskt) ────────────────────────
@@ -133,14 +134,22 @@ function discoverArticles(): ArticleFile[] {
 async function fetchExistingArticles(
   client: SupabaseClient,
 ): Promise<Map<string, ExistingArticle>> {
-  const { data, error } = await client
-    .from('article_chunks')
-    .select('article_slug, content_hash');
-  if (error) {
-    throw new Error(`Failed to fetch existing chunks: ${error.message}`);
+  // Paginerat: Supabase trunkerar tyst vid ~1 000 rader, och då skulle synken
+  // tro att artiklar saknas (onödig om-embedding) och missa orphans.
+  let data: { article_slug: string; content_hash: string }[];
+  try {
+    data = await fetchAllPages<{ article_slug: string; content_hash: string }>((from, to) =>
+      client
+        .from('article_chunks')
+        .select('article_slug, content_hash')
+        .order('id')
+        .range(from, to),
+    );
+  } catch (err) {
+    throw new Error(`Failed to fetch existing chunks: ${err instanceof Error ? err.message : err}`);
   }
   const map = new Map<string, ExistingArticle>();
-  for (const row of (data ?? []) as { article_slug: string; content_hash: string }[]) {
+  for (const row of data) {
     const cur = map.get(row.article_slug);
     if (cur) {
       cur.content_hashes.push(row.content_hash);
