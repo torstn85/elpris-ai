@@ -164,6 +164,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  kiruna: {
+    slug: 'kiruna',
+    publishedAt: '2026-10-06',
+    name: 'Kiruna',
+    area: 'SE1',
+    region: 'Norrbottens län',
+    uniqueIntro:
+      'Kiruna är Sveriges nordligaste stad och tillhör elområde SE1 — samma område som Luleå och Skellefteå. I SE1 finns mycket mer elproduktion än förbrukning, främst vattenkraft, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt: när nätet inte är trångt jämnas priserna ut, och under kalla perioder med hög efterfrågan i hela Norden kan priset stiga även här. Vintrarna i Kiruna är långa och kalla, och det är då förbrukningen är som högst. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Kiruna är det Vattenfall som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Kiruna?',
+        answer:
+          'Kiruna tillhör elområde SE1, Sveriges nordligaste elområde, samma som Luleå och Skellefteå. Spotpriset är detsamma för alla i SE1 vid samma tidpunkt. SE1 har ofta landets lägsta spotpris, men inte alltid — när överföringsförbindelserna söderut inte är trånga kan priserna vara nästan desamma i hela landet. Det som skiljer din slutfaktura från en annan SE1-stads är nätavgift, påslag och elavtal, inte spotpriset.',
+      },
+      {
+        question: 'Vad består elräkningen av i Kiruna?',
+        answer:
+          'Utöver spotpriset betalar du nätavgift till ditt nätbolag, energiskatt, moms och elhandelsbolagets påslag. I alla kommuner i Norrbottens län är energiskatten 9,6 öre/kWh lägre än normalnivån — 26,4 öre/kWh exkl. moms (33 öre inkl. moms) 2026. Källa: Skatteverket. När spotpriset är lågt blir nätavgift och skatt en större andel av kostnaden per kWh. Spotpriskostnaden kan du påverka genom att flytta förbrukning till billigare tider — förutsatt att du har kvarts- eller timpris. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar.',
+      },
+    ],
+  },
   kungsbacka: {
     slug: 'kungsbacka',
     updatedAt: '2026-10-05',
