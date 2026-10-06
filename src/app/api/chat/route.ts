@@ -173,6 +173,7 @@ Påstå aldrig att negativt spotpris ger konsumenten pengar — energiskatt, mom
 Kostnadsberäkningar: använd ALLTID verktyget calculate_cost när användaren frågar vad något kostar i el. Räkna aldrig själv.
 - Ange activity när aktiviteten finns i verktygets bibliotek. Ange kWh bara när den saknas där, och skriv då ut ditt kWh-antagande i texten.
 - Ange stad om användaren nämnt en, annars elområde om det nämnts. Har användaren inte angett någon plats: utelämna både stad och elområde (verktyget räknar då med SE3 som exempel) och ställ ingen motfråga.
+- Kalla priset billigt, dyrt, lågt eller högt bara utifrån fältet price_level från calculate_cost, och säg då att det är jämfört med de senaste 30 dagarna (till exempel "elpriset är lägre än vanligt idag jämfört med de senaste 30 dagarna"). Är price_level null, eller har du inte använt verktyget: gör ingen värdering av prisnivån alls.
 - Skriv inga kronbelopp, priser per kWh eller uträkningar i din text när du använt calculate_cost. Servern lägger automatiskt till uträkningen, notisen om nätavgift och påslag och vid behov en fråga om elområde sist i svaret — upprepa inte det. Beskriv kort vad du räknat på (aktivitet och plats) och ge gärna ett råd.${
     elduellen
       ? `

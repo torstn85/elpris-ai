@@ -6,7 +6,70 @@ import { CITIES } from "@/lib/cities";
 import { ACTIVITIES } from "@/lib/elduellen/activities";
 import { COST_FOOTNOTE, formatKwh, priceFor } from "@/lib/elduellen/cost";
 import { AREAS, loadDayPrices, type Area } from "@/lib/elduellen/prices";
-import { stockholmISODate } from "@/lib/time";
+import { supabase } from "@/lib/supabase";
+import { fetchAllPages } from "@/lib/supabasePaging";
+import { addDays } from "@/lib/elduellen/dates";
+import { stockholmDayUTCRange, stockholmISODate } from "@/lib/time";
+
+/** Antal föregående dygn som dagens pris jämförs med. */
+const LEVEL_WINDOW_DAYS = 30;
+/** ±15 % mot snittet räknas som "ungefär som vanligt". */
+const LEVEL_THRESHOLD = 0.15;
+/** Minsta antal dygn med data för att ange prisläge. */
+const LEVEL_MIN_DAYS = 20;
+
+const dayOf = (iso: string) =>
+  new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" }).format(
+    new Date(iso),
+  );
+
+/**
+ * Snittet av dygnssnitten (spotpris, öre/kWh) för de senaste 30 dygnen före
+ * `date` i området. null om för få dygn har data.
+ */
+async function windowAverage(
+  area: Area,
+  date: string,
+): Promise<{ avg: number; days: number } | null> {
+  const { from } = stockholmDayUTCRange(addDays(date, -LEVEL_WINDOW_DAYS));
+  const { to } = stockholmDayUTCRange(addDays(date, -1));
+  const rows = await fetchAllPages<{
+    delivery_period_start: string;
+    ore_per_kwh: number;
+  }>((a, b) =>
+    supabase
+      .from("spot_prices")
+      .select("delivery_period_start, ore_per_kwh")
+      .eq("area", area)
+      .gte("delivery_period_start", from)
+      .lte("delivery_period_start", to)
+      .order("delivery_period_start")
+      .order("id")
+      .range(a, b),
+  );
+  const byDay = new Map<string, number[]>();
+  for (const r of rows) {
+    const d = dayOf(r.delivery_period_start);
+    byDay.set(d, [...(byDay.get(d) ?? []), r.ore_per_kwh]);
+  }
+  if (byDay.size < LEVEL_MIN_DAYS) return null;
+  const dayAverages = Array.from(
+    byDay.values(),
+    (v) => v.reduce((x, y) => x + y, 0) / v.length,
+  );
+  return {
+    avg: dayAverages.reduce((x, y) => x + y, 0) / dayAverages.length,
+    days: byDay.size,
+  };
+}
+
+/** "lägre än vanligt" / "ungefär som vanligt" / "högre än vanligt", eller null. */
+function priceLevel(todayOre: number, avgOre: number): string | null {
+  if (avgOre <= 0) return null; // negativt eller noll snitt — kvoten säger inget
+  if (todayOre < avgOre * (1 - LEVEL_THRESHOLD)) return "lägre än vanligt";
+  if (todayOre > avgOre * (1 + LEVEL_THRESHOLD)) return "högre än vanligt";
+  return "ungefär som vanligt";
+}
 
 const nf = (digits: number) =>
   new Intl.NumberFormat("sv-SE", {
@@ -87,6 +150,13 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
   const reduced = city?.reducedEnergyTax === true;
   const spotOre = quarters.reduce((s, q) => s + q.ore, 0) / quarters.length;
   const r = priceFor(spotOre, reduced, kWh);
+  let window: { avg: number; days: number } | null = null;
+  try {
+    window = await windowAverage(area, date);
+  } catch {
+    // Prisläget är valfritt — kostnaden räknas ändå.
+  }
+  const level = window ? priceLevel(spotOre, window.avg) : null;
 
   return {
     date,
@@ -108,6 +178,11 @@ export async function calculateCost(input: CostToolInput): Promise<object> {
     cost: `${nf(2).format(r.costKr)} kr`,
     calculation: `${formatKwh(kWh)} kWh × (${nf(1).format(r.spotOre)} öre spot + ${taxNf.format(r.taxOre)} öre energiskatt) × 1,25 moms ≈ ${nf(2).format(r.costKr)} kr`,
     basis: "dagens snittpris (dygnssnitt)",
+    price_level: level,
+    price_level_basis:
+      level && window
+        ? `dagens snittspotpris ${nf(1).format(spotOre)} öre/kWh jämfört med snittet ${nf(1).format(window.avg)} öre/kWh de senaste ${LEVEL_WINDOW_DAYS} dagarna i ${area}`
+        : null,
     excludes: COST_FOOTNOTE,
   };
 }
