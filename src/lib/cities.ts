@@ -213,6 +213,7 @@ export const CITIES: Record<string, City> = {
   },
   lulea: {
     slug: 'lulea',
+    updatedAt: '2026-10-06',
     publishedAt: '2026-10-01',
     name: 'Luleå',
     area: 'SE1',
@@ -220,7 +221,7 @@ export const CITIES: Record<string, City> = {
     uniqueIntro:
       'Luleå är Norrbottens största stad och tillhör elområde SE1, Sveriges nordligaste elområde. SE1 kallas ibland "elområde Luleå" efter staden. Här finns mycket mer elproduktion än förbrukning, främst vattenkraft från de stora norrlandsälvarna, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt. Under kalla perioder, när efterfrågan är hög i hela Norden, kan det stiga även här. Luleå och Norrbotten är också mitt i en omfattande industrietablering, och regionnätet runt Luleå byggs ut för att klara energikrävande industrier och elektrifieringen. Hur det påverkar priset på sikt beror på hur snabbt produktion och överföring byggs ut i takt med efterfrågan. Förbrukningen i Luleå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Gammelstad och Råneå ofta värms med el. Där gör det störst skillnad att följa priset under vinterhalvåret.',
     commonGridCompanies:
-      'I Luleå ansvarar det kommunägda Luleå Energi Elnät för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+      'I Luleå ansvarar det kommunägda Luleå Energi Elnät för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här. I alla kommuner i Norrbottens län är energiskatten 9,6 öre/kWh lägre än normalnivån — 26,4 öre/kWh exkl. moms (33 öre inkl. moms) 2026. Källa: Skatteverket.',
     uniqueFaqs: [
       {
         question: 'Varför är elen ofta billigast i Luleå?',
@@ -283,6 +284,7 @@ export const CITIES: Record<string, City> = {
   },
   skelleftea: {
     slug: 'skelleftea',
+    updatedAt: '2026-10-06',
     publishedAt: '2026-10-05',
     name: 'Skellefteå',
     area: 'SE1',
@@ -290,7 +292,7 @@ export const CITIES: Record<string, City> = {
     uniqueIntro:
       'Skellefteå ligger i Västerbottens län men tillhör elområde SE1 — Sveriges nordligaste elområde, samma som Luleå och Kiruna. Det överraskar många, eftersom Umeå i samma län ligger i SE2. Elområdesgränserna följer elnätets flaskhalsar, inte länsgränserna. I SE1 finns mycket mer elproduktion än förbrukning, främst vattenkraft, och eftersom överföringen söderut har begränsad kapacitet hör spotpriset i SE1 ofta till de lägsta i landet. Det betyder inte att priset alltid är lågt: när nätet inte är trångt jämnas priserna ut, och under kalla perioder med hög efterfrågan i hela Norden kan priset stiga även här. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
-      'I Skellefteå är det Skellefteå Kraft Elnät som ansvarar för elnätet i huvuddelen av kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+      'I Skellefteå är det Skellefteå Kraft Elnät som ansvarar för elnätet i huvuddelen av kommunen. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här. I alla kommuner i Västerbottens län är energiskatten 9,6 öre/kWh lägre än normalnivån — 26,4 öre/kWh exkl. moms (33 öre inkl. moms) 2026. Källa: Skatteverket.',
     uniqueFaqs: [
       {
         question: 'Varför ligger Skellefteå i SE1 när Umeå ligger i SE2?',
@@ -352,6 +354,7 @@ export const CITIES: Record<string, City> = {
   },
   umea: {
     slug: 'umea',
+    updatedAt: '2026-10-06',
     publishedAt: '2026-10-01',
     name: 'Umeå',
     area: 'SE2',
@@ -359,7 +362,7 @@ export const CITIES: Record<string, City> = {
     uniqueIntro:
       'Umeå är Norrlands största stad och tillhör elområde SE2 — inte SE1 som många tror, och inte SE3 som Stockholm. SE2 är ett av Sveriges elproducerande områden: här finns stora mängder vattenkraft, bland annat Stornorrfors vid Umeälven i Umeå kommun, ett av Sveriges större vattenkraftverk. Produktionen i norr är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Ofta ligger det på samma nivå som i SE1. Under kalla vinterdagar, när efterfrågan är hög i hela Norden, kan priset ändå stiga kraftigt även här. Förbrukningen i Umeå präglas av långa, kalla vintrar. Stora delar av staden har fjärrvärme, medan villor i ytterområden och i tätorter som Holmsund och Sävar ofta värms med värmepump eller direktverkande el. Där blir det extra värdefullt att flytta förbrukningen till dygnets billigaste kvartar under vinterhalvåret.',
     commonGridCompanies:
-      'I Umeå är det Umeå Energi Elnät som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+      'I Umeå är det Umeå Energi Elnät som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara — vilket du tillhör framgår av din nätfaktura. Nätbolaget bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här. I alla kommuner i Västerbottens län är energiskatten 9,6 öre/kWh lägre än normalnivån — 26,4 öre/kWh exkl. moms (33 öre inkl. moms) 2026. Källa: Skatteverket.',
     uniqueFaqs: [
       {
         question: 'Varför är elen ofta billigare i Umeå än i Stockholm?',
