@@ -258,6 +258,29 @@ export const CITIES: Record<string, City> = {
       },
     ],
   },
+  ostersund: {
+    slug: 'ostersund',
+    publishedAt: '2026-10-06',
+    name: 'Östersund',
+    area: 'SE2',
+    region: 'Jämtlands län',
+    uniqueIntro:
+      'Östersund är Jämtlands läns största stad och tillhör elområde SE2 — samma område som Sundsvall och Umeå. SE2 omfattar stora delar av Norrland och har mycket vattenkraft. Produktionen i området är större än förbrukningen, och eftersom överföringen söderut har begränsad kapacitet blir spotpriset i SE2 ofta lägre än i södra Sverige. Det är inte alltid så: när nätet inte är trångt jämnas priserna ut, och under kalla vinterdagar med hög efterfrågan i hela Norden kan priset stiga även här. Östersund har långa, kalla vintrar, och det är då förbrukningen är som högst. Stora delar av centralorten har fjärrvärme. Bor du i villa utanför fjärrvärmenätet värms huset ofta med värmepump eller direktverkande el — då påverkar spotpriset dig mer, och det gör störst skillnad att flytta tung förbrukning till dygnets billigaste kvartar under vinterhalvåret.',
+    commonGridCompanies:
+      'I Östersund är det Jämtkraft Elnät som ansvarar för elnätet i centralorten och stora delar av kommunen. I vissa ytterområden kan ett annat nätbolag ansvara. Vilket nätbolag du tillhör bestäms av var du bor och går inte att välja själv, till skillnad från elhandelsbolaget. Nätavgiften kommer utöver spotpriset du ser här.',
+    uniqueFaqs: [
+      {
+        question: 'Vilket elområde tillhör Östersund?',
+        answer:
+          'Östersund tillhör elområde SE2, samma område som Sundsvall och Umeå. Spotpriset är detsamma för alla i SE2 vid samma tidpunkt. SE2 har ofta lägre spotpris än SE3 och SE4 i söder, men skillnaden varierar med hur belastade förbindelserna söderut är — när nätet inte är trångt kan priserna vara nästan desamma i hela landet. Det som skiljer din slutfaktura från en annan SE2-stads är nätavgift, påslag och elavtal, inte spotpriset.',
+      },
+      {
+        question: 'Vad påverkar min elräkning mest i Östersund?',
+        answer:
+          'För de flesta villahushåll är det uppvärmningen under vinterhalvåret. Ett elvärmt hus förbrukar mest när det är kallt, och det är ofta också då spotpriset är som högst. Utöver spotpriset består räkningen av nätavgift från ditt nätbolag, energiskatt, moms och elhandelsbolagets påslag. I alla kommuner i Jämtlands län är energiskatten 9,6 öre/kWh lägre än normalnivån — 26,4 öre/kWh exkl. moms (33 öre inkl. moms) 2026. Källa: Skatteverket. Spotpriskostnaden kan du påverka genom att flytta förbrukning till billigare tider — förutsatt att du har kvarts- eller timpris. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar. Den rörliga nätavgiften och energiskatten påverkar du främst genom att minska den totala förbrukningen.',
+      },
+    ],
+  },
   skelleftea: {
     slug: 'skelleftea',
     publishedAt: '2026-10-05',
