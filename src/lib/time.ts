@@ -90,16 +90,41 @@ export function parseStockholmHour(isoString: string): number {
 }
 
 /**
- * Returns the UTC start and end timestamps for a full Swedish calendar day.
- * Accounts for CEST (UTC+2) and CET (UTC+1) by always going 3 hours before
- * midnight to guarantee we cover 00:00 Stockholm time.
+ * The exact UTC instant of 00:00 Stockholm time on `isoDate` ("YYYY-MM-DD").
+ * Midnight is never inside a DST shift (those happen at 02:00/03:00), so
+ * exactly one of +01:00 (CET) and +02:00 (CEST) maps back to 00:00 that day.
+ */
+function stockholmMidnightUTC(isoDate: string): Date {
+  for (const offset of ["+01:00", "+02:00"]) {
+    const candidate = new Date(`${isoDate}T00:00:00${offset}`);
+    const local = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: TZ,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(candidate);
+    if (local === `${isoDate} 00:00`) return candidate;
+  }
+  throw new Error(`Could not resolve Stockholm midnight for ${isoDate}`);
+}
+
+/**
+ * Returns the UTC start and end timestamps for a full Swedish calendar day:
+ * `from` = 00:00 Stockholm, `to` = 1 ms before the next day's 00:00 Stockholm
+ * (inclusive, for `.lte()`). Exact in both CET and CEST, including the 23/25-hour
+ * DST days — the range never spills into the previous or next day.
  * Returns ISO strings suitable for Supabase queries.
  */
 export function stockholmDayUTCRange(isoDate?: string): { from: string; to: string } {
   const date = isoDate ?? stockholmISODate();
-  // Start: previous day 21:00 UTC = covers midnight Stockholm in both CET and CEST
-  const from = new Date(`${date}T00:00:00+02:00`).toISOString();
-  // End: current day 22:00 UTC = covers 23:59 Stockholm in both CET and CEST
-  const to = new Date(`${date}T23:59:59+01:00`).toISOString();
+  // Next calendar date via noon UTC so DST can't shift the day.
+  const next = new Date(`${date}T12:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  const nextDate = next.toISOString().slice(0, 10);
+  const from = stockholmMidnightUTC(date).toISOString();
+  const to = new Date(stockholmMidnightUTC(nextDate).getTime() - 1).toISOString();
   return { from, to };
 }
