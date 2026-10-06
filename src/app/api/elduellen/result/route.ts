@@ -9,6 +9,10 @@ import {
 } from "@/lib/elduellen/results";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+// Supabase-klienten använder fetch — utan detta kan Next.js datacache servera
+// gamla svar (statistiken uppdaterades inte i produktion).
+export const fetchCache = "force-no-store";
 export const runtime = "nodejs";
 
 // Lazy så att saknade env-variabler inte kraschar bygget.
