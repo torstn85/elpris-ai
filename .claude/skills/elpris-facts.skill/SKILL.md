@@ -48,6 +48,7 @@ Skriv ALDRIG exakta kr-belopp för Grön teknik-besparing. Installatörens offer
 - Vissa kommuner och industri kan ha reducerad nivå — hänvisa till Skatteverket för exakt nivå
 - **Nedsatt energiskatt 2026:** avdrag 9,6 öre/kWh → **26,4 öre/kWh exkl. moms (33 öre inkl. moms)** för hushåll i: samtliga kommuner i Norrbottens, Västerbottens och Jämtlands län; Västernorrlands län: Sollefteå, Ånge, Örnsköldsvik; Gävleborgs län: Ljusdal; Värmlands län: Torsby; Dalarnas län: Malung-Sälen, Mora, Orsa, Älvdalen. Gäller inte industri, jord- och skogsbruk. Källor: Skatteverket och Energimarknadsbyrån.
 - **Totalpris i räkneexempel:** Räkneexempel ska använda totalt inköpspris (spot + påslag + energiskatt + rörlig nätavgift + moms). Energiskatten ensam är 45 öre/kWh inkl. moms (33 öre i kommuner med nedsatt energiskatt) — ett totalpris runt 0,50 kr/kWh är därför orimligt även i norr, eftersom nätavgift och påslag tillkommer.
+- **Undantag — Elduellen:** Elduellen räknar kostnad som kWh × (spot + energiskatt) × 1,25, märkt "exkl. nätavgift och elhandlarens påslag". Gäller bara spelet — övriga räkneexempel använder totalt inköpspris.
 
 ## Skattereduktion för mikroproduktion (såld solel)
 
