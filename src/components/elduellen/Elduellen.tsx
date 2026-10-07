@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { COST_FOOTNOTE, formatCostShort } from "@/lib/elduellen/cost";
+import { formatSwedishDay } from "@/lib/format/date";
 import { track, trackWhenReady } from "@/lib/elduellen/analytics";
 import {
   MIN_PLAYERS_FOR_PERCENTILE,
@@ -19,7 +20,6 @@ import {
   streakFor,
 } from "@/lib/elduellen/storage";
 import {
-  capitalize,
   duelQuestion,
   optionHeadline,
   optionShortName,
@@ -30,15 +30,6 @@ import type { Duel, Option, Pick, Puzzle } from "@/lib/elduellen/types";
 type Phase = "start" | "duel" | "facit" | "done" | "bonus" | "bonus-facit";
 
 const nf1 = new Intl.NumberFormat("sv-SE", { maximumFractionDigits: 1 });
-
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  }).format(new Date(`${iso}T12:00:00Z`));
-}
 
 // ─── Delkomponenter ───────────────────────────────────────────────────────────
 
@@ -566,7 +557,7 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
           <h1 className="font-tight text-4xl font-black tracking-tight sm:text-5xl">
             {heading}
           </h1>
-          <p className="mt-2 text-[#8fafc9]">{capitalize(formatDate(date))}</p>
+          <p className="mt-2 text-[#8fafc9]">{formatSwedishDay(new Date(`${date}T12:00:00Z`))}</p>
         </div>
         <p className="max-w-sm text-lg leading-relaxed text-[#cfe0f0]">
           Fem dueller. Välj det som kostar mest i el — med dagens riktiga

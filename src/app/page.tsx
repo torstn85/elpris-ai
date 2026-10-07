@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  ReferenceLine,
-} from "recharts";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Chatbot from "@/components/dynamic/Chatbot";
@@ -18,40 +8,17 @@ import DailyPriceAnalysis from "@/components/dynamic/DailyPriceAnalysis";
 import Footer from "@/components/Footer";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
-import { stockholmHour } from "@/lib/time";
+import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
+import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function getBarColor(price: number): string {
-  if (price <= 0) return "#22C55E";
-  if (price <= 50) return "#22C55E";
-  if (price >= 100) return "#EF4444";
-  return "#00E5FF";
-}
-
-
-// ─── Custom tooltip ──────────────────────────────────────────────────────────
-
-function CustomTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: { value: number }[];
-  label?: string;
-}) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="bg-[#0F3460] border border-[#1E4976] rounded-lg px-3 py-2 text-sm shadow-xl">
-      <p className="text-[#8fafc9] mb-0.5">Kl. {label}:00</p>
-      <p className="font-semibold text-white">
-        {payload[0].value}{" "}
-        <span className="text-[#00E5FF] text-xs font-normal">öre/kWh</span>
-      </p>
-    </div>
-  );
-}
+/** Glöd bakom liveprisets siffra, per prisnivå. */
+const PRICE_GLOW = {
+  cheap: "0 0 40px rgba(34,197,94,0.45)",
+  normal: "0 0 40px rgba(0,229,255,0.45)",
+  expensive: "0 0 40px rgba(239,68,68,0.45)",
+} as const;
 
 // ─── Value card ──────────────────────────────────────────────────────────────
 
@@ -145,9 +112,35 @@ export default function Home() {
   const [selectedArea, setSelectedArea] = useState<"SE1" | "SE2" | "SE3" | "SE4">("SE3");
   const [minutesLeft, setMinutesLeft] = useState<number>(0);
 
-  // Tick countdown to next 15-min slot
+  const fetchToday = useCallback(() => {
+    fetch("/api/prices/today")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<PricesResponse>;
+      })
+      .then((data) => {
+        setPrices(data);
+        setError(null);
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchToday();
+  }, [fetchToday]);
+
+  // Tick countdown to next 15-min slot. Samma timer upptäcker midnatt (svenskt
+  // datum byts) och hämtar då dagens priser igen.
+  const swedishDay = useRef<string | null>(null);
   useEffect(() => {
     function compute() {
+      const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" }).format(new Date());
+      if (swedishDay.current !== null && swedishDay.current !== day) fetchToday();
+      swedishDay.current = day;
       const minute = parseInt(
         new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", minute: "numeric" }).format(new Date()),
         10
@@ -157,7 +150,7 @@ export default function Home() {
     compute();
     const id = setInterval(compute, 30_000);
     return () => clearInterval(id);
-  }, []);
+  }, [fetchToday]);
 
   // Geolocation: detect user's Swedish region and pre-select area
   useEffect(() => {
@@ -170,22 +163,6 @@ export default function Home() {
       })
       .catch(() => {
         // Fallback SE3 already set as default
-      });
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/prices/today")
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<PricesResponse>;
-      })
-      .then((data) => {
-        setPrices(data);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(e.message);
-        setLoading(false);
       });
   }, []);
 
@@ -210,14 +187,8 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  const now = stockholmHour();
   const areaData = prices?.areas[selectedArea] ?? [];
   const currentPrice = currentPriceData?.[selectedArea] ?? null;
-
-  const chartData = areaData.map((h) => ({
-    hour: String(h.hour).padStart(2, "0"),
-    price: h.ore_per_kwh,
-  }));
 
   const cheap = cheapestWindow(areaData, 3);
 
@@ -317,18 +288,8 @@ export default function Home() {
                 <span
                   className="font-black text-8xl md:text-9xl leading-none"
                   style={{
-                    color:
-                      currentPrice !== null && currentPrice >= 100
-                        ? "#EF4444"
-                        : currentPrice !== null && currentPrice <= 50
-                        ? "#22C55E"
-                        : "#00E5FF",
-                    textShadow:
-                      currentPrice !== null && currentPrice >= 100
-                        ? "0 0 40px rgba(239,68,68,0.45)"
-                        : currentPrice !== null && currentPrice <= 50
-                        ? "0 0 40px rgba(34,197,94,0.45)"
-                        : "0 0 40px rgba(0,229,255,0.45)",
+                    color: currentPrice !== null ? PRICE_LEVEL_COLORS[priceLevel(currentPrice)] : PRICE_LEVEL_COLORS.normal,
+                    textShadow: currentPrice !== null ? PRICE_GLOW[priceLevel(currentPrice)] : PRICE_GLOW.normal,
                   }}
                 >
                   {currentPrice !== null
@@ -475,89 +436,13 @@ export default function Home() {
         </section>
 
         {/* ── 2. Price chart ── */}
-        <section id="elomraden" className="flex flex-col gap-6">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl">
-                Dagens timpriser
-              </h2>
-              <p className="text-[#8fafc9] text-sm mt-1">
-                {prices?.date
-                  ? prices.date.replace("/", " ").replace("-", " ") + " · "
-                  : ""}
-                {selectedArea} · öre/kWh
-              </p>
-              <p className="text-[#8fafc9] text-xs mt-0.5">
-                Staplarna visar snittpris per timme
-              </p>
-            </div>
-            <div className="hidden sm:flex items-center gap-5 text-xs text-[#8fafc9]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#22C55E]" />
-                Billigt (≤50 öre)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#00E5FF]" />
-                Normalt (51–99 öre)
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444]" />
-                Dyrt (≥100 öre)
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6">
-            {loading ? (
-              <div className="h-[220px] flex items-center justify-center">
-                <div className="w-full h-full rounded-xl bg-[#0A2540] animate-pulse" />
-              </div>
-            ) : error || chartData.length === 0 ? (
-              <div className="h-[220px] flex items-center justify-center text-[#8fafc9] text-sm">
-                Prisdata ej tillgänglig
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={chartData}
-                  barCategoryGap="20%"
-                  margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-                >
-                  <XAxis
-                    dataKey="hour"
-                    tick={{ fill: "#8fafc9", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                    interval={2}
-                    tickFormatter={(v) => `${v}h`}
-                  />
-                  <YAxis
-                    tick={{ fill: "#8fafc9", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    content={<CustomTooltip />}
-                    cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                  />
-                  <ReferenceLine y={0} stroke="#ffffff30" strokeDasharray="3 3" />
-                  <Bar dataKey="price" radius={[4, 4, 0, 0]}>
-                    {chartData.map((entry) => (
-                      <Cell
-                        key={entry.hour}
-                        fill={getBarColor(entry.price)}
-                        opacity={parseInt(entry.hour) === now ? 1 : 0.75}
-                        stroke={
-                          parseInt(entry.hour) === now ? "#ffffff" : "none"
-                        }
-                        strokeWidth={parseInt(entry.hour) === now ? 1 : 0}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
+        <section id="elomraden">
+          <QuarterPriceChart
+            quarters={prices?.quarters?.[selectedArea] ?? []}
+            area={selectedArea}
+            headingLevel="h2"
+            loading={loading}
+          />
         </section>
 
         {/* ── 2b. Daily price analysis ── */}

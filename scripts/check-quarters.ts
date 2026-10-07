@@ -10,6 +10,8 @@
 
 import assert from 'node:assert/strict';
 import { toQuarterPoints, toQuarters } from '../src/lib/prices/quarters';
+import { buildHourTicks, formatClock } from '../src/lib/prices/quarterTicks';
+import { formatSwedishDay } from '../src/lib/format/date';
 
 const QUARTER_MS = 15 * 60 * 1000;
 
@@ -87,8 +89,77 @@ for (const c of CASES) {
   }
 }
 
+// ─── buildHourTicks (kvartsdiagrammets x-axel) ───────────────────────────────
+
+const pointsFor = (date: string) => toQuarterPoints(toQuarters(date, syntheticRows(date)));
+const labels = (date: string, every: number) => {
+  const p = pointsFor(date);
+  return buildHourTicks(p, every).map((i) => formatClock(p[i].start));
+};
+
+const TICK_CASES: { name: string; run: () => void }[] = [
+  {
+    name: '96 kvartar: var 3:e timme → 8 tickar, var 6:e → 4',
+    run: () => {
+      const p = pointsFor('2026-07-15');
+      assert.deepEqual(buildHourTicks(p, 3), [0, 12, 24, 36, 48, 60, 72, 84]);
+      assert.deepEqual(labels('2026-07-15', 3), ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00']);
+      assert.deepEqual(buildHourTicks(p, 6), [0, 24, 48, 72]);
+      assert.deepEqual(labels('2026-07-15', 6), ['00:00', '06:00', '12:00', '18:00']);
+    },
+  },
+  {
+    name: '92 kvartar: 02:00 saknas, inga dubbletter',
+    run: () => {
+      const every1 = labels('2026-03-29', 1);
+      assert.equal(every1.length, 23);
+      assert.ok(!every1.includes('02:00'), '02:00 ska saknas');
+      assert.equal(new Set(every1).size, every1.length, 'dubbletter');
+      const p = pointsFor('2026-03-29');
+      // 00:00, 01:00, (02 saknas) 03:00 på index 8 …
+      assert.deepEqual(buildHourTicks(p, 1).slice(0, 3), [0, 4, 8]);
+      assert.deepEqual(buildHourTicks(p, 3), [0, 8, 20, 32, 44, 56, 68, 80]);
+      assert.deepEqual(labels('2026-03-29', 6), ['00:00', '06:00', '12:00', '18:00']);
+    },
+  },
+  {
+    name: '100 kvartar: 02:00 och 03:00 en gång var, rätt index',
+    run: () => {
+      const p = pointsFor('2026-10-25');
+      const every1 = labels('2026-10-25', 1);
+      assert.equal(every1.length, 24);
+      assert.equal(new Set(every1).size, 24, 'dubbletter');
+      const t1 = buildHourTicks(p, 1);
+      // 00:00=0, 01:00=4, 02:00 (första, CEST)=8, andra 02:00 (CET) på 12 hoppas över, 03:00=16
+      assert.deepEqual(t1.slice(0, 4), [0, 4, 8, 16]);
+      assert.equal(p[8].start, '2026-10-25T00:00:00.000Z', 'första 02:00 är CEST');
+      assert.deepEqual(buildHourTicks(p, 3), [0, 16, 28, 40, 52, 64, 76, 88]);
+      assert.deepEqual(labels('2026-10-25', 3), ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00']);
+    },
+  },
+  {
+    name: 'formatSwedishDay: 2026-10-07 → "Onsdag 7 oktober"',
+    run: () => {
+      assert.equal(formatSwedishDay(new Date('2026-10-07T12:00:00Z')), 'Onsdag 7 oktober');
+      // Svensk tid, inte UTC: 22:30 UTC 6 okt är 00:30 den 7 okt i Sverige.
+      assert.equal(formatSwedishDay(new Date('2026-10-06T22:30:00Z')), 'Onsdag 7 oktober');
+    },
+  },
+];
+
+for (const t of TICK_CASES) {
+  try {
+    t.run();
+    console.log(`✓ ${t.name}`);
+  } catch (err) {
+    failed++;
+    console.error(`✗ ${t.name}: ${err instanceof Error ? err.message : err}`);
+  }
+}
+
+const total = CASES.length + TICK_CASES.length;
 if (failed > 0) {
-  console.error(`\n${failed} av ${CASES.length} fall misslyckades.`);
+  console.error(`\n${failed} av ${total} fall misslyckades.`);
   process.exit(1);
 }
-console.log(`\nAlla ${CASES.length} fall OK.`);
+console.log(`\nAlla ${total} fall OK.`);
