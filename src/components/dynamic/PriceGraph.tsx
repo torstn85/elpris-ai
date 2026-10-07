@@ -1,183 +1,84 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  Cell,
-} from 'recharts';
+// Tunt skal runt QuarterPriceChart för stadssidor och guider (MDX: <PriceGraph />).
+// Props-gränssnittet är bakåtkompatibelt så att MDX-filerna inte behöver ändras.
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import QuarterPriceChart from '@/components/prices/QuarterPriceChart';
+import type { QuarterPoint } from '@/lib/prices/quarters';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
 interface Props {
   area?: Area;
+  /** Används inte längre — kvartsdiagrammet har fast höjd. Kvar för bakåtkompatibilitet. */
   height?: number;
   caption?: string;
-  /** Server-side seed: today's hourly entries for `area`, renders in HTML before hydration. */
+  /** Används inte längre (timdata). Kvar för bakåtkompatibilitet — använd initialQuarters. */
   initialData?: Array<{ hour: number; ore_per_kwh: number }> | null;
+  /** Server-side seed: dagens kvartar för `area`, renderas i HTML före hydrering. */
+  initialQuarters?: QuarterPoint[] | null;
+  /** Ort, t.ex. "Göteborg" — ger underraden "Göteborg (SE3)". */
+  placeLabel?: string;
 }
 
-interface HourPrice {
-  hour: number;
-  hourLabel: string;
-  price: number;
-}
-
-function toHourly(areaData: Array<{ hour: number; ore_per_kwh: number }>): HourPrice[] {
-  return areaData.map((item) => ({
-    hour: item.hour,
-    hourLabel: String(item.hour).padStart(2, '0'),
-    price: item.ore_per_kwh,
-  }));
-}
-
-function toStats(hourly: HourPrice[]): { avg: number; min: number; max: number } {
-  const prices = hourly.map((h) => h.price);
-  return {
-    avg: prices.reduce((s, p) => s + p, 0) / prices.length,
-    min: Math.min(...prices),
-    max: Math.max(...prices),
-  };
-}
+const SWEDISH_DATE = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' });
+const swedishToday = () => SWEDISH_DATE.format(new Date());
+const swedishDateOf = (iso: string) => SWEDISH_DATE.format(new Date(iso));
 
 export default function PriceGraph({
   area = 'SE3',
-  height = 280,
   caption,
-  initialData = null,
+  initialQuarters = null,
+  placeLabel,
 }: Props) {
-  const seed = initialData && initialData.length > 0 ? toHourly(initialData) : [];
-  const [data, setData] = useState<HourPrice[]>(seed);
-  const [loading, setLoading] = useState(seed.length === 0);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<{ avg: number; min: number; max: number } | null>(
-    seed.length > 0 ? toStats(seed) : null,
-  );
+  const seed = initialQuarters && initialQuarters.length > 0 ? initialQuarters : null;
+  const [quarters, setQuarters] = useState<QuarterPoint[]>(seed ?? []);
+  const [loading, setLoading] = useState(seed === null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchPrices() {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/prices/today');
-        if (!res.ok) throw new Error('Kunde inte hämta priser');
-        const json = await res.json();
-
-        // Faktiskt format: { areas: { SE3: [{ hour, time_start, ore_per_kwh }] } }
-        const areaData: Array<{ hour: number; ore_per_kwh: number }> =
-          json.areas?.[area] || [];
-        const hourly: HourPrice[] = toHourly(areaData);
-
-        if (!cancelled) {
-          setData(hourly);
-          if (hourly.length > 0) setStats(toStats(hourly));
-          setError(null);
-        }
-      } catch {
-        if (!cancelled) setError('Prisdata kunde inte laddas');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  const fetchQuarters = useCallback(async () => {
+    try {
+      const res = await fetch('/api/prices/today');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setQuarters(json.quarters?.[area] ?? []);
+    } catch {
+      setQuarters([]);
+    } finally {
+      setLoading(false);
     }
-
-    fetchPrices();
-    return () => { cancelled = true; };
   }, [area]);
 
-  const getBarColor = (price: number): string => {
-    if (price <= 50) return '#22C55E';
-    if (price < 100) return '#00E5FF';
-    return '#EF4444';
-  };
+  // Hämta bara om SSR-datat saknas eller gäller ett annat svenskt datum än idag.
+  useEffect(() => {
+    if (seed && swedishDateOf(seed[0].start) === swedishToday()) return;
+    fetchQuarters();
+    // seed ändras inte efter montering; area/fetchQuarters styr.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchQuarters]);
 
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
-    if (!active || !payload || !payload[0]) return null;
-    const value = payload[0].value;
-    return (
-      <div className="rounded-lg bg-[#0F3460] px-3 py-2 ring-1 ring-[#1E4976] shadow-xl">
-        <p className="text-xs text-slate-400">{label}:00–{label}:59</p>
-        <p className="text-sm font-bold text-white">
-          {value.toFixed(1)} <span className="text-slate-400 font-normal">öre/kWh</span>
-        </p>
-      </div>
-    );
-  };
+  // Midnattsbyte: hämta igen när svenskt datum ändras medan sidan är öppen.
+  const day = useRef<string | null>(null);
+  useEffect(() => {
+    function check() {
+      const today = swedishToday();
+      if (day.current !== null && day.current !== today) fetchQuarters();
+      day.current = today;
+    }
+    check();
+    const id = window.setInterval(check, 30_000);
+    return () => window.clearInterval(id);
+  }, [fetchQuarters]);
 
   return (
-    <div className="my-8 rounded-2xl bg-[#0F3460] p-6 ring-1 ring-[#1E4976]">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <h3 className="text-lg font-bold text-white">
-            Dagens timpriser i {area}
-          </h3>
-          {stats && (
-            <p className="text-xs text-slate-400 mt-1">
-              Snitt: {stats.avg.toFixed(1)} öre · Min: {stats.min.toFixed(1)} · Max: {stats.max.toFixed(1)} öre/kWh
-            </p>
-          )}
-        </div>
-      </div>
-
-      {loading && (
-        <div className="h-[280px] flex items-center justify-center">
-          <div className="animate-pulse text-slate-500 text-sm">Hämtar prisdata...</div>
-        </div>
-      )}
-
-      {error && !loading && (
-        <div className="h-[280px] flex items-center justify-center">
-          <p className="text-amber-400 text-sm">{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && data.length > 0 && (
-        <ResponsiveContainer width="100%" height={height}>
-          <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <XAxis
-              dataKey="hourLabel"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
-              tickLine={false}
-              axisLine={{ stroke: '#334155' }}
-              interval={2}
-            />
-            <YAxis
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v) => `${v}`}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(148, 163, 184, 0.1)' }} />
-            <ReferenceLine y={0} stroke="#475569" strokeDasharray="2 2" />
-            <Bar dataKey="price" radius={[4, 4, 0, 0]}>
-              {data.map((entry, i) => (
-                <Cell key={i} fill={getBarColor(entry.price)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      )}
-
-      <div className="mt-4 flex flex-wrap gap-3 text-xs">
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#22C55E' }} />
-          <span className="text-slate-400">Billigt (≤50 öre)</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#00E5FF' }} />
-          <span className="text-slate-400">Normalt (51–99 öre)</span>
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded" style={{ backgroundColor: '#EF4444' }} />
-          <span className="text-slate-400">Dyrt (≥100 öre)</span>
-        </span>
-      </div>
-
+    <div className="not-prose my-8">
+      <QuarterPriceChart
+        quarters={quarters}
+        area={area}
+        placeLabel={placeLabel}
+        headingLevel="h3"
+        loading={loading}
+      />
       {caption && (
         <p className="mt-4 text-sm text-slate-400 italic border-l-2 border-cyan-500 pl-3">
           {caption}

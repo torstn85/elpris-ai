@@ -23,10 +23,10 @@ import {
   priceLevel,
   type PriceLevel,
 } from "@/lib/prices/priceLevel";
-import { buildHourTicks, formatClock } from "@/lib/prices/quarterTicks";
+import { buildHourTicks, buildPriceTicks, formatClock } from "@/lib/prices/quarterTicks";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 
-export { buildHourTicks };
+export { buildHourTicks, buildPriceTicks };
 
 const QUARTER_MS = 15 * 60 * 1000;
 const CHART_HEIGHT = 220;
@@ -102,11 +102,14 @@ function gradientStops(quarters: QuarterPoint[]): { offset: number; color: strin
 export default function QuarterPriceChart({
   quarters,
   area,
+  placeLabel,
   headingLevel = "h2",
   loading = false,
 }: {
   quarters: QuarterPoint[];
   area: string;
+  /** Ort, t.ex. "Göteborg" — ger underraden "Göteborg (SE3)". */
+  placeLabel?: string;
   headingLevel?: "h2" | "h3";
   /** Visa laddningsyta i stället för tomt läge medan datan hämtas. */
   loading?: boolean;
@@ -156,6 +159,10 @@ export default function QuarterPriceChart({
   const ticks = useMemo(() => buildHourTicks(quarters, wide ? 3 : 6), [quarters, wide]);
   const stops = useMemo(() => gradientStops(quarters), [quarters]);
   const stats = useMemo(() => (hasData ? statsFor(quarters) : null), [quarters, hasData]);
+  const yAxis = useMemo(
+    () => (stats ? buildPriceTicks(stats.min.ore, stats.max.ore) : null),
+    [stats],
+  );
 
   // "Nu" bara när kvartarna gäller dagens svenska datum.
   const nowMark = useMemo(() => {
@@ -196,7 +203,7 @@ export default function QuarterPriceChart({
 
   const subline = [
     hasData ? formatSwedishDay(new Date(quarters[0].start)) : null,
-    area,
+    placeLabel ? `${placeLabel} (${area})` : area,
     "öre/kWh",
   ]
     .filter(Boolean)
@@ -260,7 +267,15 @@ export default function QuarterPriceChart({
                     tickLine={false}
                     allowDataOverflow
                   />
-                  <YAxis tick={{ fill: "#8fafc9", fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis
+                    ticks={yAxis?.ticks}
+                    domain={yAxis?.domain}
+                    interval={0}
+                    allowDataOverflow
+                    tick={{ fill: "#8fafc9", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <ReferenceLine y={0} stroke="#ffffff30" strokeDasharray="3 3" />
                   {activeQ && (
                     <ReferenceArea

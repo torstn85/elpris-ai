@@ -8,7 +8,7 @@ import PriceGraph from '@/components/dynamic/PriceGraph';
 import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
 import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
-import { loadTodayPrices } from '@/lib/prices/today';
+import { getTodayQuarters, loadTodayPrices } from '@/lib/prices/today';
 import { stockholmHour, stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,7 @@ interface PageProps {
 const PUBLISHED_AT = '2026-05-05';
 // Datum för senaste TEXTändring på sidan (denna commit) — används för
 // article:modified_time / dateModified. INTE request-tidsstämpeln.
-const MODIFIED_AT = '2026-08-27';
+const MODIFIED_AT = '2026-10-07';
 
 const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
   SE1: ['Luleå', 'Kiruna', 'Skellefteå'],
@@ -110,7 +110,10 @@ export default async function StadPage({ params }: PageProps) {
 
   // SSR: hämta dagens priser för stadens elområde så pristalen finns i HTML
   // redan vid första render. Klientkomponenterna tar sen över med live-uppdatering.
-  const today = await loadTodayPrices();
+  const [today, quarters] = await Promise.all([
+    loadTodayPrices(),
+    getTodayQuarters(city.area),
+  ]);
   const areaHours = today?.areas[city.area] ?? null;
   const currentPrice =
     areaHours?.find((h) => h.hour === stockholmHour())?.ore_per_kwh ?? null;
@@ -135,7 +138,7 @@ export default async function StadPage({ params }: PageProps) {
 
   const para1 = `${city.name} tillhör elområde ${city.area}, vilket betyder att timpriserna sätts gemensamt för hela det området. Du som bor i ${city.name} betalar samma spotpris per kilowattimme som alla andra hushåll i ${city.area}, oavsett hur långt mellan er det är geografiskt.`;
 
-  const para2 = `Spotpriset sätts en gång per dygn i en day-ahead-auktion på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lämnar sina bud för nästa dygn innan buden stänger klockan 12:00, och priserna publiceras samma eftermiddag runt klockan 13:15. Priset räknas alltså inte om löpande under dagen. Det som ändras var 15:e minut är upplösningen: sedan oktober 2025 anges spotpriset per 15-minutersintervall i stället för per hel timme, vilket ger 96 prisnivåer över dygnet i stället för 24. Det är denna dygnsvisa auktion som ligger bakom prisrytmen du ser i grafen ovan.`;
+  const para2 = `Spotpriset sätts en gång per dygn i en day-ahead-auktion på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lämnar sina bud för nästa dygn innan buden stänger klockan 12:00, och priserna publiceras samma eftermiddag runt klockan 13:15. Priset räknas alltså inte om löpande under dagen. Det som ändras var 15:e minut är upplösningen: sedan oktober 2025 anges spotpriset per 15-minutersintervall i stället för per hel timme, vilket ger 96 prisnivåer över dygnet i stället för 24. Det är denna dygnsvisa auktion som ligger bakom prisrytmen du ser i grafen nedan.`;
 
   const para3 = `Alla städer i ${city.area} delar samma timpris. Förutom ${city.name} betalar exempelvis ${otherCitiesText} exakt samma per kilowattimme. Det som gör att din slutfaktura ändå skiljer sig från grannens i en annan stad är nätavgift, eventuellt påslag och elavtal — inte själva spotpriset.`;
 
@@ -283,7 +286,7 @@ export default async function StadPage({ params }: PageProps) {
           </section>
 
           <section className="mb-12">
-            <PriceGraph area={city.area} initialData={areaHours} />
+            <PriceGraph area={city.area} initialQuarters={quarters} placeLabel={city.name} />
           </section>
 
           <section className="mb-12">

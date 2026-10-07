@@ -10,7 +10,7 @@
 
 import assert from 'node:assert/strict';
 import { toQuarterPoints, toQuarters } from '../src/lib/prices/quarters';
-import { buildHourTicks, formatClock } from '../src/lib/prices/quarterTicks';
+import { buildHourTicks, buildPriceTicks, formatClock } from '../src/lib/prices/quarterTicks';
 import { formatSwedishDay } from '../src/lib/format/date';
 
 const QUARTER_MS = 15 * 60 * 1000;
@@ -135,6 +135,30 @@ const TICK_CASES: { name: string; run: () => void }[] = [
       assert.equal(p[8].start, '2026-10-25T00:00:00.000Z', 'första 02:00 är CEST');
       assert.deepEqual(buildHourTicks(p, 3), [0, 16, 28, 40, 52, 64, 76, 88]);
       assert.deepEqual(labels('2026-10-25', 3), ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00']);
+    },
+  },
+  {
+    name: 'buildPriceTicks: max 208 → 0–250 i steg om 50',
+    run: () => {
+      assert.deepEqual(buildPriceTicks(83.9, 208.1), { ticks: [0, 50, 100, 150, 200, 250], domain: [0, 250] });
+      assert.deepEqual(buildPriceTicks(40, 200), { ticks: [0, 50, 100, 150, 200, 250], domain: [0, 250] }, 'max 200 → topp 250 (strikt över)');
+      assert.deepEqual(buildPriceTicks(40, 199), { ticks: [0, 50, 100, 150, 200], domain: [0, 200] }, 'max 199 → topp 200');
+    },
+  },
+  {
+    name: 'buildPriceTicks: max 420 → steg 100',
+    run: () => {
+      assert.deepEqual(buildPriceTicks(40, 420), { ticks: [0, 100, 200, 300, 400, 500], domain: [0, 500] });
+      assert.deepEqual(buildPriceTicks(40, 300).ticks, [0, 50, 100, 150, 200, 250, 300, 350], '300 är inte > 300: steg 50, topp strikt över');
+    },
+  },
+  {
+    name: 'buildPriceTicks: min −12 → negativ tick −50',
+    run: () => {
+      assert.deepEqual(buildPriceTicks(-12, 95), { ticks: [-50, 0, 50, 100], domain: [-50, 100] });
+      assert.deepEqual(buildPriceTicks(-12, -3), { ticks: [-50, 0], domain: [-50, 0] }, 'bara negativa');
+      assert.deepEqual(buildPriceTicks(-50, 95).domain, [-100, 100], 'min −50 → botten −100 (strikt under)');
+      assert.deepEqual(buildPriceTicks(0, 0), { ticks: [0, 50], domain: [0, 50] }, 'platt dygn');
     },
   },
   {

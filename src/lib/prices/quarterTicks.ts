@@ -39,3 +39,23 @@ export function buildHourTicks(quarters: QuarterPoint[], everyHours: number): nu
   });
   return ticks;
 }
+
+/**
+ * Y-axelns tickar på jämna 50-tal så att axelstrecken sammanfaller med
+ * prisnivåernas gränser (50 och 100 öre). Steg 100 när max > 300 öre.
+ * Negativa tickar tas med i samma steg när min < 0. Domänen går från lägsta
+ * till högsta tick; toppen är närmaste tick strikt över max (200 → 250,
+ * 199 → 200) och botten närmaste tick strikt under min när min < 0.
+ */
+export function buildPriceTicks(
+  min: number,
+  max: number,
+): { ticks: number[]; domain: [number, number] } {
+  const step = max > 300 ? 100 : 50;
+  const bottom = min < 0 ? (Math.ceil(min / step) - 1) * step : 0;
+  // Toppen aldrig under 0 (dygn med bara negativa priser).
+  const top = Math.max(0, (Math.floor(max / step) + 1) * step);
+  const ticks: number[] = [];
+  for (let t = bottom; t <= top; t += step) ticks.push(t);
+  return { ticks, domain: [bottom, top] };
+}
