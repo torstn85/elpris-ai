@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { fetchGeoArea } from '@/lib/geo/client';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -17,18 +18,6 @@ interface ViewState {
   tomorrowAvg: number | null;
   todayAvg: number | null;
   loading: boolean;
-}
-
-const SE1_REGIONS = ['norrbotten', 'västerbotten'];
-const SE2_REGIONS = ['jämtland', 'västernorrland'];
-const SE4_REGIONS = ['skåne', 'blekinge', 'kronoberg'];
-
-function regionToArea(region: string): Area {
-  const r = region.toLowerCase();
-  if (SE1_REGIONS.some((s) => r.includes(s))) return 'SE1';
-  if (SE2_REGIONS.some((s) => r.includes(s))) return 'SE2';
-  if (SE4_REGIONS.some((s) => r.includes(s))) return 'SE4';
-  return 'SE3';
 }
 
 function priceColor(price: number): string {
@@ -51,18 +40,14 @@ export default function TomorrowPriceTeaser({ area }: Props) {
     loading: true,
   });
 
-  // Auto-detect via IP — only when no explicit area prop is set.
+  // Förval via /api/geo (Vercels geo-headers) — bara när ingen area-prop är satt.
+  // Ett manuellt val har alltid företräde, även om svaret kommer senare.
+  const pickedManually = useRef(false);
   useEffect(() => {
     if (area !== undefined) return;
-    fetch('https://api.ipapi.is')
-      .then((r) => r.json())
-      .then((data: { location?: { region?: string } }) => {
-        const region = data?.location?.region ?? '';
-        setSelectedArea(regionToArea(region));
-      })
-      .catch(() => {
-        // fallback SE3 already set as default
-      });
+    fetchGeoArea().then((detected) => {
+      if (detected && !pickedManually.current) setSelectedArea(detected);
+    });
   }, [area]);
 
   // Fetch data when selectedArea changes (manual click eller auto-detect-uppdatering)
@@ -111,7 +96,10 @@ export default function TomorrowPriceTeaser({ area }: Props) {
       {(['SE1', 'SE2', 'SE3', 'SE4'] as const).map((a) => (
         <button
           key={a}
-          onClick={() => setSelectedArea(a)}
+          onClick={() => {
+            pickedManually.current = true;
+            setSelectedArea(a);
+          }}
           aria-pressed={selectedArea === a}
           aria-label={`Välj elområde ${a}`}
           className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F3460] ${

@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
 import type { CurrentPriceResponse } from "./api/prices/current/route";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
+import { fetchGeoArea } from "@/lib/geo/client";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -80,25 +81,11 @@ function cheapestWindow(
   };
 }
 
-// ─── Region → elområde mapping ───────────────────────────────────────────────
-
-const SE1_REGIONS = ["norrbotten", "västerbotten"];
-const SE2_REGIONS = ["jämtland", "västernorrland"];
-const SE4_REGIONS = ["skåne", "blekinge", "kronoberg"];
-
 function priceAccentColor(avg: number | null): string {
   if (avg === null) return "#00E5FF";
   if (avg <= 50) return "#22C55E";
   if (avg < 100) return "#00E5FF";
   return "#EF4444";
-}
-
-function regionToArea(region: string): "SE1" | "SE2" | "SE3" | "SE4" {
-  const r = region.toLowerCase();
-  if (SE1_REGIONS.some((s) => r.includes(s))) return "SE1";
-  if (SE2_REGIONS.some((s) => r.includes(s))) return "SE2";
-  if (SE4_REGIONS.some((s) => r.includes(s))) return "SE4";
-  return "SE3";
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -152,18 +139,13 @@ export default function Home() {
     return () => clearInterval(id);
   }, [fetchToday]);
 
-  // Geolocation: detect user's Swedish region and pre-select area
+  // Förval av elområde via /api/geo (Vercels geo-headers). SE3 vid fel.
+  // Ett manuellt val har alltid företräde, även om svaret kommer senare.
+  const pickedManually = useRef(false);
   useEffect(() => {
-    fetch("https://api.ipapi.is")
-      .then((r) => r.json())
-      .then((data) => {
-        const region: string = data?.location?.region ?? "";
-        const area = regionToArea(region);
-        setSelectedArea(area);
-      })
-      .catch(() => {
-        // Fallback SE3 already set as default
-      });
+    fetchGeoArea().then((area) => {
+      if (area && !pickedManually.current) setSelectedArea(area);
+    });
   }, []);
 
   useEffect(() => {
@@ -318,7 +300,10 @@ export default function Home() {
             {(["SE1", "SE2", "SE3", "SE4"] as const).map((area) => (
               <button
                 key={area}
-                onClick={() => setSelectedArea(area)}
+                onClick={() => {
+                  pickedManually.current = true;
+                  setSelectedArea(area);
+                }}
                 className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 ${
                   selectedArea === area
                     ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
