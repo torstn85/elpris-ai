@@ -15,6 +15,7 @@ import {
   getPlayerId,
   loadHistory,
   loadProgress,
+  pruneOldDays,
   recordHistory,
   saveProgress,
   streakFor,
@@ -520,6 +521,7 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
 
   // Återställ dagens progress vid första renderingen i webbläsaren.
   useEffect(() => {
+    pruneOldDays(date);
     const saved = loadProgress(date);
     if (saved && saved.picks.length > 0) {
       const restored = saved.picks.slice(0, duels.length);

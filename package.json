@@ -11,7 +11,8 @@
     "indexnow": "node scripts/indexnow-changed.mjs | node scripts/indexnow-ping.mjs",
     "indexnow:dry": "node scripts/indexnow-changed.mjs --verbose | node scripts/indexnow-ping.mjs --dry-run",
     "test:time": "npx -y tsx scripts/check-time.ts",
-    "test:quarters": "npx -y tsx scripts/check-quarters.ts"
+    "test:quarters": "npx -y tsx scripts/check-quarters.ts",
+    "test:elduellen-storage": "npx -y tsx scripts/check-elduellen-storage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

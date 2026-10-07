@@ -96,6 +96,29 @@ export function recordHistory(date: string, score: number): HistoryEntry[] {
   return next;
 }
 
+/**
+ * Tar bort dagsnycklar (elduellen:day:{datum}) äldre än HISTORY_DAYS — samma
+ * gräns som historiken. Rör aldrig elduellen:player eller elduellen:history.
+ * Allt i try/catch: rensningen får aldrig störa spelet.
+ */
+export function pruneOldDays(today: string): void {
+  try {
+    const cutoff = addDays(today, -HISTORY_DAYS);
+    const prefix = `${PREFIX}day:`;
+    const stale: string[] = [];
+    // Samla först — att ta bort under iterationen flyttar index.
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (!key?.startsWith(prefix)) continue;
+      const date = key.slice(prefix.length);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date) && date < cutoff) stale.push(key);
+    }
+    for (const key of stale) window.localStorage.removeItem(key);
+  } catch {
+    // Lagring otillgänglig — inget att rensa.
+  }
+}
+
 /** Antal dagar i rad som spelats, räknat bakåt från `date`. */
 export function streakFor(history: HistoryEntry[], date: string): number {
   const played = new Set(history.map((e) => e.date));
