@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import ConsentManager from "@/components/ConsentManager";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,33 +40,33 @@ export default function RootLayout({
   return (
     <html lang="sv">
       <head>
-        <Script
+        {/* Consent Mode v2: allt nekat som standard, innan någon Google-tagg.
+            Ingen global gtag här — window.gtag sätts av ConsentManager först
+            vid statistiksamtycke, så att egna events inte köas före samtycke. */}
+        <script
+          id="consent-default"
+          data-cookieconsent="ignore"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];(function(){function g(){window.dataLayer.push(arguments);}g("consent","default",{ad_storage:"denied",analytics_storage:"denied",ad_user_data:"denied",ad_personalization:"denied",wait_for_update:500});})();`,
+          }}
+        />
+        {/* Cookiebot först av alla tredjepartsskript, synkront. Blockeringen av
+            GA4 och AdSense sköts av ConsentManager (strikt: skripten injiceras
+            först efter samtycke), därför blockingmode="manual". */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="025f3725-ecd4-457b-80e9-d7f2ae4d5e96"
-          data-blockingmode="auto"
-          strategy="beforeInteractive"
+          data-blockingmode="manual"
+          type="text/javascript"
         />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-CY788GRNLW"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-CY788GRNLW');
-          `}
-        </Script>
-        <Script
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7126610035053617"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
+        {/* AdSense-verifiering utan att skriptet behöver köras. */}
+        <meta name="google-adsense-account" content="ca-pub-7126610035053617" />
       </head>
       <body className="antialiased bg-bg text-white min-h-screen">
         {children}
+        <ConsentManager />
       </body>
     </html>
   );

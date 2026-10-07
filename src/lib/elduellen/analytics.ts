@@ -1,6 +1,6 @@
-// GA4-events för Elduellen. gtag laddas i layout.tsx och blockeras av Cookiebot
-// tills besökaren samtyckt till statistik — då finns window.gtag inte, och
-// anropen blir tysta no-ops.
+// GA4-events för Elduellen. window.gtag sätts av src/components/ConsentManager.tsx
+// först när besökaren samtyckt till statistik i Cookiebot — utan samtycke finns
+// den inte, och anropen blir tysta no-ops (inget köas för senare utskick).
 
 type GtagParams = Record<string, string | number | boolean>;
 
