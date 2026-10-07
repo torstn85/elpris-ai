@@ -3,6 +3,9 @@ import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
+import { formatSwedishDay } from "@/lib/format/date";
+import { addDays } from "@/lib/elduellen/dates";
+import { stockholmISODate } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -41,20 +44,10 @@ export default async function ElprisImorgon() {
   const tomorrowData = await loadTomorrowPrices();
   const areas = tomorrowData?.areas ?? null;
 
-  const tomorrow = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
-
-  const tomorrowLabel = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(`${tomorrow}T12:00:00`));
+  // Svenskt datum idag + ett kalenderdygn — inte "nu + 24 h", som blir fel
+  // första timmen på dygnet med 25 timmar (vintertid).
+  const tomorrow = addDays(stockholmISODate(), 1);
+  const tomorrowLabel = formatSwedishDay(new Date(`${tomorrow}T12:00:00Z`));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -166,7 +159,7 @@ export default async function ElprisImorgon() {
                 <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
                   Timpriser för imorgon — alla elområden
                 </h2>
-                <p className="text-[#8fafc9] text-sm capitalize mb-3">{tomorrowLabel}</p>
+                <p className="text-[#8fafc9] text-sm mb-3">{tomorrowLabel}</p>
 
                 {/* Legend */}
                 <div className="flex flex-wrap gap-5 text-xs text-[#8fafc9] mb-6">
