@@ -17,8 +17,9 @@ const config: Config = {
         muted: "#1E4976",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        tight: ["Inter Tight", "Inter", "system-ui", "sans-serif"],
+        // Självhostade via next/font (src/app/layout.tsx) — inga anrop till Google.
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        tight: ["var(--font-inter-tight)", "var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },

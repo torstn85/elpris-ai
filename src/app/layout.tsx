@@ -1,6 +1,30 @@
 import type { Metadata } from "next";
+import { Inter, Inter_Tight } from "next/font/google";
 import ConsentManager from "@/components/ConsentManager";
 import "./globals.css";
+
+// Självhostade typsnitt: next/font laddar ner filerna vid build och serverar
+// dem från /_next/static/media — besökarens webbläsare kontaktar aldrig Google.
+// Exakt samma vikter som tidigare (@import från Google Fonts i globals.css).
+const inter = Inter({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  // Ingen justerad Arial-reserv: tecken som saknas i Inter (t.ex. → U+2192)
+  // ska som tidigare tas från system-ui, inte från Arial.
+  adjustFontFallback: false,
+  variable: "--font-inter",
+});
+
+const interTight = Inter_Tight({
+  weight: ["600", "700", "800", "900"],
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  // Ingen justerad Arial-reserv: tecken som saknas i Inter (t.ex. → U+2192)
+  // ska som tidigare tas från system-ui, inte från Arial.
+  adjustFontFallback: false,
+  variable: "--font-inter-tight",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.elpris.ai"),
@@ -38,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sv">
+    <html lang="sv" className={`${inter.variable} ${interTight.variable}`}>
       <head>
         {/* Consent Mode v2: allt nekat som standard, innan någon Google-tagg.
             Ingen global gtag här — window.gtag sätts av ConsentManager först
