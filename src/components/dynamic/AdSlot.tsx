@@ -18,6 +18,14 @@ declare global {
 
 const PUBLISHER_ID = 'ca-pub-7126610035053617';
 
+/**
+ * Annonsfälten visas bara när NEXT_PUBLIC_ADS_ENABLED === "true" (avstängt tills
+ * AdSense är godkänt). Saknas flaggan renderas inget alls — ingen tom yta eller
+ * marginal. AdSense-skriptet i layout.tsx och public/ads.txt ligger kvar för
+ * verifiering.
+ */
+const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === 'true';
+
 export default function AdSlot({ slot, format = 'in-article', className = '' }: Props) {
   const insRef = useRef<HTMLModElement>(null);
 
@@ -32,6 +40,8 @@ export default function AdSlot({ slot, format = 'in-article', className = '' }: 
       console.warn('AdSense load failed:', err);
     }
   }, [slot]);
+
+  if (!ADS_ENABLED) return null;
 
   // Sticky mobile har specifik styling — bara synlig på mobil, fixerad i botten
   if (format === 'sticky-mobile') {
