@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { loadDayPrices, toQuarterPoints, type QuarterPoint } from "@/lib/prices/quarters";
 import {
   parseStockholmHour,
   stockholmDayUTCRange,
@@ -127,6 +128,20 @@ export async function loadTodayPrices(): Promise<TodayData | null> {
   try {
     const fallbackAreas = await fromElprisetjustnu(dateStr);
     return { date: isoDate, source: "elprisetjustnu", areas: fallbackAreas };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Dagens kvartspriser för ett elområde (SSR), i tidsordning — 92/96/100 st
+ * beroende på dygn. Samma data som fältet `quarters` i /api/prices/today.
+ * null om kvartsdata saknas.
+ */
+export async function getTodayQuarters(area: Area): Promise<QuarterPoint[] | null> {
+  try {
+    const day = await loadDayPrices(stockholmISODate());
+    return day ? toQuarterPoints(day[area]) : null;
   } catch {
     return null;
   }

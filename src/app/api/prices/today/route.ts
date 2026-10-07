@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { stockholmDateString, stockholmISODate, parseStockholmHour, stockholmDayUTCRange } from "@/lib/time";
+import { loadDayPrices, toQuarterPoints, type QuarterPoint } from "@/lib/prices/quarters";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -16,10 +17,18 @@ export interface HourEntry {
   ore_per_kwh: number; // averaged across the hour, 1 decimal
 }
 
+export type { QuarterPoint };
+
 export interface PricesResponse {
   date: string;
   source: "supabase" | "elprisetjustnu";
   areas: Record<Area, HourEntry[]>;
+  /**
+   * Dagens kvartspriser per elområde i tidsordning (92/96/100 st beroende på
+   * dygn), från den delade kvartsladdaren. null om kvartsdata saknas — påverkar
+   * aldrig `areas`.
+   */
+  quarters: Record<Area, QuarterPoint[]> | null;
   fetched_at: string;
 }
 
@@ -113,10 +122,29 @@ async function fromElprisetjustnu(): Promise<Record<Area, HourEntry[]>> {
   return { SE1, SE2, SE3, SE4 };
 }
 
+// ─── Kvartar ──────────────────────────────────────────────────────────────────
+
+async function loadQuarters(): Promise<Record<Area, QuarterPoint[]> | null> {
+  try {
+    const day = await loadDayPrices(stockholmISODate());
+    if (!day) return null;
+    return {
+      SE1: toQuarterPoints(day.SE1),
+      SE2: toQuarterPoints(day.SE2),
+      SE3: toQuarterPoints(day.SE3),
+      SE4: toQuarterPoints(day.SE4),
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export async function GET() {
   try {
+    // Kvartarna hämtas parallellt och får aldrig fälla timdatan.
+    const quartersPromise = loadQuarters();
     let areas = await fromSupabase();
     let source: PricesResponse["source"] = "supabase";
 
@@ -129,6 +157,7 @@ export async function GET() {
       date: stockholmDateString(),
       source,
       areas,
+      quarters: await quartersPromise,
       fetched_at: new Date().toISOString(),
     };
 
