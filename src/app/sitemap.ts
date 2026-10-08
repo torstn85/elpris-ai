@@ -113,13 +113,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${BASE_URL}/om-oss`,
-      lastModified: new Date("2026-04-24"),
+      lastModified: new Date("2026-10-08"),
       changeFrequency: "yearly",
       priority: 0.5,
     },
     {
       url: `${BASE_URL}/integritetspolicy`,
-      lastModified: new Date("2026-04-14"),
+      lastModified: new Date("2026-10-08"),
       changeFrequency: "yearly",
       priority: 0.3,
     },
