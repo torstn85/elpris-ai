@@ -8,7 +8,6 @@ import matter from 'gray-matter';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
-import Footer from '@/components/Footer';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
@@ -118,7 +117,6 @@ export default function CategoryPage({ params }: PageProps) {
             ))}
           </div>
         )}
-        <Footer className="mt-12" />
       </div>
     </div>
   );

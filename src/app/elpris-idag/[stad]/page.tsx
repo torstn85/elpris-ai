@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import NavBar from '@/components/NavBar';
-import Footer from '@/components/Footer';
 import LivePriceWidget from '@/components/dynamic/LivePriceWidget';
 import PriceGraph from '@/components/dynamic/PriceGraph';
 import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
@@ -399,7 +398,6 @@ export default async function StadPage({ params }: PageProps) {
             </ul>
           </section>
 
-          <Footer />
         </main>
       </div>
     </>

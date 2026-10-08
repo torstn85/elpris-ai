@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import ConsentManager from "@/components/ConsentManager";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 // Självhostade typsnitt: next/font laddar ner filerna vid build och serverar
@@ -90,6 +91,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-bg text-white min-h-screen">
         {children}
+        {/* Gemensam sidfot för alla sidor, utanför sidornas innehållsbehållare. */}
+        <Footer id="om-oss" />
         <ConsentManager />
       </body>
     </html>

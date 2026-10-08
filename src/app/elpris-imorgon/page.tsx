@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
 import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
 import { formatSwedishDay } from "@/lib/format/date";
 import { addDays } from "@/lib/elduellen/dates";
@@ -325,7 +324,6 @@ export default async function ElprisImorgon() {
             </div>
           </section>
 
-          <Footer />
         </div>
       </main>
     </>

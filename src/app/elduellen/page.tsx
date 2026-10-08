@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
 import Elduellen from "@/components/elduellen/Elduellen";
 import { loadDayPrices } from "@/lib/elduellen/prices";
 import { addDays, generatePuzzle } from "@/lib/elduellen/generate";
@@ -128,7 +127,6 @@ export default async function ElduellenPage() {
           </section>
         </div>
       </div>
-      <Footer />
     </main>
   );
 }

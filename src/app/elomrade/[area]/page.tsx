@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
 import SwedenMap from "@/components/SwedenMap";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
 import { CITIES } from "@/lib/cities";
@@ -367,7 +366,6 @@ export default async function ElprisArea({
 
           </div>
 
-          <Footer className="mt-12" />
         </div>
       </main>
     </>

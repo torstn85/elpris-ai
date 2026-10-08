@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import CookiebotRenewButton from "@/components/CookiebotRenewButton";
 
 export const metadata: Metadata = {
   title: "Integritetspolicy",
@@ -440,18 +439,6 @@ export default function Integritetspolicy() {
           </p>
         </Section>
 
-        {/* Footer */}
-        <div className="border-t border-[#1E4976] pt-8 flex items-center justify-between text-sm text-[#8fafc9]">
-          <span>
-            elpris<span className="text-[#00E5FF]">.ai</span>
-          </span>
-          <div className="flex items-center gap-4">
-            <CookiebotRenewButton />
-            <a href="mailto:info@elpris.ai" className="hover:text-white transition-colors">
-              info@elpris.ai
-            </a>
-          </div>
-        </div>
       </div>
     </main>
   );

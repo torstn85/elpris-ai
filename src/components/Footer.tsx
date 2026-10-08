@@ -20,9 +20,8 @@ export default function Footer({ id, className = '' }: FooterProps) {
       className={`border-t border-[#1E4976] pt-12 pb-8 ${className}`.trim()}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* ── Kolumner: anpassar sig efter behållarens bredd (sidfoten ligger även
-            i smalare behållare), en kolumn på mobil, fem på bred skärm. ── */}
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-8">
+        {/* ── Kolumner: 1 på mobil, 2 från sm, 5 från lg ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
 
           {/* Col 1: Om elpris.ai */}
           <div>
@@ -146,14 +145,13 @@ export default function Footer({ id, className = '' }: FooterProps) {
         </div>
 
         {/* ── Bottom row ── */}
-        <div className="border-t border-[#1E4976] pt-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#8fafc9]">
+        <div className="border-t border-[#1E4976] pt-6 mt-8 flex flex-col items-start gap-2 lg:flex-row lg:items-center lg:justify-between text-xs text-[#8fafc9]">
           <span>© 2026 elpris.ai</span>
-          <span className="hidden sm:block text-center">
-            Spotpris per kvart från elprisetjustnu.se · Täcker SE1–SE4
+          <span>
+            Spotpris per kvart från elprisetjustnu.se · Täcker{" "}
+            <span className="whitespace-nowrap">SE1–SE4</span>
           </span>
-          <span className="text-center sm:text-right">
-            Vägledande information, ej ekonomisk rådgivning.
-          </span>
+          <span>Vägledande information, ej ekonomisk rådgivning.</span>
         </div>
       </div>
     </footer>

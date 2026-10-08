@@ -89,12 +89,8 @@ function priceAccentColor(avg: number | null): string {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-/**
- * Startsidans klientdel. Sidfoten skickas in från serverskalet i page.tsx, så
- * att den renderas på servern och dess data (t.ex. CITIES) inte hamnar i
- * startsidans JavaScript.
- */
-export default function HomeClient({ footer }: { footer: React.ReactNode }) {
+/** Startsidans klientdel. Sidfoten renderas av root-layouten (på servern). */
+export default function HomeClient() {
   const [prices, setPrices] = useState<PricesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -519,8 +515,6 @@ export default function HomeClient({ footer }: { footer: React.ReactNode }) {
           </div>
         </section>
 
-        {/* ── 5. Trust section ── */}
-        {footer}
       </div>
     </main>
   );

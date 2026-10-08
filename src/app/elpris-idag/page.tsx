@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
 import { formatSwedishDay } from "@/lib/format/date";
@@ -473,7 +472,6 @@ export default async function ElprisIdag() {
             </div>
           </section>
 
-          <Footer />
         </div>
       </main>
     </>

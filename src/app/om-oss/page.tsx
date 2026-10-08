@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Om oss",
@@ -293,9 +292,6 @@ export default function OmOssPage() {
         </p>
       </main>
 
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <Footer />
-      </div>
     </div>
   );
 }
