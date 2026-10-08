@@ -1,5 +1,12 @@
 import Link from 'next/link';
 import CookiebotRenewButton from './CookiebotRenewButton';
+import { CITIES } from '@/lib/cities';
+
+/** Städer i kolumnen "Elpris i din stad", i visningsordning (slug i CITIES). */
+const FOOTER_CITY_SLUGS = ['stockholm', 'goteborg', 'malmo', 'uppsala', 'vasteras', 'umea'];
+const FOOTER_CITIES = FOOTER_CITY_SLUGS.map((slug) => CITIES[slug]).filter(Boolean);
+
+const GAMES_ENABLED = process.env.NEXT_PUBLIC_GAMES_ENABLED === 'true';
 
 interface FooterProps {
   id?: string;
@@ -13,8 +20,9 @@ export default function Footer({ id, className = '' }: FooterProps) {
       className={`border-t border-[#1E4976] pt-12 pb-8 ${className}`.trim()}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* ── Four columns ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        {/* ── Kolumner: anpassar sig efter behållarens bredd (sidfoten ligger även
+            i smalare behållare), en kolumn på mobil, fem på bred skärm. ── */}
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-8">
 
           {/* Col 1: Om elpris.ai */}
           <div>
@@ -22,7 +30,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
               elpris<span className="text-[#00E5FF]">.ai</span>
             </Link>
             <p className="text-xs text-[#8fafc9] mt-2 mb-4">
-              Realtidspriser och AI-rådgivning för svensk el
+              Elpriset per kvart – begripligt och lite roligare.
             </p>
             <ul className="space-y-2">
               <li>
@@ -62,6 +70,13 @@ export default function Footer({ id, className = '' }: FooterProps) {
                   Fråga AI
                 </Link>
               </li>
+              {GAMES_ENABLED && (
+                <li>
+                  <Link href="/elduellen" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                    Elduellen
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -97,7 +112,24 @@ export default function Footer({ id, className = '' }: FooterProps) {
             </ul>
           </div>
 
-          {/* Col 4: Information */}
+          {/* Col 4: Elpris i din stad */}
+          <div>
+            <h3 className="text-sm font-semibold text-white mb-3">Elpris i din stad</h3>
+            <ul className="space-y-2">
+              {FOOTER_CITIES.map((city) => (
+                <li key={city.slug}>
+                  <Link
+                    href={`/elpris-idag/${city.slug}`}
+                    className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors"
+                  >
+                    {city.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 5: Information */}
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Information</h3>
             <ul className="space-y-2">
@@ -117,7 +149,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
         <div className="border-t border-[#1E4976] pt-6 mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#8fafc9]">
           <span>© 2026 elpris.ai</span>
           <span className="hidden sm:block text-center">
-            Data från elprisetjustnu.se · Uppdateras var 15:e minut · Täcker SE1–SE4
+            Spotpris per kvart från elprisetjustnu.se · Täcker SE1–SE4
           </span>
           <span className="text-center sm:text-right">
             Vägledande information, ej ekonomisk rådgivning.
