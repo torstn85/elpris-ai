@@ -123,6 +123,7 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 - Spridningen spelar bara roll för den som flyttar förbrukning med kvarts- eller timprisavtal. Ett högre snittpris i ett elområde gör inte i sig flytt av förbrukning mer lönsam – det är spridningen som avgör.
 - För energieffektivisering (tätning, isolering, fönster, FTX) avgörs värdet i första hand av prisnivån under de timmar huset förbrukar, inte av spridningen.
 - Skriv inga fasta öreintervall för spridningen (t.ex. "ofta 30–60 öre"). Beskriv mekanismen och hänvisa till dagens diagram.
+- "Arbitrage" är ett etablerat branschord och får användas, men ska förklaras i förbigående första gången det används i en text (t.ex. "arbitrage – att ladda batteriet när elen är billig och använda strömmen när den är dyr"). Det är inte en anglicism i samma mening som "spread".
 
 ## Elnätsbolag — alltid öppen formulering
 
