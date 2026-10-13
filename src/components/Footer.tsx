@@ -47,7 +47,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
 
           {/* Col 2: Verktyg */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-3">Verktyg</h3>
+            <p className="text-sm font-semibold text-white mb-3">Verktyg</p>
             <ul className="space-y-2">
               <li>
                 <Link href="/elpris-idag" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
@@ -81,7 +81,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
 
           {/* Col 3: Guider */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-3">Guider</h3>
+            <p className="text-sm font-semibold text-white mb-3">Guider</p>
             <ul className="space-y-2">
               <li>
                 <Link href="/guider" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
@@ -113,7 +113,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
 
           {/* Col 4: Elpris i din stad */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-3">Elpris i din stad</h3>
+            <p className="text-sm font-semibold text-white mb-3">Elpris i din stad</p>
             <ul className="space-y-2">
               {FOOTER_CITIES.map((city) => (
                 <li key={city.slug}>
@@ -130,7 +130,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
 
           {/* Col 5: Information */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-3">Information</h3>
+            <p className="text-sm font-semibold text-white mb-3">Information</p>
             <ul className="space-y-2">
               <li>
                 <Link href="/integritetspolicy" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
