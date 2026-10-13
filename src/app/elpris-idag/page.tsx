@@ -36,7 +36,7 @@ const FAQS = [
   {
     question: "Var kommer prisdatan ifrån?",
     answer:
-      "Priserna är spotpriser från den nordiska elbörsen Nord Pool. Vi hämtar datan via elprisetjustnu.se och uppdaterar automatiskt.",
+      "Spotpriset sätts i den gemensamma europeiska day-ahead-auktionen, där Nord Pool är elbörsen för Norden. Vi hämtar priserna via elprisetjustnu.se, som bygger på data från ENTSO-E Transparency Platform, och uppdaterar sidan automatiskt.",
   },
 ];
 
@@ -197,21 +197,22 @@ export default async function ElprisIdag() {
               </p>
               <ul className="space-y-2 text-base text-[#8fafc9] leading-relaxed mb-4">
                 <li>
-                  <strong className="text-[#22C55E]">Grön</strong> (under 50 öre/kWh) — låg
+                  <strong className="text-[#22C55E]">Grön</strong> (≤ 50 öre/kWh) — låg
                   nivå, bra tillfälle för planerad förbrukning som tvätt, disk, laddning av elbil
                 </li>
                 <li>
-                  <strong className="text-[#00E5FF]">Cyan</strong> (50–99 öre/kWh) — normal
+                  <strong className="text-[#00E5FF]">Cyan</strong> (51–99 öre/kWh) — normal
                   nivå, ingen stor anledning att vänta
                 </li>
                 <li>
-                  <strong className="text-[#EF4444]">Röd</strong> (över 100 öre/kWh) — hög
+                  <strong className="text-[#EF4444]">Röd</strong> (≥ 100 öre/kWh) — hög
                   nivå, undvik om möjligt eller flytta förbrukning till en grön timme
                 </li>
               </ul>
               <p className="text-base text-[#8fafc9] leading-relaxed">
-                Bor du i SE3 eller SE4 har du oftare röda timmar än om du bor i SE1 eller SE2,
-                eftersom södra Sverige har högre och mer volatila priser.
+                Bor du i SE3 eller SE4 har du oftare röda timmar än i SE1 och SE2, eftersom
+                priserna i södra Sverige ofta är högre – särskilt när överföringen söderut är
+                fullt belastad.
               </p>
             </div>
           </section>

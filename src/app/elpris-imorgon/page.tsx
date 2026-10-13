@@ -102,8 +102,8 @@ export default async function ElprisImorgon() {
                     Morgondagens priser publiceras runt kl 13:15
                   </h2>
                   <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                    Elpriset för imorgon sätts varje eftermiddag på Nord Pool när all europeisk
-                    produktion och förbrukning har balanserats. Kom tillbaka efter kl 13:15 för
+                    Elpriset för imorgon sätts i den gemensamma europeiska day-ahead-auktionen.
+                    Buden stänger kl 12:00 och priserna publiceras runt kl 13:15. Kom tillbaka efter kl 13:15 för
                     att se morgondagens timpriser för alla fyra elområden.
                   </p>
                   <p className="text-base text-[#8fafc9] leading-relaxed">
@@ -138,22 +138,18 @@ export default async function ElprisImorgon() {
                   </p>
                   <ul className="space-y-2 text-base text-[#8fafc9] leading-relaxed mb-4">
                     <li>
-                      <strong className="text-[#22C55E]">Grön</strong> (under 50 öre/kWh) — bra
+                      <strong className="text-[#22C55E]">Grön</strong> (≤ 50 öre/kWh) — bra
                       timmar för planerad förbrukning, ställ in tvättmaskinen på fördröjd start
                     </li>
                     <li>
-                      <strong className="text-[#00E5FF]">Cyan</strong> (50–99 öre/kWh) — normal
+                      <strong className="text-[#00E5FF]">Cyan</strong> (51–99 öre/kWh) — normal
                       nivå, ingen större anledning att vänta
                     </li>
                     <li>
-                      <strong className="text-[#EF4444]">Röd</strong> (över 100 öre/kWh) — undvik
+                      <strong className="text-[#EF4444]">Röd</strong> (≥ 100 öre/kWh) — undvik
                       om möjligt eller flytta förbrukning till en grön timme
                     </li>
                   </ul>
-                  <p className="text-base text-[#8fafc9] leading-relaxed">
-                    Tänk på att morgondagens priser kan svänga mer än dagens — extrema pristoppar
-                    är vanligast under vintermånaderna och vid kalla, vindstilla dygn.
-                  </p>
                 </div>
               </section>
 
