@@ -12,6 +12,9 @@ import assert from 'node:assert/strict';
 import { toQuarterPoints, toQuarters } from '../src/lib/prices/quarters';
 import { buildHourTicks, buildPriceTicks, formatClock } from '../src/lib/prices/quarterTicks';
 import { formatSwedishDay } from '../src/lib/format/date';
+import { isCurrentHour, isFutureHour, quartersToHours } from '../src/lib/prices/hourly';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const QUARTER_MS = 15 * 60 * 1000;
 
@@ -170,6 +173,110 @@ const TICK_CASES: { name: string; run: () => void }[] = [
     },
   },
 ];
+
+// ─── quartersToHours (timsnitt ur kvartar) ───────────────────────────────────
+
+const hoursFor = (date: string) => quartersToHours(toQuarters(date, syntheticRows(date)));
+
+/** Oberoende kontroll av snitten: gruppera råraderna själv per UTC-timme. */
+function expectedMeans(date: string): number[] {
+  const q = toQuarters(date, syntheticRows(date));
+  const m = new Map<string, number[]>();
+  for (const x of q) {
+    const k = x.startUTC.slice(0, 13);
+    m.set(k, [...(m.get(k) ?? []), x.ore]);
+  }
+  return Array.from(m.keys()).sort().map((k) => Math.round((m.get(k)!.reduce((a, b) => a + b, 0) / m.get(k)!.length) * 10) / 10);
+}
+
+/** Riktig data från elprisetjustnu.se (scripts/fixtures) → kvartar. */
+function fixtureQuarters(date: string, area: string) {
+  const raw: { SEK_per_kWh: number; time_start: string }[] = JSON.parse(
+    readFileSync(join(__dirname, 'fixtures', `elprisetjustnu-${date}_${area}.json`), 'utf8'),
+  );
+  return toQuarters(date, raw.map((e) => ({ start: e.time_start, ore: Math.round(e.SEK_per_kWh * 10000) / 100 })));
+}
+
+TICK_CASES.push(
+  {
+    name: 'quartersToHours: 96 kvartar → 24 timmar, etiketter och snitt',
+    run: () => {
+      const h = hoursFor('2026-07-15');
+      assert.equal(h.length, 24);
+      assert.equal(new Set(h.map((x) => x.startUTC)).size, 24, 'unika startUTC');
+      assert.equal(h[0].label, '00:00–01:00');
+      assert.equal(h[14].label, '14:00–15:00');
+      assert.equal(h[23].label, '23:00–00:00', 'sista timmen skrivs 23:00–00:00');
+      assert.ok(h.every((x) => x.dst === undefined), 'ingen dst-markering en vanlig dag');
+      assert.deepEqual(h.map((x) => x.ore_per_kwh), expectedMeans('2026-07-15'));
+      assert.ok(h.every((x, i) => i === 0 || h[i - 1].startUTC < x.startUTC), 'tidsordning');
+      assert.ok(h.every((x) => Date.parse(x.endUTC) - Date.parse(x.startUTC) === 3600000), 'varje timme är 60 min');
+    },
+  },
+  {
+    name: 'quartersToHours: 92 kvartar → 23 timmar, 02 saknas',
+    run: () => {
+      const h = hoursFor('2026-03-29');
+      assert.equal(h.length, 23);
+      assert.ok(!h.some((x) => x.hour === 2), '02 ska saknas');
+      assert.deepEqual(h.slice(0, 3).map((x) => x.label), ['00:00–01:00', '01:00–02:00', '03:00–04:00']);
+      assert.deepEqual(h.map((x) => x.ore_per_kwh), expectedMeans('2026-03-29'));
+    },
+  },
+  {
+    name: 'quartersToHours: 100 kvartar → 25 timmar, dubbla 02 märkta',
+    run: () => {
+      const h = hoursFor('2026-10-25');
+      assert.equal(h.length, 25);
+      assert.equal(new Set(h.map((x) => x.startUTC)).size, 25, 'unika startUTC trots två 02');
+      const twos = h.filter((x) => x.hour === 2);
+      assert.deepEqual(twos.map((x) => x.label), ['02:00–03:00 (sommartid)', '02:00–03:00 (normaltid)']);
+      assert.deepEqual(twos.map((x) => x.dst), ['summer', 'winter']);
+      assert.deepEqual(twos.map((x) => x.startUTC), ['2026-10-25T00:00:00.000Z', '2026-10-25T01:00:00.000Z']);
+      assert.equal(h.filter((x) => x.dst).length, 2, 'bara 02-timmarna märks');
+      assert.deepEqual(h.map((x) => x.ore_per_kwh), expectedMeans('2026-10-25'));
+    },
+  },
+  {
+    name: 'isCurrentHour och isFutureHour vid gränserna (även dubbla 02)',
+    run: () => {
+      const h = hoursFor('2026-10-25');
+      const [first2, second2] = h.filter((x) => x.hour === 2);
+      const at = (iso: string) => Date.parse(iso);
+      assert.ok(isCurrentHour(first2, at('2026-10-25T00:00:00Z')), 'första 02 börjar');
+      assert.ok(isCurrentHour(first2, at('2026-10-25T00:59:59Z')));
+      assert.ok(!isCurrentHour(first2, at('2026-10-25T01:00:00Z')), 'slutet är exklusivt');
+      assert.ok(isCurrentHour(second2, at('2026-10-25T01:00:00Z')), 'andra 02 tar vid');
+      assert.equal(h.filter((x) => isCurrentHour(x, at('2026-10-25T01:30:00Z'))).length, 1, 'exakt en aktuell timme');
+      assert.ok(isFutureHour(second2, at('2026-10-25T00:30:00Z')), 'andra 02 är framtida under första');
+      assert.ok(!isFutureHour(first2, at('2026-10-25T00:30:00Z')));
+    },
+  },
+  {
+    name: 'riktig data 2025-10-26 (fixtures): 25 timmar i alla områden',
+    run: () => {
+      for (const area of ['SE1', 'SE2', 'SE3', 'SE4']) {
+        const q = fixtureQuarters('2025-10-26', area);
+        assert.equal(q.length, 100, area + ' kvartar');
+        const h = quartersToHours(q);
+        assert.equal(h.length, 25, area + ' timmar');
+        assert.deepEqual(h.filter((x) => x.dst).map((x) => x.label), ['02:00–03:00 (sommartid)', '02:00–03:00 (normaltid)']);
+      }
+    },
+  },
+  {
+    name: 'riktig data 2026-03-29 (fixtures): 23 timmar i alla områden',
+    run: () => {
+      for (const area of ['SE1', 'SE2', 'SE3', 'SE4']) {
+        const q = fixtureQuarters('2026-03-29', area);
+        assert.equal(q.length, 92, area + ' kvartar');
+        const h = quartersToHours(q);
+        assert.equal(h.length, 23, area + ' timmar');
+        assert.ok(!h.some((x) => x.hour === 2), area + ' utan 02');
+      }
+    },
+  },
+);
 
 for (const t of TICK_CASES) {
   try {
