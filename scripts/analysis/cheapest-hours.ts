@@ -13,7 +13,9 @@
 // Dygn som inte har 92, 96 eller 100 kvartar hoppas över.
 //
 // Användning:
-//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum]   (standard 2026-04-13, till och med i går)
+//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum]           (standard 2026-04-13, till och med i går)
+//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] --write   skriver även src/lib/prices/windowSpreadStats.ts
+//                                                                     (medianskillnad per fönsterlängd, över midnatt)
 
 import fs from "fs";
 import path from "path";
@@ -58,13 +60,14 @@ interface Day {
   avg: number;
   cheapestHour: number;
   dearestHour: number;
-  cheap2: Window;
-  dear2: Window;
-  cheap3: Window;
-  /** Över midnatt: får fortsätta in i nästa dygn. */
-  cheap2x: Window;
-  cheap3x: Window;
+  /** Billigaste/dyraste fönster per längd (1–4 h). in = inom dygnet, x = över midnatt. */
+  win: Record<WinLen, { in: { cheap: Window; dear: Window }; x: { cheap: Window; dear: Window } }>;
 }
+
+const WIN_LENGTHS = [1, 2, 3, 4] as const;
+type WinLen = (typeof WIN_LENGTHS)[number];
+type Variant = "in" | "x";
+const VARIANT_LABEL: Record<Variant, string> = { in: "inom dygnet ", x: "över midnatt" };
 
 const SWEDISH_DATE = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" });
 
@@ -110,11 +113,18 @@ function analyseDay(date: string, hours: HourEntry[], quarterAvg: number, next: 
     avg: quarterAvg,
     cheapestHour: cheap.hour,
     dearestHour: dear.hour,
-    cheap2: extremeWindow(hours, 2, true),
-    dear2: extremeWindow(hours, 2, false),
-    cheap3: extremeWindow(hours, 3, true),
-    cheap2x: extremeWindow([...hours, ...next.slice(0, 1)], 2, true, hours.length),
-    cheap3x: extremeWindow([...hours, ...next.slice(0, 2)], 3, true, hours.length),
+    win: Object.fromEntries(
+      WIN_LENGTHS.map((n) => {
+        const ext = [...hours, ...next.slice(0, n - 1)];
+        return [
+          n,
+          {
+            in: { cheap: extremeWindow(hours, n, true), dear: extremeWindow(hours, n, false) },
+            x: { cheap: extremeWindow(ext, n, true, hours.length), dear: extremeWindow(ext, n, false, hours.length) },
+          },
+        ];
+      }),
+    ) as Day["win"],
   };
 }
 
@@ -245,12 +255,9 @@ async function main() {
     }
   }
 
-  // ── 2. Billigaste fönster på 2 och 3 timmar ───────────────────────────────
-  for (const n of [2, 3] as const) {
-    const variants = [
-      ["inom dygnet ", (d: Day) => (n === 2 ? d.cheap2 : d.cheap3).startHour],
-      ["över midnatt", (d: Day) => (n === 2 ? d.cheap2x : d.cheap3x).startHour],
-    ] as const;
+  // ── 2. Billigaste fönster på 2–4 timmar ───────────────────────────────────
+  for (const n of [2, 3, 4] as const) {
+    const variants = (["in", "x"] as const).map((v) => [VARIANT_LABEL[v], (d: Day) => d.win[n][v].cheap.startHour] as const);
     console.log(`\n${line}\n2. Billigaste fönstret på ${n} timmar i följd — vanligaste starttimme (topp 3)\n${line}`);
     for (const a of AREAS) {
       const d = days.get(a)!;
@@ -263,28 +270,30 @@ async function main() {
     }
   }
 
-  // ── 3. Prisskillnad billigaste vs dyraste 2-timmarsfönster ────────────────
-  console.log(`\n${line}\n3. Skillnad dyraste − billigaste 2-timmarsfönster per dygn (öre/kWh, median [p25–p75])\n${line}`);
-  const spreadStr = (d: Day[]) => {
+  // ── 3. Prisskillnad dyraste − billigaste fönster, 1–4 timmar ──────────────
+  const spreadOf = (d: Day[], n: WinLen, v: Variant) => d.map((x) => x.win[n][v].dear.avg - x.win[n][v].cheap.avg);
+  const spreadStr = (d: Day[], n: WinLen, v: Variant) => {
     if (d.length === 0) return "–";
-    const s = d.map((x) => x.dear2.avg - x.cheap2.avg);
+    const s = spreadOf(d, n, v);
     return `${f1(percentile(s, 0.5))} [${f1(percentile(s, 0.25))}–${f1(percentile(s, 0.75))}]`;
   };
-  console.log("            " + AREAS.map((a) => a.padStart(20)).join(""));
-  console.log("  alla      " + AREAS.map((a) => spreadStr(days.get(a)!).padStart(20)).join(""));
-  console.log("  vardag    " + AREAS.map((a) => spreadStr(days.get(a)!.filter((x) => !isWeekend(x))).padStart(20)).join(""));
-  console.log("  helg      " + AREAS.map((a) => spreadStr(days.get(a)!.filter(isWeekend)).padStart(20)).join(""));
-  for (const m of months(days.get("SE3")!)) {
-    console.log(`  ${MONTH_NAMES[m].padEnd(10)}` + AREAS.map((a) => spreadStr(days.get(a)!.filter((x) => x.month === m)).padStart(20)).join(""));
+  for (const n of WIN_LENGTHS) {
+    for (const v of ["x", "in"] as const) {
+      console.log(`\n${line}\n3. Skillnad dyraste − billigaste ${n}-timmarsfönster per dygn, ${VARIANT_LABEL[v].trim()} (öre/kWh, median [p25–p75])\n${line}`);
+      console.log("            " + AREAS.map((a) => a.padStart(20)).join(""));
+      console.log("  alla      " + AREAS.map((a) => spreadStr(days.get(a)!, n, v).padStart(20)).join(""));
+      console.log("  vardag    " + AREAS.map((a) => spreadStr(days.get(a)!.filter((x) => !isWeekend(x)), n, v).padStart(20)).join(""));
+      console.log("  helg      " + AREAS.map((a) => spreadStr(days.get(a)!.filter(isWeekend), n, v).padStart(20)).join(""));
+      for (const m of months(days.get("SE3")!)) {
+        console.log(`  ${MONTH_NAMES[m].padEnd(10)}` + AREAS.map((a) => spreadStr(days.get(a)!.filter((x) => x.month === m), n, v).padStart(20)).join(""));
+      }
+    }
   }
 
   // ── 4. Natt mot mitt på dagen ─────────────────────────────────────────────
-  for (const [title, pick] of [
-    ["2 timmar, inom dygnet", (d: Day) => d.cheap2.startHour],
-    ["2 timmar, över midnatt", (d: Day) => d.cheap2x.startHour],
-    ["3 timmar, inom dygnet", (d: Day) => d.cheap3.startHour],
-    ["3 timmar, över midnatt", (d: Day) => d.cheap3x.startHour],
-  ] as const) {
+  for (const [title, pick] of ([2, 3, 4] as const).flatMap((n) =>
+    (["in", "x"] as const).map((v) => [`${n} timmar, ${VARIANT_LABEL[v].trim()}`, (d: Day) => d.win[n][v].cheap.startHour] as const),
+  )) {
     console.log(`\n${line}\n4. Var startar billigaste fönstret (${title})?\n   Andel dygn: natt 00–05 / dag 10–15 / övrigt (varav kväll 20–23)\n${line}`);
     const bucket = (d: Day[]) => {
       const n = d.filter((x) => pick(x) <= 5).length;
@@ -311,6 +320,40 @@ async function main() {
     );
   }
   console.log(`\n${line}\nOBS igen: bara april–oktober 2026. Vintern saknas i underlaget.\n${line}`);
+
+  if (process.argv.includes("--write")) {
+    const firstMonth = Math.min(...months(days.get("SE3")!));
+    const lastMonth = Math.max(...months(days.get("SE3")!));
+    const MONTH_LONG = ["", "januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
+    const label = `${MONTH_LONG[firstMonth]}–${MONTH_LONG[lastMonth]} ${toDate.slice(0, 4)}`;
+    const median = (n: WinLen, a: Area) => Math.round(percentile(spreadOf(days.get(a)!, n, "x"), 0.5) * 10) / 10;
+    const body = WIN_LENGTHS.map((n) => `  ${n}: { ${AREAS.map((a) => `${a}: ${median(n, a)}`).join(", ")} },`).join("\n");
+    const out = `// GENERERAD FIL — ändra inte för hand.
+// Kör: npx tsx scripts/analysis/cheapest-hours.ts ${fromDate} --write
+//
+// Medianskillnad per dygn mellan dygnets dyraste och billigaste fönster om N
+// timmar i följd (1–4), per elområde. Fönster räknas i hela timmar på
+// kvartspriserna och får fortsätta in i nästa dygn. Spotpris, öre/kWh exkl. moms.
+// Källa: elpris.ai:s egen prisdata (spot_prices).
+
+export type SpreadArea = "SE1" | "SE2" | "SE3" | "SE4";
+export type WindowHours = 1 | 2 | 3 | 4;
+
+export const WINDOW_SPREAD_PERIOD = {
+  from: "${fromDate}",
+  to: "${toDate}",
+  /** Till källraden, t.ex. "april–oktober 2026". */
+  label: "${label}",
+  daysPerArea: ${days.get("SE3")!.length},
+} as const;
+
+export const WINDOW_SPREAD_MEDIAN: Record<WindowHours, Record<SpreadArea, number>> = {
+${body}
+};
+`;
+    fs.writeFileSync("src/lib/prices/windowSpreadStats.ts", out);
+    console.log("\nSkrev src/lib/prices/windowSpreadStats.ts:\n" + out);
+  }
 }
 
 main().catch((err) => {
