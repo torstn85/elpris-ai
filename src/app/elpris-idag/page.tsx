@@ -152,8 +152,9 @@ export default async function ElprisIdag() {
                 Elpriset idag timme för timme
               </h1>
               <p className="text-sm text-[#8fafc9]">
-                {data ? dayLabel(data.date) : formatSwedishDay(fetchedAt)} · Uppdaterad kl{" "}
-                {formatClock(fetchedAt.toISOString())}
+                {data
+                  ? `${dayLabel(data.date)} · Priserna sattes i går i day-ahead-auktionen`
+                  : formatSwedishDay(fetchedAt)}
               </p>
               <p className="text-base text-[#8fafc9] leading-relaxed max-w-3xl">
                 Här ser du dagens spotpris för Sveriges fyra elområden – per kvart i diagrammet
