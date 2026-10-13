@@ -40,8 +40,8 @@ const LEGEND: { level: PriceLevel; text: string }[] = [
   { level: "expensive", text: "Dyrt ≥ 100 öre" },
 ];
 
-/** En decimal med decimalkomma, som startsidans livepris. */
-const ore1 = (v: number) => v.toFixed(1).replace(".", ",");
+/** En decimal med decimalkomma, som startsidans livepris. -0,04 visas som 0,0. */
+const ore1 = (v: number) => (Math.round(v * 10) / 10 || 0).toFixed(1).replace(".", ",");
 
 const SWEDISH_DATE = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" });
 const swedishDate = (ms: number) => SWEDISH_DATE.format(new Date(ms));
@@ -104,6 +104,7 @@ export default function QuarterPriceChart({
   area,
   placeLabel,
   headingLevel = "h2",
+  title = "Dagens elpris per kvart",
   loading = false,
 }: {
   quarters: QuarterPoint[];
@@ -111,6 +112,8 @@ export default function QuarterPriceChart({
   /** Ort, t.ex. "Göteborg" — ger underraden "Göteborg (SE3)". */
   placeLabel?: string;
   headingLevel?: "h2" | "h3";
+  /** Rubriktext. Standard: "Dagens elpris per kvart". */
+  title?: string;
   /** Visa laddningsyta i stället för tomt läge medan datan hämtas. */
   loading?: boolean;
 }) {
@@ -226,7 +229,7 @@ export default function QuarterPriceChart({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Heading className="font-bold text-2xl md:text-3xl">Dagens elpris per kvart</Heading>
+        <Heading className="font-bold text-2xl md:text-3xl">{title}</Heading>
         <p className="text-[#8fafc9] text-sm mt-1">{subline}</p>
         <p className="text-[#8fafc9] text-xs mt-0.5">
           Spotpris exkl. moms och nätavgift. Varje pris gäller i 15 minuter.
