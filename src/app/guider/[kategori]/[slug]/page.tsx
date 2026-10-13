@@ -16,6 +16,8 @@ import NavBar from '@/components/NavBar';
 import { formatMonthYear } from '@/lib/time';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
 import PageReading from "@/components/layout/PageReading";
+import { ogImageFields } from '@/lib/seo';
+import { ogGuideUrl } from '@/lib/og/images';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -52,6 +54,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { frontmatter } = article;
   const url = `https://www.elpris.ai/guider/${params.kategori}/${params.slug}`;
 
+  const image = ogImageFields({ url: ogGuideUrl(params.kategori, params.slug), alt: frontmatter.title });
+
   return {
     title: frontmatter.metaTitle || frontmatter.title,
     description: frontmatter.description,
@@ -65,11 +69,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: frontmatter.publishedAt,
       modifiedTime: frontmatter.updatedAt,
       authors: frontmatter.author ? [frontmatter.author] : undefined,
+      ...image.openGraph,
     },
     twitter: {
       card: 'summary_large_image',
       title: `${frontmatter.metaTitle || frontmatter.title} | elpris.ai`,
       description: frontmatter.description,
+      ...image.twitter,
     },
   };
 }

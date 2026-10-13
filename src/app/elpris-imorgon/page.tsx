@@ -18,6 +18,7 @@ import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
 import { loadTomorrowPrices, tomorrowISODate } from "@/lib/prices/tomorrow";
 import { cheapestWindow, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
 import { pageMeta } from "@/lib/seo";
+import { ogTomorrowUrl } from "@/lib/og/images";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -119,6 +120,10 @@ export async function generateMetadata(): Promise<Metadata> {
     path: "/elpris-imorgon",
     title: "Elpriset imorgon timme för timme – SE1–SE4",
     description,
+    image: {
+      url: ogTomorrowUrl(data?.date ?? tomorrowISODate(), data !== null),
+      alt: data ? "Elpriset imorgon – snittpris per elområde SE1–SE4" : "Elpriset imorgon publiceras runt kl 13:15",
+    },
   });
 }
 

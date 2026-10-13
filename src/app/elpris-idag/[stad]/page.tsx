@@ -14,6 +14,8 @@ import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@
 import { formatSwedishDay } from '@/lib/format/date';
 import { ore1 } from '@/lib/format/ore';
 import { pageMeta } from '@/lib/seo';
+import { ogCityUrl } from '@/lib/og/images';
+import { stockholmISODate } from '@/lib/time';
 import HourTable from '@/components/prices/HourTable';
 import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 import PageReading from "@/components/layout/PageReading";
@@ -113,6 +115,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: buildTitle(city.name, city.area),
     description: buildDescription(city.name, city.area, data),
     type: 'article',
+    image: { url: ogCityUrl(city.slug, data?.date ?? stockholmISODate()), alt: `Elpris ${city.name} idag – snittpris i ${city.area}` },
   });
   return {
     ...meta,
