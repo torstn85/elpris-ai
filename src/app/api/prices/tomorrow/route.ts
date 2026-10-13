@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadTomorrowPrices, type TomorrowData } from "@/lib/prices/tomorrow";
+import { loadTomorrowPrices, tomorrowISODate, type TomorrowData } from "@/lib/prices/tomorrow";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,15 +18,6 @@ interface TomorrowUnavailableResponse {
   available: false;
   message: string;
   date: string;
-}
-
-function tomorrowISODate(): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
 }
 
 export async function GET() {

@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server";
 import { supabase, type SpotPriceRow } from "@/lib/supabase";
-import { stockholmDateString } from "@/lib/time";
+import { stockholmDateString, stockholmISODate } from "@/lib/time";
+import { addDays } from "@/lib/dates";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
 
+/** Morgondagen som elprisetjustnu-sökväg "YYYY/MM-DD": svenskt datum + ett kalenderdygn. */
 function getTomorrowDateString(): string {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(tomorrow).replace(/-/g, "/").replace(/(\d{4})\/(\d{2})\/(\d{2})/, "$1/$2-$3");
+  const [y, m, d] = addDays(stockholmISODate(), 1).split("-");
+  return `${y}/${m}-${d}`;
 }
 
 interface RawEntry {

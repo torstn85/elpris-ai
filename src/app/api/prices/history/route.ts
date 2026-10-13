@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { fetchAllPages } from "@/lib/supabasePaging";
 import { stockholmISODate, stockholmDayUTCRange } from "@/lib/time";
+import { addDays } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,18 +20,6 @@ export interface HistoryResponse {
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
-
-function addDays(isoDate: string, days: number): string {
-  // Use noon UTC to avoid DST edge-cases when shifting days
-  const d = new Date(`${isoDate}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d);
-}
 
 function toStockholmDate(isoString: string): string {
   return new Intl.DateTimeFormat("sv-SE", {

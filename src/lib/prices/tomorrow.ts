@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
-import { parseStockholmHour, stockholmDayUTCRange } from "@/lib/time";
+import { parseStockholmHour, stockholmDayUTCRange, stockholmISODate } from "@/lib/time";
+import { addDays } from "@/lib/dates";
 
 export const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 export type Area = (typeof AREAS)[number];
@@ -18,13 +19,9 @@ export interface TomorrowData {
   areas: Record<Area, HourEntry[]>;
 }
 
-function tomorrowISODate(): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Stockholm",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(Date.now() + 24 * 60 * 60 * 1000));
+/** Morgondagens svenska datum: dagens datum + ett kalenderdygn (inte nu + 24 h). */
+export function tomorrowISODate(): string {
+  return addDays(stockholmISODate(), 1);
 }
 
 function tomorrowDateString(isoDate: string): string {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
 import { formatSwedishDay } from "@/lib/format/date";
-import { addDays } from "@/lib/elduellen/dates";
+import { addDays } from "@/lib/dates";
 import { stockholmISODate } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
