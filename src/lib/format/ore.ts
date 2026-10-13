@@ -13,3 +13,8 @@ export function kr2(v: number): string {
 export function decimal(v: number): string {
   return String(v).replace(".", ",");
 }
+
+/** Hela kronor med svensk tusentalsavgränsning, t.ex. 1 234. */
+export function krInt(v: number): string {
+  return Math.round(v).toLocaleString("sv-SE");
+}
