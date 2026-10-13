@@ -115,3 +115,60 @@ export function dayWindow(hours: HourEntry[], size: number, mode: "cheapest" | "
     avg: bestAvg,
   };
 }
+
+export interface WindowAdvice {
+  /** true = nu-fönstret ligger inom tröskeln från det billigaste kvarvarande. */
+  goodNow: boolean;
+  /** Snitt för fönstret som börjar med pågående timme (öre/kWh). */
+  nowAvg: number;
+  /** Billigaste fönster som återstår (startar nu eller senare, idag eller imorgon). */
+  best: { start: string; startUTC: string; avg: number; tomorrow: boolean };
+  /** Millisekunder från nu till bästa fönstrets start (0 om det börjar nu). */
+  waitMs: number;
+  /** Dagens spridning: dyraste − billigaste fönster över hela dygnet (öre/kWh). */
+  daySpread: number;
+}
+
+/**
+ * Råd för en aktivitet som tar `size` timmar: är det ett bra läge nu, eller
+ * lönar det sig att vänta? Relativt dagens priser, utan fast öretröskel:
+ *
+ *   bra läge  ⇔  nuSnitt ≤ bästaKvarvarande + threshold × dagensSpridning
+ *
+ * där dagensSpridning = dyraste − billigaste fönster om `size` timmar över hela
+ * dygnet. Kvarvarande fönster får starta från pågående timme och framåt, och
+ * fortsätta in i morgondagen om dess priser finns (`tomorrow`, annars []).
+ * Klarar 23/25-timmarsdygn (räknar i HourEntry-ordning, inte klocktimmar).
+ * null om pågående timme inte finns i `today`.
+ */
+export function windowAdvice(
+  today: HourEntry[],
+  tomorrow: HourEntry[],
+  size: number,
+  nowMs: number,
+  threshold = 0.1,
+): WindowAdvice | null {
+  const i = today.findIndex((h) => Date.parse(h.startUTC) <= nowMs && nowMs < Date.parse(h.endUTC));
+  if (i < 0) return null;
+  const all = [...today, ...tomorrow];
+  const mean = (hs: HourEntry[]) => hs.reduce((s, h) => s + h.ore_per_kwh, 0) / hs.length;
+
+  const nowAvg = mean(all.slice(i, i + size));
+  // Kandidater: hela fönster från pågående timme och framåt; finns inga, resten av dygnet.
+  let best = { index: i, avg: nowAvg };
+  for (let k = i; k + size <= all.length; k++) {
+    const avg = mean(all.slice(k, k + size));
+    if (avg < best.avg) best = { index: k, avg };
+  }
+  const cheap = dayWindow(today, size, "cheapest");
+  const dear = dayWindow(today, size, "dearest");
+  const daySpread = cheap && dear ? dear.avg - cheap.avg : 0;
+  const startHour = all[best.index];
+  return {
+    goodNow: nowAvg <= best.avg + threshold * daySpread,
+    nowAvg,
+    best: { start: formatClock(startHour.startUTC), startUTC: startHour.startUTC, avg: best.avg, tomorrow: best.index >= today.length },
+    waitMs: Math.max(0, Date.parse(startHour.startUTC) - nowMs),
+    daySpread,
+  };
+}

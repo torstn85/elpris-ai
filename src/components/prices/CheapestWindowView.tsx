@@ -11,7 +11,7 @@ import { decimal, kr2, ore1 } from "@/lib/format/ore";
 import { formatSwedishDay } from "@/lib/format/date";
 import type { HourEntry } from "@/lib/prices/hourly";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
-import { cheapestWindow, dayWindow, type DayWindow } from "@/lib/prices/todaySummary";
+import { cheapestWindow, dayWindow, windowAdvice, type DayWindow } from "@/lib/prices/todaySummary";
 
 type Area = "SE1" | "SE2" | "SE3" | "SE4";
 const AREAS: Area[] = ["SE1", "SE2", "SE3", "SE4"];
@@ -25,6 +25,20 @@ export interface WindowData {
 }
 
 const TICK_MS = 30_000;
+/**
+ * "Bra läge nu" om fönstret som börjar nu kostar högst så här stor andel av
+ * dagens spridning (dyraste − billigaste fönster) mer än det billigaste som
+ * återstår. Relativt dagens priser — ingen fast öretröskel.
+ */
+export const ADVICE_THRESHOLD = 0.1;
+const HOUR_MS = 60 * 60 * 1000;
+
+/** "vänta under en timme" / "vänta ca 1 timme" / "vänta ca 5 timmar". */
+function waitText(ms: number): string {
+  if (ms < HOUR_MS) return "vänta under en timme";
+  const n = Math.round(ms / HOUR_MS);
+  return `vänta ca ${n} ${n === 1 ? "timme" : "timmar"}`;
+}
 const TOMORROW_POLL_MS = 60_000;
 const PUBLISH_POLL_FROM_MIN = 13 * 60 + 10;
 
@@ -145,9 +159,12 @@ export default function CheapestWindowView({
   const tomorrowHours = data.tomorrow?.[area] ?? [];
   const tomorrowCheap = dayWindow(tomorrowHours, size, "cheapest");
   const saving = cheap && dear && kwh !== null ? (kwh * (dear.avg - cheap.avg)) / 100 * 1.25 : null;
+  const advice = windowAdvice(hours, tomorrowHours, size, now, ADVICE_THRESHOLD);
+  const waitSaving = advice && kwh !== null ? (kwh * (advice.nowAvg - advice.best.avg)) / 100 * 1.25 : null;
 
+  // not-prose: guidernas typografistilar ska inte ändra komponentens rubrik och avstånd.
   return (
-    <section className="my-8 rounded-2xl bg-[#0F3460] border border-[#1E4976] p-5 sm:p-6">
+    <section className="not-prose my-8 rounded-2xl bg-[#0F3460] border border-[#1E4976] p-5 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-1">
         <h3 className="text-lg font-bold text-white">
           Billigast att {activity} idag i {area}
@@ -175,6 +192,26 @@ export default function CheapestWindowView({
         {size} timmar i följd{kwh !== null ? ` · ${decimal(kwh)} kWh per pass` : ""}
         {data.todayDate ? ` · ${dayLabel(data.todayDate)}` : ""}
       </p>
+
+      {advice && (
+        <p
+          className={`mb-3 rounded-xl px-4 py-3 text-base font-semibold ${
+            advice.goodNow ? "bg-[#22C55E]/15 text-[#22C55E]" : "bg-[#00E5FF]/10 text-[#00E5FF]"
+          }`}
+          aria-live="polite"
+        >
+          {advice.goodNow ? (
+            <>Bra läge att {activity} nu</>
+          ) : (
+            <>
+              Billigare {advice.best.tomorrow ? "imorgon " : ""}kl {advice.best.start} – {waitText(advice.waitMs)}
+              {waitSaving !== null && (
+                <span className="font-normal text-[#8fafc9]"> (sparar ≈ {kr2(waitSaving)} kr)</span>
+              )}
+            </>
+          )}
+        </p>
+      )}
 
       {!cheap || !dear ? (
         <p className="text-sm text-[#8fafc9]">Dagens priser är inte tillgängliga just nu.</p>
