@@ -3,6 +3,7 @@ import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import SwedenMap from "@/components/SwedenMap";
 import { pageMeta } from "@/lib/seo";
+import PageWide from "@/components/layout/PageWide";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -44,7 +45,7 @@ export default function ElomradenPage() {
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <div className="max-w-4xl mx-auto px-6 py-12 flex flex-col gap-12">
+        <PageWide className="py-12 flex flex-col gap-12">
 
           {/* ── Header ── */}
           <section className="flex flex-col gap-4">
@@ -216,7 +217,7 @@ export default function ElomradenPage() {
           </div>
 
 
-        </div>
+        </PageWide>
       </main>
     </>
   );

@@ -19,7 +19,7 @@ export default function Footer({ id, className = '' }: FooterProps) {
       id={id}
       className={`border-t border-[#1E4976] pt-12 pb-8 ${className}`.trim()}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-6xl mx-auto px-6">
         {/* ── Kolumner: 1 på mobil, 2 från sm, 5 från lg ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
 

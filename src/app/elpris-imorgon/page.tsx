@@ -6,6 +6,7 @@ import { formatSwedishDay } from "@/lib/format/date";
 import { addDays } from "@/lib/dates";
 import { stockholmISODate } from "@/lib/time";
 import { pageMeta } from "@/lib/seo";
+import PageWide from "@/components/layout/PageWide";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -71,7 +72,7 @@ export default async function ElprisImorgon() {
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
+        <PageWide className="py-12 flex flex-col gap-12">
 
           {/* ── Header ── */}
           <section className="flex flex-col gap-3">
@@ -323,7 +324,7 @@ export default async function ElprisImorgon() {
             </div>
           </section>
 
-        </div>
+        </PageWide>
       </main>
     </>
   );

@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
 import { pageMeta } from "@/lib/seo";
+import PageWide from "@/components/layout/PageWide";
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -68,7 +69,7 @@ export default function GuiderPage() {
     <div className="min-h-screen bg-[#0A2540] text-white">
       <NavBar />
 
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
+      <PageWide className="py-12">
         <header className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Guider om elpriser
@@ -88,7 +89,7 @@ export default function GuiderPage() {
                 <h2 className="text-2xl font-bold text-cyan-400 mb-6">
                   {CATEGORY_LABELS[category] || category}
                 </h2>
-                <div className="grid gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {items.map((article) => (
                     <a
                       key={article.slug}
@@ -111,7 +112,7 @@ export default function GuiderPage() {
             ))}
           </div>
         )}
-      </div>
+      </PageWide>
     </div>
   );
 }

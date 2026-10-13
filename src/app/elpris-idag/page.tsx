@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import { isCurrentHour } from "@/lib/prices/hourly";
 import { loadTodayPrices, type HourEntry } from "@/lib/prices/today";
 import { formatSwedishDay } from "@/lib/format/date";
+import PageWide from "@/components/layout/PageWide";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -165,7 +166,7 @@ export default async function ElprisIdag() {
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
+        <PageWide className="py-12 flex flex-col gap-12">
 
           {/* ── Header ── */}
           <section className="flex flex-col gap-3">
@@ -428,7 +429,7 @@ export default async function ElprisIdag() {
             </div>
           </section>
 
-        </div>
+        </PageWide>
       </main>
     </>
   );

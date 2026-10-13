@@ -5,6 +5,7 @@ import SwedenMap from "@/components/SwedenMap";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
 import { CITIES } from "@/lib/cities";
 import { pageMeta } from "@/lib/seo";
+import PageWide from "@/components/layout/PageWide";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -239,7 +240,7 @@ export default async function ElprisArea({
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col items-center">
+        <PageWide className="py-12 flex flex-col items-center">
 
           {/* ── Header ── */}
           <section className="w-full flex flex-col gap-3">
@@ -368,7 +369,7 @@ export default async function ElprisArea({
 
           </div>
 
-        </div>
+        </PageWide>
       </main>
     </>
   );

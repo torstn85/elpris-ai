@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import { pageMeta } from "@/lib/seo";
+import PageReading from "@/components/layout/PageReading";
 
 export const metadata: Metadata = pageMeta({
   path: "/integritetspolicy",
@@ -123,7 +124,7 @@ export default function Integritetspolicy() {
       {/* Nav */}
       <NavBar />
 
-      <div className="max-w-4xl mx-auto px-6 py-14 flex flex-col gap-12">
+      <PageReading className="py-14 flex flex-col gap-12">
         {/* Header */}
         <div className="flex flex-col gap-3">
           <p className="text-[#00E5FF] text-sm font-medium uppercase tracking-wider">
@@ -441,7 +442,7 @@ export default function Integritetspolicy() {
           </p>
         </Section>
 
-      </div>
+      </PageReading>
     </main>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import { pageMeta } from "@/lib/seo";
+import PageReading from "@/components/layout/PageReading";
 
 export const metadata: Metadata = pageMeta({
   path: "/om-oss",
@@ -36,7 +37,7 @@ export default function OmOssPage() {
       />
       <NavBar />
 
-      <main className="max-w-3xl mx-auto px-4 py-12 md:py-16">
+      <PageReading as="main" className="py-12 md:py-16">
         <h1 className="text-3xl md:text-4xl font-bold mb-8">Om elpris.ai</h1>
 
         <div className="space-y-5 text-slate-200 leading-relaxed">
@@ -289,7 +290,7 @@ export default function OmOssPage() {
         <p className="text-xs text-[#8fafc9]/60 mt-12 italic">
           Senast uppdaterad: 8 oktober 2026
         </p>
-      </main>
+      </PageReading>
 
     </div>
   );

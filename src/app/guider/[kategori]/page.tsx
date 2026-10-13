@@ -10,6 +10,7 @@ import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
 import { pageMeta } from "@/lib/seo";
+import PageWide from "@/components/layout/PageWide";
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -77,7 +78,7 @@ export default function CategoryPage({ params }: PageProps) {
     <div className="min-h-screen bg-[#0A2540] text-white">
       <NavBar />
 
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
+      <PageWide className="py-12">
         <nav className="text-xs text-slate-400 mb-6 flex items-center gap-2">
           <a href="/" className="hover:text-cyan-400 transition">Hem</a>
           <span>/</span>
@@ -98,7 +99,7 @@ export default function CategoryPage({ params }: PageProps) {
         {articles.length === 0 ? (
           <p className="text-slate-400">Inga guider i denna kategori än. Kom snart tillbaka!</p>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {articles.map((article) => (
               <a
                 key={article.slug}
@@ -118,7 +119,7 @@ export default function CategoryPage({ params }: PageProps) {
             ))}
           </div>
         )}
-      </div>
+      </PageWide>
     </div>
   );
 }

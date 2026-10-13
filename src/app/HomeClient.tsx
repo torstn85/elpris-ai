@@ -10,6 +10,7 @@ import type { CurrentPriceResponse } from "./api/prices/current/route";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { fetchGeoArea } from "@/lib/geo/client";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
+import PageWide from "@/components/layout/PageWide";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -234,7 +235,7 @@ export default function HomeClient() {
       {/* ── Nav ── */}
       <NavBar />
 
-      <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12">
+      <PageWide className="py-12 flex flex-col gap-12">
         {/* ── 1. Hero ── */}
         <section className="flex flex-col items-center text-center gap-6 pt-8">
           {/* Live badge */}
@@ -517,7 +518,7 @@ export default function HomeClient() {
           </div>
         </section>
 
-      </div>
+      </PageWide>
     </main>
   );
 }

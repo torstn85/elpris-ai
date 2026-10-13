@@ -15,6 +15,7 @@ import FaqAccordion, { type FaqItem } from '@/components/dynamic/FaqAccordion';
 import NavBar from '@/components/NavBar';
 import { formatMonthYear } from '@/lib/time';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
+import PageReading from "@/components/layout/PageReading";
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -159,7 +160,7 @@ export default function ArticlePage({ params }: PageProps) {
       <div className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <article className="mx-auto max-w-3xl px-4 sm:px-6 py-8 sm:py-12">
+        <PageReading as="article" className="py-8 sm:py-12">
           <nav className="text-xs text-slate-400 mb-6 flex items-center gap-2 flex-wrap">
             <a href="/" className="hover:text-cyan-400 transition">Hem</a>
             <span>/</span>
@@ -261,9 +262,7 @@ export default function ArticlePage({ params }: PageProps) {
               ← Tillbaka till alla guider
             </a>
           </div>
-        </article>
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        </div>
+        </PageReading>
       </div>
     </>
   );

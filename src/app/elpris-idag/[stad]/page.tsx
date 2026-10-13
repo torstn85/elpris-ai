@@ -10,6 +10,7 @@ import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
 import { isCurrentHour } from '@/lib/prices/hourly';
 import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
+import PageReading from "@/components/layout/PageReading";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -229,7 +230,7 @@ export default async function StadPage({ params }: PageProps) {
       <div className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <PageReading as="main" className="py-8 sm:py-12">
           <nav className="text-xs text-[#8fafc9] mb-6 flex items-center gap-2 flex-wrap">
             <Link href="/" className="hover:text-[#00E5FF] transition-colors">
               Hem
@@ -400,7 +401,7 @@ export default async function StadPage({ params }: PageProps) {
             </ul>
           </section>
 
-        </main>
+        </PageReading>
       </div>
     </>
   );
