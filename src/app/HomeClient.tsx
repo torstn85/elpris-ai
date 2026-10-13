@@ -381,8 +381,8 @@ export default function HomeClient() {
               Sverige är indelat i{" "}
               <Link href="/elomrade" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">fyra elområden</Link>
               {" "}där priserna kan skilja sig markant beroende på var produktionen av el
-              sker och hur överföringskapaciteten ser ut. Bor du i söder har du historiskt
-              haft högre och mer volatila priser än norra Sverige.
+              sker och hur överföringskapaciteten ser ut. Bor du i söder är priserna
+              ofta högre än i norra Sverige – särskilt när överföringen söderut är fullt belastad.
             </p>
             {/* Stycke 3 */}
             <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
