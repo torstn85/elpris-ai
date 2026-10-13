@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import { supabase } from "@/lib/supabase";
-import { stockholmISODate, stockholmHour, stockholmDayUTCRange } from "@/lib/time";
+import { stockholmHour } from "@/lib/time";
+import { loadTodayPrices, type HourEntry } from "@/lib/prices/today";
 import { formatSwedishDay } from "@/lib/format/date";
 
 export const dynamic = "force-dynamic";
@@ -40,11 +40,6 @@ const FAQS = [
   },
 ];
 
-interface HourEntry {
-  hour: number;
-  ore_per_kwh: number;
-}
-
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
@@ -72,49 +67,10 @@ export const metadata: Metadata = {
 
 // ─── Data fetching ────────────────────────────────────────────────────────────
 
+// Timsnitt ur den delade kvartsladdaren (src/lib/prices/today.ts) — samma data
+// som /api/prices/today. 23/24/25 timmar beroende på dygn.
 async function fetchTodayPrices(): Promise<Record<Area, HourEntry[]> | null> {
-  const isoDate = stockholmISODate();
-  const { from, to } = stockholmDayUTCRange(isoDate);
-
-  const { data, error } = await supabase
-    .from("spot_prices")
-    .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", from)
-    .lte("delivery_period_start", to)
-    .order("delivery_period_start");
-
-  if (error || !data || data.length === 0) return null;
-
-  const grouped: Record<string, { sum: number; count: number }[]> = {};
-  for (const row of data) {
-    const hour = new Date(row.delivery_period_start).toLocaleString("sv-SE", {
-      timeZone: "Europe/Stockholm",
-      hour: "numeric",
-      hour12: false,
-    });
-    const h = parseInt(hour, 10);
-    if (!grouped[row.area]) grouped[row.area] = Array.from({ length: 24 }, () => ({ sum: 0, count: 0 }));
-    grouped[row.area][h].sum += row.ore_per_kwh;
-    grouped[row.area][h].count += 1;
-  }
-
-  const toEntries = (area: string): HourEntry[] =>
-    (grouped[area] ?? [])
-      .map((bucket, hour) =>
-        bucket.count > 0
-          ? { hour, ore_per_kwh: Math.round((bucket.sum / bucket.count) * 10) / 10 }
-          : null
-      )
-      .filter((e): e is HourEntry => e !== null);
-
-  if (!AREAS.every((a) => toEntries(a).length > 0)) return null;
-
-  return {
-    SE1: toEntries("SE1"),
-    SE2: toEntries("SE2"),
-    SE3: toEntries("SE3"),
-    SE4: toEntries("SE4"),
-  };
+  return (await loadTodayPrices())?.areas ?? null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -1,133 +1,42 @@
-import { supabase } from "@/lib/supabase";
-import { loadDayPrices, toQuarterPoints, type QuarterPoint } from "@/lib/prices/quarters";
-import {
-  parseStockholmHour,
-  stockholmDayUTCRange,
-  stockholmISODate,
-  stockholmDateString,
-} from "@/lib/time";
+// Dagens priser (SSR och /api/prices/today): timsnitt och kvartar ur samma
+// laddning — en databasfråga, Supabase först och elprisetjustnu.se som reserv.
+
+import { loadDayPricesDetailed, toQuarterPoints, type DaySource, type QuarterPoint } from "@/lib/prices/quarters";
+import { quartersToHours, type HourEntry } from "@/lib/prices/hourly";
+import { stockholmISODate } from "@/lib/time";
 
 export const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 export type Area = (typeof AREAS)[number];
+export type { HourEntry };
 
-export interface HourEntry {
-  hour: number;
-  time_start: string;
-  ore_per_kwh: number;
-}
-
-export type TodaySource = "supabase" | "elprisetjustnu";
+export type TodaySource = DaySource;
 
 export interface TodayData {
+  /** Svenskt datum, ISO (YYYY-MM-DD). */
   date: string;
   source: TodaySource;
+  /** Timsnitt per område — 23, 24 eller 25 timmar beroende på dygn. */
   areas: Record<Area, HourEntry[]>;
-}
-
-interface RawSlot {
-  time_start: string;
-  ore_per_kwh: number;
-}
-
-function aggregateToHourly(slots: RawSlot[]): HourEntry[] {
-  const buckets = new Map<number, RawSlot[]>();
-  for (const slot of slots) {
-    const hour = parseStockholmHour(slot.time_start);
-    if (!buckets.has(hour)) buckets.set(hour, []);
-    buckets.get(hour)!.push(slot);
-  }
-  return Array.from(buckets.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([hour, items]) => ({
-      hour,
-      time_start: items[0].time_start,
-      ore_per_kwh:
-        Math.round(
-          (items.reduce((s, i) => s + i.ore_per_kwh, 0) / items.length) * 10
-        ) / 10,
-    }));
-}
-
-async function fromSupabase(
-  isoDate: string,
-): Promise<Record<Area, HourEntry[]> | null> {
-  const { from, to } = stockholmDayUTCRange(isoDate);
-  const { data, error } = await supabase
-    .from("spot_prices")
-    .select("area, delivery_period_start, ore_per_kwh")
-    .gte("delivery_period_start", from)
-    .lte("delivery_period_start", to)
-    .order("delivery_period_start");
-
-  if (error || !data || data.length === 0) return null;
-
-  const grouped: Record<string, RawSlot[]> = {};
-  for (const row of data) {
-    if (!grouped[row.area]) grouped[row.area] = [];
-    grouped[row.area].push({
-      time_start: row.delivery_period_start,
-      ore_per_kwh: row.ore_per_kwh,
-    });
-  }
-
-  if (!AREAS.every((a) => (grouped[a]?.length ?? 0) > 0)) return null;
-
-  return {
-    SE1: aggregateToHourly(grouped["SE1"]),
-    SE2: aggregateToHourly(grouped["SE2"]),
-    SE3: aggregateToHourly(grouped["SE3"]),
-    SE4: aggregateToHourly(grouped["SE4"]),
-  };
-}
-
-interface RawEntry {
-  SEK_per_kWh: number;
-  time_start: string;
-  time_end: string;
-}
-
-async function fetchArea(area: Area, dateStr: string): Promise<HourEntry[]> {
-  const url = `https://www.elprisetjustnu.se/api/v1/prices/${dateStr}_${area}.json`;
-  const res = await fetch(url, { next: { revalidate: 900 } });
-  if (!res.ok) throw new Error(`Failed to fetch ${area}: ${res.status}`);
-  const data: RawEntry[] = await res.json();
-  return aggregateToHourly(
-    data.map((e) => ({
-      time_start: e.time_start,
-      ore_per_kwh: Math.round(e.SEK_per_kWh * 10000) / 100,
-    }))
-  );
-}
-
-async function fromElprisetjustnu(
-  dateStr: string,
-): Promise<Record<Area, HourEntry[]>> {
-  const [SE1, SE2, SE3, SE4] = await Promise.all(
-    AREAS.map((area) => fetchArea(area, dateStr))
-  );
-  return { SE1, SE2, SE3, SE4 };
+  /** Kvartspriser per område — 92, 96 eller 100 kvartar beroende på dygn. */
+  quarters: Record<Area, QuarterPoint[]>;
 }
 
 /**
- * Loads today's hourly prices. Tries Supabase first, then falls back to
- * elprisetjustnu.se. Returns null only when BOTH sources fail — the caller
- * then renders the skeleton/error fallback instead of SSR:ed prices.
- *
- * Mirrors loadTomorrowPrices() (src/lib/prices/tomorrow.ts) so the same
- * initialData/SSR pattern can be reused on the city pages.
+ * Dagens priser för alla fyra elområden. `isoDate` används av testskript
+ * (scripts/check-dst-days.ts); sidorna anropar utan argument. null om data
+ * saknas i båda källorna.
  */
-export async function loadTodayPrices(): Promise<TodayData | null> {
-  const isoDate = stockholmISODate();
-  const dateStr = stockholmDateString();
-
-  const supabaseAreas = await fromSupabase(isoDate);
-  if (supabaseAreas) {
-    return { date: isoDate, source: "supabase", areas: supabaseAreas };
-  }
-
+export async function loadTodayPrices(isoDate: string = stockholmISODate()): Promise<TodayData | null> {
   try {
-    const fallbackAreas = await fromElprisetjustnu(dateStr);
-    return { date: isoDate, source: "elprisetjustnu", areas: fallbackAreas };
+    const day = await loadDayPricesDetailed(isoDate);
+    if (!day) return null;
+    const areas = {} as Record<Area, HourEntry[]>;
+    const quarters = {} as Record<Area, QuarterPoint[]>;
+    for (const a of AREAS) {
+      areas[a] = quartersToHours(day.areas[a]);
+      quarters[a] = toQuarterPoints(day.areas[a]);
+    }
+    return { date: isoDate, source: day.source, areas, quarters };
   } catch {
     return null;
   }
@@ -139,10 +48,5 @@ export async function loadTodayPrices(): Promise<TodayData | null> {
  * null om kvartsdata saknas.
  */
 export async function getTodayQuarters(area: Area): Promise<QuarterPoint[] | null> {
-  try {
-    const day = await loadDayPrices(stockholmISODate());
-    return day ? toQuarterPoints(day[area]) : null;
-  } catch {
-    return null;
-  }
+  return (await loadTodayPrices())?.quarters[area] ?? null;
 }

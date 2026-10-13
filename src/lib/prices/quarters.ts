@@ -126,11 +126,23 @@ async function fromElprisetjustnu(isoDate: string): Promise<DayPrices | null> {
   }
 }
 
+export type DaySource = "supabase" | "elprisetjustnu";
+
+/** Dygnets kvartspriser plus vilken källa de kom från. `null` om data saknas. */
+export async function loadDayPricesDetailed(
+  isoDate: string,
+): Promise<{ areas: DayPrices; source: DaySource } | null> {
+  const fromDb = await fromSupabase(isoDate);
+  if (fromDb) return { areas: fromDb, source: "supabase" };
+  const fromApi = await fromElprisetjustnu(isoDate);
+  return fromApi ? { areas: fromApi, source: "elprisetjustnu" } : null;
+}
+
 /** Dygnets kvartspriser för alla fyra elområden. `null` om data saknas. */
 export async function loadDayPrices(
   isoDate: string,
 ): Promise<DayPrices | null> {
-  return (await fromSupabase(isoDate)) ?? (await fromElprisetjustnu(isoDate));
+  return (await loadDayPricesDetailed(isoDate))?.areas ?? null;
 }
 
 /** Kvart i API-format: starttid i UTC (ISO) och spotpris i öre/kWh exkl. moms. */
