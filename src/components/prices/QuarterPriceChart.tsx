@@ -105,6 +105,7 @@ export default function QuarterPriceChart({
   placeLabel,
   headingLevel = "h2",
   title = "Dagens elpris per kvart",
+  showStats = true,
   loading = false,
 }: {
   quarters: QuarterPoint[];
@@ -114,6 +115,8 @@ export default function QuarterPriceChart({
   headingLevel?: "h2" | "h3";
   /** Rubriktext. Standard: "Dagens elpris per kvart". */
   title?: string;
+  /** Visa raden "Snitt · Lägst · Högst" under diagrammet. Döljs där sidan själv visar nyckeltalen. */
+  showStats?: boolean;
   /** Visa laddningsyta i stället för tomt läge medan datan hämtas. */
   loading?: boolean;
 }) {
@@ -367,7 +370,7 @@ export default function QuarterPriceChart({
               )}
             </div>
 
-            {stats && (
+            {stats && showStats && (
               <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#cfe0f0]">
                 <span>Snitt {ore1(stats.avg)} öre</span>
                 <span>

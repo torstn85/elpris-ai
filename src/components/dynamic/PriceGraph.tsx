@@ -20,6 +20,8 @@ interface Props {
   initialQuarters?: QuarterPoint[] | null;
   /** Ort, t.ex. "Göteborg" — ger underraden "Göteborg (SE3)". */
   placeLabel?: string;
+  /** Visa diagrammets statistikrad (snitt, lägst, högst). Standard: ja. */
+  showStats?: boolean;
 }
 
 const SWEDISH_DATE = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' });
@@ -31,6 +33,7 @@ export default function PriceGraph({
   caption,
   initialQuarters = null,
   placeLabel,
+  showStats = true,
 }: Props) {
   const seed = initialQuarters && initialQuarters.length > 0 ? initialQuarters : null;
   const [quarters, setQuarters] = useState<QuarterPoint[]>(seed ?? []);
@@ -76,6 +79,7 @@ export default function PriceGraph({
         quarters={quarters}
         area={area}
         placeLabel={placeLabel}
+        showStats={showStats}
         headingLevel="h3"
         loading={loading}
       />

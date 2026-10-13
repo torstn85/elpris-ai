@@ -1,14 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import NavBar from '@/components/NavBar';
 import LivePriceWidget from '@/components/dynamic/LivePriceWidget';
 import PriceGraph from '@/components/dynamic/PriceGraph';
-import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
-import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
+import { loadTomorrowPrices } from '@/lib/prices/tomorrow';
 import { isCurrentHour } from '@/lib/prices/hourly';
+import { formatClock } from '@/lib/prices/quarterTicks';
+import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
+import { formatSwedishDay } from '@/lib/format/date';
+import { ore1 } from '@/lib/format/ore';
+import { pageMeta } from '@/lib/seo';
+import HourTable from '@/components/prices/HourTable';
 import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 import PageReading from "@/components/layout/PageReading";
 
@@ -25,7 +31,7 @@ interface PageProps {
 const PUBLISHED_AT = '2026-05-05';
 // Datum för senaste TEXTändring på sidan (denna commit) — används för
 // article:modified_time / dateModified. INTE request-tidsstämpeln.
-const MODIFIED_AT = '2026-10-07';
+const MODIFIED_AT = '2026-10-13';
 
 const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
   SE1: ['Luleå', 'Kiruna', 'Skellefteå'],
@@ -37,15 +43,27 @@ const EXAMPLE_CITIES_BY_AREA: Record<Area, string[]> = {
 const LINK_CLASS =
   'font-semibold text-[#00E5FF] hover:text-white underline transition-colors duration-150';
 
-function buildTitle(name: string): string {
-  const full = `Elpris idag i ${name} — timme för timme`;
-  if (full.length <= 60) return full;
-  return `Elpris idag i ${name}`;
+function buildTitle(name: string, area: Area): string {
+  return `Elpris ${name} idag – timme för timme (${area})`;
 }
 
-function buildDescription(name: string, area: Area): string {
-  return `Aktuellt spotpris i ${name} (${area}). Se dagens timpriser, billigaste timmarna och planera din elanvändning. Live-data uppdateras var 15:e minut.`;
+/** Dynamisk beskrivning från dagens data; reservtext när data saknas. */
+function buildDescription(
+  name: string,
+  area: Area,
+  today: Awaited<ReturnType<typeof loadTodayPrices>>,
+): string {
+  if (!today) {
+    return `Se dagens elpris i ${name} timme för timme och per kvart – spotpris för ${area}, billigaste timmarna och tips för att spara.`;
+  }
+  const day = formatSwedishDay(new Date(`${today.date}T12:00:00Z`));
+  const avg = Math.round(quarterAverage(today.quarters[area]));
+  const cheap = cheapestHour(today.areas[area]);
+  return `Elpriset i ${name} idag ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg} öre/kWh i ${area}, billigast kl ${cheap.label}. Se spotpriset timme för timme och per kvart.`;
 }
+
+// En laddning per förfrågan, delad av generateMetadata och sidan.
+const getToday = cache(async () => ({ data: await loadTodayPrices(), fetchedAt: new Date() }));
 
 function otherCitiesInArea(name: string, area: Area): string[] {
   return EXAMPLE_CITIES_BY_AREA[area].filter(
@@ -86,18 +104,20 @@ export function generateStaticParams() {
   return Object.keys(CITIES).map((slug) => ({ stad: slug }));
 }
 
-export function generateMetadata({ params }: PageProps): Metadata {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const city = getCity(params.stad);
   if (!city) return {};
-  const url = `https://www.elpris.ai/elpris-idag/${city.slug}`;
+  const { data } = await getToday();
+  const meta = pageMeta({
+    path: `/elpris-idag/${city.slug}`,
+    title: buildTitle(city.name, city.area),
+    description: buildDescription(city.name, city.area, data),
+    type: 'article',
+  });
   return {
-    title: buildTitle(city.name),
-    description: buildDescription(city.name, city.area),
-    alternates: { canonical: url },
+    ...meta,
     openGraph: {
-      title: buildTitle(city.name),
-      description: buildDescription(city.name, city.area),
-      url,
+      ...meta.openGraph,
       type: 'article',
       publishedTime: cityDatePublished(city),
       modifiedTime: cityDateModified(city),
@@ -112,24 +132,22 @@ export default async function StadPage({ params }: PageProps) {
   // SSR: hämta dagens priser för stadens elområde så pristalen finns i HTML
   // redan vid första render. Klientkomponenterna tar sen över med live-uppdatering.
   // Timmar och kvartar ur samma laddning (en databasfråga).
-  const today = await loadTodayPrices();
+  const [{ data: today, fetchedAt }, tomorrow] = await Promise.all([getToday(), loadTomorrowPrices()]);
   const areaHours = today?.areas[city.area] ?? null;
   const quarters = today?.quarters[city.area] ?? null;
   // Aktuell timme på tid, inte klocktimme — 02 finns två gånger natten till normaltid.
-  const nowMs = Date.now();
+  const nowMs = fetchedAt.getTime();
+  const extremes = quarters && quarters.length > 0 ? quarterExtremes(quarters) : null;
+  const restWindow = areaHours ? cheapestWindow(areaHours, nowMs) : null;
+  const tomorrowHours = tomorrow?.areas[city.area] ?? null;
+  const tomorrowAvg = tomorrowHours
+    ? tomorrowHours.reduce((sum, h) => sum + h.ore_per_kwh, 0) / tomorrowHours.length
+    : null;
   const currentPrice =
     areaHours?.find((h) => isCurrentHour(h, nowMs))?.ore_per_kwh ?? null;
 
-  // Server-side tidsstämpel för prisdatan (aktuellt 15-min-slot, Stockholm).
-  // Renderas i HTML både under H1 och i spotpris-boxen (slotLabel = bara tiden).
+  // Aktuell 15-min-slot (Stockholm) — seed för LivePriceWidgets "Uppdaterad".
   const slotLabel = stockholmSlotLabel();
-  const priceDateLabel = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Europe/Stockholm',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date());
-  const priceUpdatedLabel = `${priceDateLabel} ${slotLabel}`;
   // Artikeldatum: samma härledda värden som JSON-LD datePublished/dateModified.
   const publishedAt = cityDatePublished(city);
   const modifiedAt = cityDateModified(city);
@@ -140,13 +158,9 @@ export default async function StadPage({ params }: PageProps) {
 
   const para1 = `${city.name} tillhör elområde ${city.area}, vilket betyder att timpriserna sätts gemensamt för hela det området. Du som bor i ${city.name} betalar samma spotpris per kilowattimme som alla andra hushåll i ${city.area}, oavsett hur långt mellan er det är geografiskt.`;
 
-  const para2 = `Spotpriset sätts en gång per dygn i en day-ahead-auktion på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lämnar sina bud för nästa dygn innan buden stänger klockan 12:00, och priserna publiceras samma eftermiddag runt klockan 13:15. Priset räknas alltså inte om löpande under dagen. Det som ändras var 15:e minut är upplösningen: sedan oktober 2025 anges spotpriset per 15-minutersintervall i stället för per hel timme, vilket ger 96 prisnivåer över dygnet i stället för 24. Det är denna dygnsvisa auktion som ligger bakom prisrytmen du ser i grafen nedan.`;
+  const para2 = `Spotpriset sätts en gång per dygn i en day-ahead-auktion på Nord Pool, den nordiska elbörsen. Producenter och elhandelsbolag lämnar sina bud för nästa dygn innan buden stänger klockan 12:00, och priserna publiceras samma eftermiddag runt klockan 13:15. Priset räknas alltså inte om löpande under dagen. Det som ändras var 15:e minut är upplösningen: sedan oktober 2025 anges spotpriset per 15-minutersintervall i stället för per hel timme, vilket ger 96 prisnivåer över dygnet i stället för 24. Det är denna dygnsvisa auktion som ligger bakom prisrytmen du ser i grafen ovan.`;
 
   const para3 = `Alla städer i ${city.area} delar samma timpris. Förutom ${city.name} betalar exempelvis ${otherCitiesText} exakt samma per kilowattimme. Det som gör att din slutfaktura ändå skiljer sig från grannens i en annan stad är nätavgift, eventuellt påslag och elavtal — inte själva spotpriset.`;
-
-  const dailyAdviceLead = `Dagens prisspridning visar var du tjänar mest på att flytta din förbrukning. Här är de tre billigaste och de tre dyraste timmarna just nu i ${city.area}:`;
-
-  const dailyAdviceTail = `Om du har möjlighet att flytta tvätt, diskmaskin eller elbilsladdning till de billigaste timmarna sänker du din elkostnad — hur mycket beror på hur stor del av din förbrukning som är flyttbar och hur stor prisskillnaden mellan dygnets billigaste och dyraste timmar är.`;
 
   const gridExplainer = `Spotpriset är samma för hela ${city.area}, men nätavgiften — både den fasta delen och den rörliga delen per kilowattimme — sätts av ditt lokala nätbolag och kan skilja sig markant mellan kommuner.`;
 
@@ -156,7 +170,7 @@ export default async function StadPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: `Elpris idag i ${city.name}`,
-    description: buildDescription(city.name, city.area),
+    description: buildDescription(city.name, city.area, today),
     datePublished: publishedAt,
     dateModified: modifiedAt,
     author: {
@@ -247,7 +261,10 @@ export default async function StadPage({ params }: PageProps) {
             Elpris idag i {city.name} — timme för timme
           </h1>
           <p className="text-xs text-[#8fafc9] mb-8">
-            {areaHours && <>Prisdata uppdaterad {priceUpdatedLabel} · </>}
+            {today
+              ? `${formatSwedishDay(new Date(`${today.date}T12:00:00Z`))} · Priserna sattes i går i day-ahead-auktionen`
+              : formatSwedishDay(fetchedAt)}
+            {' · '}
             <time dateTime={publishedAt}>Publicerad {formatMonthYear(publishedAt)}</time>
             {modifiedAt !== publishedAt && (
               <>
@@ -272,6 +289,90 @@ export default async function StadPage({ params }: PageProps) {
             {city.uniqueIntro}
           </p>
 
+          {/* 2a. Spotpriset idag: nyckeltal + kvartsdiagram */}
+          <section className="mb-12">
+            <h2 className="font-bold text-2xl sm:text-3xl text-white mb-2">
+              Spotpriset idag i {city.name}
+            </h2>
+            <p className="text-sm text-[#8fafc9] mb-6">
+              {formatSwedishDay(today ? new Date(`${today.date}T12:00:00Z`) : fetchedAt)} · {city.area} · spotpris exkl. moms och nätavgift
+            </p>
+            {quarters && extremes && (
+              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                {[
+                  ['Snitt idag', `${ore1(quarterAverage(quarters))} öre/kWh`],
+                  ['Billigast', `${ore1(extremes.min.ore)} öre kl ${formatClock(extremes.min.start)}`],
+                  ['Dyrast', `${ore1(extremes.max.ore)} öre kl ${formatClock(extremes.max.start)}`],
+                ].map(([label, value]) => (
+                  <div key={label} className="bg-[#0F3460] border border-[#1E4976] rounded-2xl px-4 py-3">
+                    <dt className="text-xs text-[#8fafc9]">{label}</dt>
+                    <dd className="text-lg font-bold text-white tabular-nums">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            <PriceGraph area={city.area} initialQuarters={quarters} placeLabel={city.name} showStats={false} />
+          </section>
+
+          {/* 2b. Timme för timme */}
+          {areaHours && (
+            <section className="mb-12">
+              <h2 className="font-bold text-2xl sm:text-3xl text-white mb-6">
+                Elpriset timme för timme i {city.name}
+              </h2>
+              <p className="text-sm text-[#8fafc9] leading-relaxed mb-4">
+                Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart –
+                diagrammet ovan visar varje kvart.
+              </p>
+              <HourTable hours={areaHours} caption={`Snittpris per timme idag i ${city.name} (${city.area})`} nowMs={nowMs} />
+              {restWindow && (
+                <p className="text-lg text-white leading-relaxed mt-6">
+                  Billigast resten av dagen i {city.name}:{' '}
+                  <strong>
+                    {restWindow.start}–{restWindow.end}
+                  </strong>
+                  , snitt {ore1(restWindow.avg)} öre/kWh.
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* 2c. Morgondagen */}
+          <section className="mb-12 bg-[#0F3460] border border-[#1E4976] rounded-2xl p-5 sm:p-6">
+            {tomorrowAvg === null ? (
+              <p className="text-base text-[#e2eaf4]">
+                Morgondagens elpris för {city.name} ({city.area}) publiceras runt kl 13:15.{' '}
+                <Link href="/elpris-imorgon" className={LINK_CLASS}>→ Elpriset imorgon</Link>
+              </p>
+            ) : (
+              <p className="text-base text-[#e2eaf4]">
+                Elpriset imorgon i {city.name}: snitt {ore1(tomorrowAvg)} öre/kWh i {city.area}.{' '}
+                <Link href={`/elpris-imorgon#${city.area.toLowerCase()}`} className={LINK_CLASS}>
+                  → Se morgondagens pris timme för timme
+                </Link>
+              </p>
+            )}
+          </section>
+
+          {/* 2d. Rörligt elpris */}
+          <section className="mb-12">
+            <h2 className="font-bold text-2xl sm:text-3xl text-white mb-6">
+              Rörligt elpris i {city.name}
+            </h2>
+            <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
+              Har du rörligt elpris i {city.name} betalar du i regel ett snitt av spotpriset i{' '}
+              {city.area} under månaden, plus elhandlarens påslag. Med ett kvartsprisavtal betalar
+              du i stället priset för varje kvart – och då kan det löna sig att lägga tvätt, disk
+              och laddning på de billiga timmarna i tabellen ovan. Vilket avtal som passar bäst
+              beror på hur mycket av din förbrukning du kan flytta.
+            </p>
+            <p className="text-base">
+              <Link href="/guider/elavtal/rorligt-vs-kvartspris" className={LINK_CLASS}>
+                Rörligt pris eller kvartspris?
+              </Link>
+            </p>
+          </section>
+
           <section className="mb-12">
             <h2 className="font-bold text-2xl sm:text-3xl text-white mb-6">
               Hur fungerar elpriset i {city.name}?
@@ -284,37 +385,6 @@ export default async function StadPage({ params }: PageProps) {
             </p>
             <p className="text-base text-[#8fafc9] leading-relaxed">
               {para3}
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <PriceGraph area={city.area} initialQuarters={quarters} placeLabel={city.name} />
-          </section>
-
-          <section className="mb-12">
-            <h2 className="font-bold text-2xl sm:text-3xl text-white mb-6">
-              Vad betyder dagens priser för dig i {city.name}?
-            </h2>
-            <p className="text-base text-[#8fafc9] leading-relaxed mb-6">
-              {dailyAdviceLead}
-            </p>
-            <div className="mb-6">
-              <CheapestHoursToday
-                area={city.area}
-                count={3}
-                format="detailed"
-                initialData={areaHours}
-              />
-            </div>
-            <div className="mb-6">
-              <MostExpensiveHoursToday
-                area={city.area}
-                count={3}
-                initialData={areaHours}
-              />
-            </div>
-            <p className="text-base text-[#8fafc9] leading-relaxed">
-              {dailyAdviceTail}
             </p>
           </section>
 

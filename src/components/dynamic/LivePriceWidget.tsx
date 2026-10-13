@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ore1 } from '@/lib/format/ore';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -150,7 +151,7 @@ export default function LivePriceWidget({
         <>
           <div className="flex items-baseline gap-3">
             <span className={`text-6xl font-bold ${getPriceColor(data.price_ore_kwh)}`}>
-              {data.price_ore_kwh.toFixed(1)}
+              {ore1(data.price_ore_kwh)}
             </span>
             <span className="text-xl text-slate-400 font-medium">öre/kWh</span>
           </div>
@@ -161,7 +162,7 @@ export default function LivePriceWidget({
             </span>
             <span className="text-slate-500">·</span>
             <span className="text-slate-400">
-              Inkl. moms: {data.price_with_vat.toFixed(1)} öre
+              Inkl. moms: {ore1(data.price_with_vat)} öre
             </span>
             <span className="text-slate-500">·</span>
             <span className="text-slate-400">
