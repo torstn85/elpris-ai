@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
+import { pageMeta } from "@/lib/seo";
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
@@ -36,11 +37,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const label = CATEGORY_LABELS[params.kategori];
   if (!label) return {};
 
-  return {
+  return pageMeta({
+    path: `/guider/${params.kategori}`,
     title: `${label} – guider`,
     description: CATEGORY_DESCRIPTIONS[params.kategori],
-    alternates: { canonical: `https://www.elpris.ai/guider/${params.kategori}` },
-  };
+  });
 }
 
 function getCategoryArticles(kategori: string): ArticleMeta[] {

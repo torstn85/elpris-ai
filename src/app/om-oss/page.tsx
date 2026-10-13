@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: "/om-oss",
   title: "Om oss",
   description:
     "elpris.ai gör elpriset begripligt – och lite roligare. Oberoende redaktion, faktagranskade guider, elpris per kvart och det dagliga spelet Elduellen.",
-  alternates: {
-    canonical: "https://www.elpris.ai/om-oss",
-  },
-};
+});
 
 const LINK = "font-semibold text-[#00E5FF] hover:underline";
 

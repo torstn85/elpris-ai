@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import SwedenMap from "@/components/SwedenMap";
+import { pageMeta } from "@/lib/seo";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: "/elomrade",
   title: "Elområden i Sverige — SE1, SE2, SE3, SE4",
   description:
     "Lär dig om Sveriges fyra elområden SE1–SE4. Förstå varför elpriset skiljer sig åt i Luleå, Sundsvall, Stockholm och Malmö.",
-};
+});
 
 // ─── Area data ────────────────────────────────────────────────────────────────
 

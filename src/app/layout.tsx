@@ -33,25 +33,9 @@ export const metadata: Metadata = {
     default: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
     template: "%s | elpris.ai",
   },
-  description:
-    "Se elpriset just nu för SE1, SE2, SE3 och SE4. AI-driven rådgivning för när du bör ladda elbilen, tvätta eller använda el.",
-  alternates: {
-    canonical: "https://www.elpris.ai",
-  },
-  openGraph: {
-    title: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
-    description:
-      "Se elpriset just nu för SE1, SE2, SE3 och SE4. AI-driven rådgivning för när du bör använda el.",
-    url: "https://www.elpris.ai",
-    siteName: "elpris.ai",
-    locale: "sv_SE",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "elpris.ai — Realtidspriser och AI-rådgivning för svensk el",
-    description: "Se elpriset just nu för SE1, SE2, SE3 och SE4.",
-  },
+  // Ingen canonical, og:url eller beskrivning här — varje sida sätter sina egna
+  // via pageMeta() (src/lib/seo.ts). Ärvd canonical gjorde sidor till kopior av
+  // startsidan i Googles ögon.
   icons: {
     icon: "/favicon.png",
   },

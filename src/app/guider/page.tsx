@@ -8,14 +8,15 @@ import matter from 'gray-matter';
 import type { Metadata } from 'next';
 import NavBar from '@/components/NavBar';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
+import { pageMeta } from "@/lib/seo";
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/guider',
   title: 'Guider om elpriser och elavtal',
   description: 'Allt du behöver veta om elpriser, elavtal och hur du sparar el. Konkreta guider med live-data från elmarknaden.',
-  alternates: { canonical: 'https://www.elpris.ai/guider' },
-};
+});
 
 interface ArticleMeta {
   title: string;

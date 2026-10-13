@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: "/integritetspolicy",
   title: "Integritetspolicy",
   description:
     "Läs om hur elpris.ai hanterar personuppgifter, cookies och tredjepartstjänster.",
-};
+});
 
 function Section({
   title,

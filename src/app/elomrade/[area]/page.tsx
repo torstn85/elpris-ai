@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import SwedenMap from "@/components/SwedenMap";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
 import { CITIES } from "@/lib/cities";
+import { pageMeta } from "@/lib/seo";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -166,10 +167,11 @@ export async function generateMetadata({
   const { area } = await params;
   const meta = AREA_META[area as AreaKey];
   if (!meta) return {};
-  return {
+  return pageMeta({
+    path: `/elomrade/${area}`,
     title: `Elpris ${meta.name} — Spotpris ${meta.city} & ${meta.region}`,
     description: `Se aktuellt elpris för elområde ${meta.name} (${meta.city}, ${meta.region}). Timpriser idag och imorgon i öre/kWh.`,
-  };
+  });
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

@@ -5,17 +5,21 @@ import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
 import { formatSwedishDay } from "@/lib/format/date";
 import { addDays } from "@/lib/dates";
 import { stockholmISODate } from "@/lib/time";
+import { pageMeta } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: "/elpris-imorgon",
   title: "Elpriset imorgon — Sveriges fyra elområden",
   description:
     "Se morgondagens elpriser för SE1, SE2, SE3 och SE4. Day-ahead-priser publiceras runt kl 13:15 varje dag. Planera tvätt, elbilsladdning och uppvärmning till de billigaste timmarna.",
-};
+  ogTitle: "Elpriset imorgon — Sveriges fyra elområden",
+  twitterDescription: "Se morgondagens elpriser för SE1, SE2, SE3 och SE4.",
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
