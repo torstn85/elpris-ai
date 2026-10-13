@@ -109,6 +109,19 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 
 **Prisskillnad SE3 vs SE4:** SE4 har ofta högre spotpris än SE3. Skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Skriv ALDRIG "konsekvent" eller fasta procentintervall som "20–40 %" utan källa och räknesätt. Skäl till skillnaden: begränsad överföringskapacitet från norr, koppling till europeiska elnätet via Tyskland och Polen.
 
+## Dygnsspridning per elområde (egen data)
+
+- Dygnsspridning = dygnets dyraste kvart minus billigaste kvart (spotpris, öre/kWh exkl. moms).
+- Källa: elpris.ai:s egen prisdata (tabellen spot_prices), 13 april–12 oktober 2026, 182 dygn per område. Räknas fram med npx tsx scripts/analysis/daily-spread.ts.
+- Median för dygnsspridningen: SE1 57 öre, SE2 62 öre, SE3 112 öre, SE4 160 öre.
+- SE4 hade större spridning än SE3 172 av 182 dygn och högre dygnssnitt 176 av 182 dygn.
+- Datan täcker bara sommarhalvåret 2026. Skriv inte "historiskt" och dra inga slutsatser om vintern utifrån den.
+- Standardformulering: "Skillnaden mellan dygnets billigaste och dyraste kvartar är oftast störst i SE4 och minst i SE1 och SE2." Med källa: "Under april–oktober 2026 var skillnaden större i SE4 än i SE3 nästan varje dygn (elpris.ai:s egen prisdata)."
+- Skriv inte "volatil" eller "volatilitet". Skriv "skillnaden mellan billiga och dyra kvartar" eller "prisspridningen över dygnet".
+- Spridningen spelar bara roll för den som flyttar förbrukning med kvarts- eller timprisavtal. Ett högre snittpris i ett elområde gör inte i sig flytt av förbrukning mer lönsam – det är spridningen som avgör.
+- För energieffektivisering (tätning, isolering, fönster, FTX) avgörs värdet i första hand av prisnivån under de timmar huset förbrukar, inte av spridningen.
+- Skriv inga fasta öreintervall för spridningen (t.ex. "ofta 30–60 öre"). Beskriv mekanismen och hänvisa till dagens diagram.
+
 ## Elnätsbolag — alltid öppen formulering
 
 Vi vet INTE alltid om de nätbolag vi hittar via elomraden.se är de enda i kommunen. Nätmarknaden förändras också. Därför använder vi alltid öppen formulering:
