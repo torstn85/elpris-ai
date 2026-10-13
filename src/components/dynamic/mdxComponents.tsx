@@ -15,6 +15,7 @@ import SavingsCalculator from './SavingsCalculator';
 import SevenDayPriceTrend from './SevenDayPriceTrend';
 import FaqAccordion from './FaqAccordion';
 import TomorrowPriceTeaser from './TomorrowPriceTeaser';
+import CheapestWindowToday from '@/components/prices/CheapestWindowToday';
 
 export const mdxComponents = {
   LivePriceWidget,
@@ -29,6 +30,7 @@ export const mdxComponents = {
   SevenDayPriceTrend,
   FaqAccordion,
   TomorrowPriceTeaser,
+  CheapestWindowToday,
   // Lägg till nya komponenter här när de skapas:
   // NegativePriceAlert,
 };
