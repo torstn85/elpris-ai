@@ -1,330 +1,366 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cache } from "react";
 import NavBar from "@/components/NavBar";
-import { AREAS, loadTomorrowPrices } from "@/lib/prices/tomorrow";
-import { formatSwedishDay } from "@/lib/format/date";
-import { addDays } from "@/lib/dates";
-import { stockholmISODate } from "@/lib/time";
-import { pageMeta } from "@/lib/seo";
 import PageWide from "@/components/layout/PageWide";
+import { AreaPanel, AreaProvider, AreaSelector } from "@/components/elpris-idag/AreaSelect";
+import NowAndChart from "@/components/elpris-idag/NowAndChart";
+import AreaSevenDayTrend from "@/components/elpris-imorgon/AreaSevenDayTrend";
+import TomorrowStatus from "@/components/elpris-imorgon/TomorrowStatus";
+import AreaCompareTable from "@/components/prices/AreaCompareTable";
+import CityLinksByArea from "@/components/prices/CityLinksByArea";
+import HourTable from "@/components/prices/HourTable";
+import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
+import { formatSwedishDay } from "@/lib/format/date";
+import { ore1 } from "@/lib/format/ore";
+import { formatClock } from "@/lib/prices/quarterTicks";
+import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
+import { loadTomorrowPrices, tomorrowISODate } from "@/lib/prices/tomorrow";
+import { cheapestWindow, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
+import { pageMeta } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
+// ─── Texter ───────────────────────────────────────────────────────────────────
 
-export const metadata: Metadata = pageMeta({
-  path: "/elpris-imorgon",
-  title: "Elpriset imorgon — Sveriges fyra elområden",
-  description:
-    "Se morgondagens elpriser för SE1, SE2, SE3 och SE4. Day-ahead-priser publiceras runt kl 13:15 varje dag. Planera tvätt, elbilsladdning och uppvärmning till de billigaste timmarna.",
-  ogTitle: "Elpriset imorgon — Sveriges fyra elområden",
-  twitterDescription: "Se morgondagens elpriser för SE1, SE2, SE3 och SE4.",
+// Delas av den synliga FAQ:n och FAQPage-JSON-LD så att texterna inte glider isär.
+const FAQS = [
+  {
+    question: "När kommer morgondagens elpris?",
+    answer:
+      "Morgondagens spotpris publiceras varje dag runt kl 13:15, efter att buden i day-ahead-auktionen har stängt kl 12:00. Då visas priserna här för alla fyra elområden.",
+  },
+  {
+    question: "Kan morgondagens elpris ändras efter att det publicerats?",
+    answer:
+      "Nej. När auktionen är avslutad ligger priset fast för varje kvart nästa dygn. Därför kan du planera tvätt, disk och laddning redan i dag.",
+  },
+  {
+    question: "Hur planerar jag med morgondagens elpris?",
+    answer:
+      "Leta upp de billigaste timmarna i tabellen för ditt elområde och lägg tvätt, disk och elbilsladdning där, till exempel med fördröjd start. Det lönar sig bara med ett kvarts- eller timprisavtal – med rörligt månadspris betalar du samma snittpris oavsett när.",
+  },
+];
+
+const BEFORE_DESCRIPTION =
+  "Morgondagens elpris för SE1–SE4 publiceras runt kl 13:15. Se priset timme för timme och per kvart så snart det är klart – och dagens priser fram till dess.";
+
+const PLACE: Record<Area, string> = { SE1: "Luleå", SE2: "Sundsvall", SE3: "Stockholm", SE4: "Malmö" };
+
+const LINK = "font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150";
+const H2 = "font-bold text-2xl md:text-3xl text-white mb-6";
+const TEXT = "text-base text-[#8fafc9] leading-relaxed";
+
+/** "Vad påverkar morgondagens elpris?" — visas i båda lägena. */
+function PriceFactors() {
+  return (
+    <section className="max-w-3xl">
+      <h2 className={H2}>Vad påverkar morgondagens elpris?</h2>
+      <p className={`${TEXT} mb-4`}>
+        Morgondagens pris beror på hur mycket el som väntas produceras och förbrukas under dygnet –
+        och hur mycket som kan föras över mellan elområden och länder.
+      </p>
+      <ul className={`${TEXT} list-disc pl-5 space-y-2 mb-4`}>
+        <li>
+          Vind – blåsiga dygn ger mycket vindkraft och ofta lägre priser. Vindstilla dygn drar upp
+          priset, särskilt i södra Sverige.
+        </li>
+        <li>Temperatur – kyla ökar förbrukningen, eftersom många värmer sina hem med el.</li>
+        <li>
+          Vattenkraft och kärnkraft – hur mycket vatten som finns i magasinen och om reaktorer är
+          avställda påverkar hur mycket el som finns att tillgå.
+        </li>
+        <li>
+          Överföring – när ledningarna söderut eller till grannländerna är fullt belastade kan priset
+          skilja mycket mellan elområdena.
+        </li>
+        <li>Veckodag – på helger är förbrukningen ofta lägre än på vardagar.</li>
+      </ul>
+      <p className={TEXT}>
+        Ofta är elen billigast på natten och dyrast på morgonen och tidig kväll, när förbrukningen
+        är som störst. Men på blåsiga eller soliga dygn kan mönstret se helt annorlunda ut – därför
+        lönar det sig att titta på morgondagens priser i stället för att gissa.
+      </p>
+    </section>
+  );
+}
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+// En laddning per förfrågan, delad av generateMetadata och sidan.
+const getTomorrow = cache(async () => {
+  const data = await loadTomorrowPrices();
+  return { data, fetchedAt: new Date() };
 });
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+/** "Onsdag 14 oktober" för ett ISO-datum. */
+const dayLabel = (isoDate: string) => formatSwedishDay(new Date(`${isoDate}T12:00:00Z`));
 
-function priceColor(price: number): string {
-  if (price <= 0) return "#22C55E";
-  if (price <= 50) return "#22C55E";
-  if (price >= 100) return "#EF4444";
-  return "#00E5FF";
+/** "{X} % billigare" / "{X} % dyrare" / "ungefär samma" (under 3 %). */
+function change(tomorrow: number, today: number): string {
+  if (today <= 0) return "–";
+  const pct = ((tomorrow - today) / today) * 100;
+  if (Math.abs(pct) < 3) return "ungefär samma";
+  return `${Math.round(Math.abs(pct))} % ${pct < 0 ? "billigare" : "dyrare"}`;
 }
 
-function priceLabel(price: number): string {
-  if (price <= 0) return "Negativt";
-  if (price <= 50) return "Billigt";
-  if (price >= 100) return "Dyrt";
-  return "Normalt";
+// ─── Metadata ─────────────────────────────────────────────────────────────────
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { data } = await getTomorrow();
+  let description = BEFORE_DESCRIPTION;
+  if (data) {
+    const avg = (a: Area) => Math.round(quarterAverage(data.quarters[a]));
+    const day = dayLabel(data.date);
+    description = `Elpriset imorgon ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg("SE3")} öre/kWh i SE3, ${avg("SE4")} i SE4, ${avg("SE2")} i SE2 och ${avg("SE1")} i SE1. Se morgondagens pris timme för timme och per kvart.`;
+  }
+  return pageMeta({
+    path: "/elpris-imorgon",
+    title: "Elpriset imorgon timme för timme – SE1–SE4",
+    description,
+  });
 }
 
-function fmt(price: number): string {
-  return price.toFixed(1).replace(".", ",");
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Sida ─────────────────────────────────────────────────────────────────────
 
 export default async function ElprisImorgon() {
-  const tomorrowData = await loadTomorrowPrices();
-  const areas = tomorrowData?.areas ?? null;
+  const [{ data: tomorrow, fetchedAt }, today] = await Promise.all([getTomorrow(), loadTodayPrices()]);
+  const nowMs = fetchedAt.getTime();
+  const tomorrowDate = tomorrow?.date ?? tomorrowISODate();
 
-  // Svenskt datum idag + ett kalenderdygn — inte "nu + 24 h", som blir fel
-  // första timmen på dygnet med 25 timmar (vintertid).
-  const tomorrow = addDays(stockholmISODate(), 1);
-  const tomorrowLabel = formatSwedishDay(new Date(`${tomorrow}T12:00:00Z`));
-
-  const jsonLd = {
+  const jsonLd: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://www.elpris.ai" },
+        { "@type": "ListItem", position: 2, name: "Elpris imorgon", item: "https://www.elpris.ai/elpris-imorgon" },
+      ],
+    },
+  ];
+  if (tomorrow) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      name: "Elpriser imorgon för SE1, SE2, SE3 och SE4",
+      description:
+        "Morgondagens spotpriser per kvart och snittpris per timme för Sveriges fyra elområden. Hämtas automatiskt via elprisetjustnu.se.",
+      url: "https://www.elpris.ai/elpris-imorgon",
+      keywords: ["elpris imorgon", "spotpris", "Nord Pool", "SE1", "SE2", "SE3", "SE4", "Sverige"],
+      isAccessibleForFree: true,
+      license: "https://www.elprisetjustnu.se/elpris-api",
+      creator: { "@type": "Organization", name: "elpris.ai", url: "https://www.elpris.ai" },
+      temporalCoverage: tomorrow.date,
+      dateModified: fetchedAt.toISOString(),
+      spatialCoverage: { "@type": "Place", name: "Sverige" },
+      variableMeasured: "Elpris (öre/kWh)",
+    });
+  }
+  jsonLd.push({
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.elpris.ai" },
-      { "@type": "ListItem", position: 2, name: "Elpris imorgon", item: "https://www.elpris.ai/elpris-imorgon" },
-    ],
-  };
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  });
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {jsonLd.map((ld) => (
+        <script
+          key={String(ld["@type"])}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      ))}
 
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <PageWide className="py-12 flex flex-col gap-12">
-
-          {/* ── Header ── */}
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-xs text-[#8fafc9]">
-              <a href="/" className="hover:text-[#00E5FF] transition-colors">Hem</a>
-              <span>/</span>
-              <span className="text-white">Elpris imorgon</span>
-            </div>
-            <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">
-              Elpriset imorgon — Sveriges fyra elområden
-            </h1>
-            <p className="text-base text-[#8fafc9] leading-relaxed max-w-3xl">
-              Här ser du morgondagens elpriser så snart de publiceras. Day-ahead-priser
-              fastställs på elbörsen Nord Pool varje eftermiddag runt{" "}
-              <strong className="text-white">kl 13:15</strong>, och uppdateras automatiskt
-              här på sidan så snart de blir tillgängliga.
-            </p>
-          </section>
-
-          {/* ── Villkorligt innehåll: ej publicerat / publicerat ── */}
-          {areas === null ? (
-
-            /* ── 3A: Empty state ── */
-            <>
-              <section>
-                <div className="max-w-3xl">
-                  <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
-                    Morgondagens priser publiceras runt kl 13:15
-                  </h2>
-                  <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                    Elpriset för imorgon sätts i den gemensamma europeiska day-ahead-auktionen.
-                    Buden stänger kl 12:00 och priserna publiceras runt kl 13:15. Kom tillbaka efter kl 13:15 för
-                    att se morgondagens timpriser för alla fyra elområden.
-                  </p>
-                  <p className="text-base text-[#8fafc9] leading-relaxed">
-                    Vill du planera redan nu? Titta på{" "}
-                    <Link
-                      href="/elpris-idag"
-                      className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150"
-                    >
-                      dagens priser
-                    </Link>{" "}
-                    för att se prismönstret — morgondagens priser brukar följa liknande
-                    dygnskurvor.
-                  </p>
+        <AreaProvider>
+          <PageWide className="py-12 flex flex-col gap-12">
+            {/* 1. Rubrik */}
+            <section className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-xs text-[#8fafc9]">
+                <a href="/" className="hover:text-[#00E5FF] transition-colors">Hem</a>
+                <span>/</span>
+                <span className="text-white">Elpris imorgon</span>
+              </div>
+              <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">
+                Elpriset imorgon timme för timme
+              </h1>
+              <p className="text-sm text-[#8fafc9]">
+                {`${dayLabel(tomorrowDate)} · ${tomorrow ? "Priserna sattes i dag i day-ahead-auktionen" : "Publiceras runt kl 13:15"}`}
+              </p>
+              <p className={`${TEXT} max-w-3xl`}>
+                {tomorrow
+                  ? "Här ser du morgondagens spotpris för Sveriges fyra elområden – per kvart i diagrammet och timme för timme i tabellen. Välj ditt elområde nedan."
+                  : "Morgondagens spotpris sätts i dag i den gemensamma europeiska day-ahead-auktionen. Buden stänger kl 12:00 och priserna publiceras runt kl 13:15 – då visas de här, per kvart och timme för timme."}
+              </p>
+              {tomorrow && (
+                <div className="mt-2">
+                  <AreaSelector />
                 </div>
-              </section>
-            </>
+              )}
+            </section>
 
-          ) : (
+            {tomorrow === null ? (
+              <>
+                {/* 2. Status */}
+                <TomorrowStatus serverNow={nowMs} />
 
-            /* ── 3B: Priser publicerade ── */
-            <>
-              {/* 3B.1: Hur du planerar */}
-              <section>
-                <div className="max-w-3xl">
-                  <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
-                    Hur du planerar med morgondagens priser
-                  </h2>
-                  <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                    Att se morgondagens priser i förväg är en av de mest värdefulla möjligheterna
-                    med kvartspris. När du vet när elen är som billigast respektive dyrast under
-                    nästa dygn kan du planera in tunga laster i rätt fönster:
+                {/* 3. Dagens priser */}
+                <section>
+                  <h2 className={H2}>Dagens priser i väntan på morgondagen</h2>
+                  {today ? (
+                    <AreaCompareTable
+                      columns={["Snitt", "Billigaste kvart", "Dyraste kvart"]}
+                      rows={AREAS.map((area) => {
+                        const q = today.quarters[area];
+                        const { min, max } = quarterExtremes(q);
+                        return {
+                          area,
+                          cells: [
+                            `${ore1(quarterAverage(q))} öre`,
+                            `${ore1(min.ore)} öre kl ${formatClock(min.start)}`,
+                            `${ore1(max.ore)} öre kl ${formatClock(max.start)}`,
+                          ],
+                        };
+                      })}
+                    />
+                  ) : (
+                    <p className={TEXT}>Dagens priser är inte tillgängliga just nu.</p>
+                  )}
+                  <p className="mt-4">
+                    <Link href="/elpris-idag" className={LINK}>Se dagens elpris timme för timme →</Link>
                   </p>
-                  <ul className="space-y-2 text-base text-[#8fafc9] leading-relaxed mb-4">
-                    <li>
-                      <strong className="text-[#22C55E]">Grön</strong> (≤ 50 öre/kWh) — bra
-                      timmar för planerad förbrukning, ställ in tvättmaskinen på fördröjd start
-                    </li>
-                    <li>
-                      <strong className="text-[#00E5FF]">Cyan</strong> (51–99 öre/kWh) — normal
-                      nivå, ingen större anledning att vänta
-                    </li>
-                    <li>
-                      <strong className="text-[#EF4444]">Röd</strong> (≥ 100 öre/kWh) — undvik
-                      om möjligt eller flytta förbrukning till en grön timme
-                    </li>
-                  </ul>
-                </div>
-              </section>
+                </section>
 
-              {/* 3B.2: Pristabell */}
-              <section>
-                <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
-                  Timpriser för imorgon — alla elområden
-                </h2>
-                <p className="text-[#8fafc9] text-sm mb-3">{tomorrowLabel}</p>
+                {/* 4. Sju dagar */}
+                <section className="max-w-3xl">
+                  <h2 className={H2}>Elpriset de senaste sju dagarna</h2>
+                  <AreaSevenDayTrend />
+                </section>
 
-                {/* Legend */}
-                <div className="flex flex-wrap gap-5 text-xs text-[#8fafc9] mb-6">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-[#22C55E]" />
-                    Billigt / negativt (&le;50 öre)
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-[#00E5FF]" />
-                    Normalt (51–99 öre)
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444]" />
-                    Dyrt (&ge;100 öre)
-                  </span>
-                </div>
+                {/* 5. Så sätts priset */}
+                <section className="max-w-3xl">
+                  <h2 className={H2}>Så sätts morgondagens elpris</h2>
+                  <p className={TEXT}>
+                    Varje dag före kl 12:00 lämnar elproducenter och elhandlare bud för varje kvart
+                    nästa dygn i den gemensamma europeiska day-ahead-auktionen, där Nord Pool är
+                    elbörsen för Norden. När buden har stängt räknas ett pris fram för varje kvart och
+                    varje elområde. Resultatet publiceras runt kl 13:15. Priset kan skilja mellan
+                    elområdena när överföringen mellan dem är fullt belastad.
+                  </p>
+                </section>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {AREAS.map((area) => {
-                    const entries = areas[area];
-                    const min = Math.min(...entries.map((e) => e.ore_per_kwh));
-                    const max = Math.max(...entries.map((e) => e.ore_per_kwh));
-                    const avg =
-                      Math.round(
-                        (entries.reduce((s, e) => s + e.ore_per_kwh, 0) / entries.length) * 10
-                      ) / 10;
+                <PriceFactors />
+              </>
+            ) : (
+              <>
+                {/* 6. Kvartsdiagram */}
+                <NowAndChart
+                  quarters={tomorrow.quarters}
+                  serverNow={nowMs}
+                  titlePrefix="Morgondagens elpris per kvart i"
+                  showNow={false}
+                />
 
-                    return (
-                      <div key={area} className="bg-[#0F3460] border border-[#1E4976] rounded-2xl overflow-hidden">
-                        <div className="px-5 py-4 border-b border-[#1E4976] flex items-center justify-between">
-                          <div>
-                            <h3 className="font-bold text-lg">{area}</h3>
-                            <p className="text-[#8fafc9] text-xs mt-0.5">
-                              {area === "SE1" && "Luleå · Norra Sverige"}
-                              {area === "SE2" && "Sundsvall · Norra mellansverige"}
-                              {area === "SE3" && "Stockholm · Södra mellansverige"}
-                              {area === "SE4" && "Malmö · Södra Sverige"}
+                {/* 7. Imorgon jämfört med idag */}
+                <section>
+                  <h2 className={H2}>Imorgon jämfört med idag</h2>
+                  <AreaCompareTable
+                    columns={["Snitt imorgon", "Snitt idag", "Förändring", "Billigaste kvart imorgon"]}
+                    rows={AREAS.map((area) => {
+                      const tm = quarterAverage(tomorrow.quarters[area]);
+                      const td = today ? quarterAverage(today.quarters[area]) : null;
+                      const { min } = quarterExtremes(tomorrow.quarters[area]);
+                      return {
+                        area,
+                        cells: [
+                          `${ore1(tm)} öre`,
+                          td === null ? "–" : `${ore1(td)} öre`,
+                          td === null ? "–" : change(tm, td),
+                          `${ore1(min.ore)} öre kl ${formatClock(min.start)}`,
+                        ],
+                      };
+                    })}
+                  />
+                </section>
+
+                <PriceFactors />
+
+                {/* 8. En panel per område */}
+                {AREAS.map((area) => {
+                  const w = cheapestWindow(tomorrow.areas[area], 0);
+                  return (
+                    <AreaPanel key={area} area={area} id={area.toLowerCase()}>
+                      <section className="scroll-mt-6">
+                        <h2 className={H2}>
+                          Elpriset imorgon i {area} ({PLACE[area]})
+                        </h2>
+                        <p className="text-sm text-[#8fafc9] leading-relaxed mb-4 max-w-3xl">
+                          Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart
+                          – diagrammet ovan visar varje kvart.
+                        </p>
+                        <HourTable hours={tomorrow.areas[area]} caption={`Snittpris per timme imorgon i ${area}`} />
+                        <div className="max-w-3xl mt-8">
+                          {w && (
+                            <p className="text-lg text-white leading-relaxed mb-4">
+                              Billigast imorgon i {area}:{" "}
+                              <strong>
+                                {w.start}–{w.end}
+                              </strong>
+                              , snitt {ore1(w.avg)} öre/kWh.
                             </p>
-                          </div>
-                          <div className="text-right text-xs text-[#8fafc9] flex flex-col gap-0.5">
-                            <span>Snitt: <span className="text-white font-semibold">{fmt(avg)} öre</span></span>
-                            <span>
-                              Min: <span style={{ color: priceColor(min) }} className="font-semibold">{fmt(min)}</span>
-                              {" "}· Max: <span style={{ color: priceColor(max) }} className="font-semibold">{fmt(max)}</span>
-                            </span>
-                          </div>
+                          )}
+                          <ShiftUsageLinks />
                         </div>
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="text-[#8fafc9] text-xs border-b border-[#1E4976]">
-                              <th className="text-left px-5 py-2 font-medium">Timme</th>
-                              <th className="text-right px-5 py-2 font-medium">öre/kWh</th>
-                              <th className="text-right px-5 py-2 font-medium hidden sm:table-cell">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {entries.map((entry) => (
-                              <tr
-                                key={entry.startUTC}
-                                className="border-b border-[#1E4976]/50 last:border-0 hover:bg-white/[0.02] transition-colors"
-                              >
-                                <td className="px-5 py-2.5 font-mono text-[#e2eaf4]">
-                                  {entry.label}
-                                </td>
-                                <td className="px-5 py-2.5 text-right font-bold font-mono tabular-nums">
-                                  <span style={{ color: priceColor(entry.ore_per_kwh) }}>
-                                    {fmt(entry.ore_per_kwh)}
-                                  </span>
-                                </td>
-                                <td className="px-5 py-2.5 text-right hidden sm:table-cell">
-                                  <span
-                                    className="text-xs px-2 py-0.5 rounded-full"
-                                    style={{
-                                      color: priceColor(entry.ore_per_kwh),
-                                      backgroundColor: `${priceColor(entry.ore_per_kwh)}18`,
-                                      border: `1px solid ${priceColor(entry.ore_per_kwh)}40`,
-                                    }}
-                                  >
-                                    {priceLabel(entry.ore_per_kwh)}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
+                      </section>
+                    </AreaPanel>
+                  );
+                })}
+              </>
+            )}
 
-              {/* 3B.3: Vad du kan planera */}
-              <section>
-                <div className="max-w-3xl">
-                  <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
-                    Vad du kan planera redan ikväll
-                  </h2>
-                  <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                    Tre konkreta saker du kan förbereda kvällen innan:
-                  </p>
-                  <ol className="space-y-3 text-base text-[#8fafc9] leading-relaxed list-decimal list-inside mb-4">
-                    <li>
-                      <strong className="text-white">Tvätt och disk på fördröjd start.</strong>{" "}
-                      De flesta moderna maskiner har timer-funktion som låter dig starta upp till
-                      24 timmar fram. Sätt programmet ikväll, schemalägg starten till morgondagens
-                      billigaste timme.
-                    </li>
-                    <li>
-                      <strong className="text-white">Schemalägg elbilsladdning.</strong>{" "}
-                      De flesta moderna laddboxar och elbilar har inbyggd schemafunktion som kan
-                      ställas in att starta laddning under specifika timmar. Många smarta laddboxar
-                      kan dessutom kopplas till spotpriset och välja billigaste timmarna
-                      automatiskt — kolla i din laddbox-app eller bilens menyer.
-                    </li>
-                    <li>
-                      <strong className="text-white">Justera värmepumpens schema.</strong>{" "}
-                      Om din värmepump har stöd för smart styrning eller spotprisanpassning kan
-                      du programmera den att köra hårdare under billiga timmar och dra ner under
-                      dyra. Hur du gör beror på modell — kolla manualen eller tillverkarens app.
-                    </li>
-                  </ol>
-                  <p className="text-base text-[#8fafc9] leading-relaxed">
-                    För djupare strategier, läs våra guider om{" "}
-                    <Link href="/guider/spara-el/tvatta-billigt" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">tvätta billigt</Link>,{" "}
-                    <Link href="/guider/spara-el/ladda-elbil-billigt" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">ladda elbil billigt</Link>{" "}
-                    och{" "}
-                    <Link href="/guider/spara-el/varmepump-elpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">värmepump och spotpris</Link>.
-                  </p>
-                </div>
-              </section>
-            </>
-          )}
+            {/* 9. Städer */}
+            <section>
+              <h2 className={H2}>Elpris i din stad</h2>
+              <CityLinksByArea />
+            </section>
 
-          {/* ── Om priserna (visas alltid) ── */}
-          <section>
-            <div className="max-w-3xl">
-              <h2 className="font-bold text-2xl md:text-3xl text-white mb-6">
-                Om priserna på elpris.ai
-              </h2>
-              <p className="text-sm text-[#8fafc9] leading-relaxed mb-3">
-                Priserna som visas är{" "}
-                <strong className="text-white">spotpris exklusive moms och nätavgifter</strong>,
-                hämtade från{" "}
-                <a
-                  href="https://www.elprisetjustnu.se/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150"
-                >
-                  elprisetjustnu.se
-                </a>{" "}
-                som i sin tur bygger på data från ENTSO-E Transparency Platform. Din faktiska
-                elkostnad påverkas också av moms (25%), elnätsavgift, energiskatt och eventuellt
-                påslag från ditt elavtal.
+            {/* 10. Om morgondagens priser */}
+            <section className="max-w-3xl">
+              <h2 className={H2}>Om morgondagens priser</h2>
+              <p className={`${TEXT} mb-4`}>
+                Priserna är spotpriser exklusive moms och nätavgift. När morgondagens priser har
+                publicerats ändras de inte – varje kvartspris ligger fast för hela nästa dygn. Din
+                faktiska kostnad blir högre: moms (25 %), energiskatt, elnätsavgift och eventuellt
+                påslag från ditt elavtal tillkommer.
               </p>
-              <p className="text-sm text-[#8fafc9] leading-relaxed">
-                För att förstå hur de olika delarna av elpriset hänger ihop, läs{" "}
-                <Link href="/guider/forsta-elpriset/elprisets-bestandsdelar" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elprisets beståndsdelar</Link>.
-                Vill du veta hur prisbildningen fungerar, läs{" "}
-                <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">vad är spotpris</Link>.
-              </p>
-            </div>
-          </section>
+              <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base">
+                <li><Link href="/guider/forsta-elpriset/elprisets-bestandsdelar" className={LINK}>Elprisets beståndsdelar</Link></li>
+                <li><Link href="/guider/forsta-elpriset/vad-ar-spotpris" className={LINK}>Vad är spotpris?</Link></li>
+              </ul>
+            </section>
 
-        </PageWide>
+            {/* 11. FAQ (samma innehåll som FAQPage-JSON-LD) */}
+            <section className="max-w-3xl">
+              <h2 className={H2}>Vanliga frågor om morgondagens elpris</h2>
+              <div className="space-y-6">
+                {FAQS.map((f) => (
+                  <div key={f.question}>
+                    <h3 className="font-semibold text-lg text-white mb-2">{f.question}</h3>
+                    <p className={TEXT}>{f.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </PageWide>
+        </AreaProvider>
       </main>
     </>
   );

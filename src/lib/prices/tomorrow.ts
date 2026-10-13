@@ -1,7 +1,7 @@
 // Morgondagens priser (/elpris-imorgon och /api/prices/tomorrow): timsnitt ur
 // den delade kvartsladdaren. null före publiceringen (runt 13:15).
 
-import { loadDayPricesDetailed, type DaySource } from "@/lib/prices/quarters";
+import { loadDayPricesDetailed, toQuarterPoints, type DaySource, type QuarterPoint } from "@/lib/prices/quarters";
 import { quartersToHours, type HourEntry } from "@/lib/prices/hourly";
 import { stockholmISODate } from "@/lib/time";
 import { addDays } from "@/lib/dates";
@@ -18,6 +18,8 @@ export interface TomorrowData {
   source: TomorrowSource;
   /** Timsnitt per område — 23, 24 eller 25 timmar beroende på dygn. */
   areas: Record<Area, HourEntry[]>;
+  /** Kvartspriser per område — 92, 96 eller 100 kvartar. Bara för sidan; API:t skickar dem inte. */
+  quarters: Record<Area, QuarterPoint[]>;
 }
 
 /** Morgondagens svenska datum: dagens datum + ett kalenderdygn (inte nu + 24 h). */
@@ -34,8 +36,12 @@ export async function loadTomorrowPrices(isoDate: string = tomorrowISODate()): P
     const day = await loadDayPricesDetailed(isoDate);
     if (!day) return null;
     const areas = {} as Record<Area, HourEntry[]>;
-    for (const a of AREAS) areas[a] = quartersToHours(day.areas[a]);
-    return { date: isoDate, source: day.source, areas };
+    const quarters = {} as Record<Area, QuarterPoint[]>;
+    for (const a of AREAS) {
+      areas[a] = quartersToHours(day.areas[a]);
+      quarters[a] = toQuarterPoints(day.areas[a]);
+    }
+    return { date: isoDate, source: day.source, areas, quarters };
   } catch {
     return null;
   }

@@ -10,7 +10,7 @@ const NO_STORE_HEADERS = {
   "Vercel-CDN-Cache-Control": "no-store",
 };
 
-interface TomorrowResponse extends TomorrowData {
+interface TomorrowResponse extends Omit<TomorrowData, "quarters"> {
   fetched_at: string;
 }
 
@@ -33,8 +33,11 @@ export async function GET() {
       return NextResponse.json(body, { headers: NO_STORE_HEADERS });
     }
 
+    // Kvartarna används bara av /elpris-imorgon (SSR) — API-svaret är oförändrat.
     const body: TomorrowResponse = {
-      ...data,
+      date: data.date,
+      source: data.source,
+      areas: data.areas,
       fetched_at: new Date().toISOString(),
     };
     return NextResponse.json(body, { headers: NO_STORE_HEADERS });

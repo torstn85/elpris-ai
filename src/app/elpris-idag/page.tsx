@@ -5,10 +5,12 @@ import NavBar from "@/components/NavBar";
 import PageWide from "@/components/layout/PageWide";
 import { AreaName, AreaPanel, AreaProvider, AreaSelector } from "@/components/elpris-idag/AreaSelect";
 import NowAndChart from "@/components/elpris-idag/NowAndChart";
-import { CITIES } from "@/lib/cities";
+import AreaCompareTable from "@/components/prices/AreaCompareTable";
+import CityLinksByArea from "@/components/prices/CityLinksByArea";
+import HourTable from "@/components/prices/HourTable";
+import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
 import { formatSwedishDay } from "@/lib/format/date";
-import { isCurrentHour } from "@/lib/prices/hourly";
-import { PRICE_LEVEL_COLORS, PRICE_LEVEL_LABELS, priceLevel } from "@/lib/prices/priceLevel";
+import { ore1 } from "@/lib/format/ore";
 import { formatClock } from "@/lib/prices/quarterTicks";
 import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
 import { loadTomorrowPrices } from "@/lib/prices/tomorrow";
@@ -56,8 +58,6 @@ const getToday = cache(async () => {
 /** Dagens datum i data som "Tisdag 13 oktober". */
 const dayLabel = (isoDate: string) => formatSwedishDay(new Date(`${isoDate}T12:00:00Z`));
 
-/** En decimal med decimalkomma; -0,04 visas som 0,0, inte -0,0. */
-const ore1 = (v: number) => (Math.round(v * 10) / 10 || 0).toFixed(1).replace(".", ",");
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -82,13 +82,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ElprisIdag() {
   const [{ data, fetchedAt }, tomorrow] = await Promise.all([getToday(), loadTomorrowPrices()]);
   const nowMs = fetchedAt.getTime();
-
-  const citiesByArea = AREAS.map((area) => ({
-    area,
-    cities: Object.values(CITIES)
-      .filter((c) => c.area === area)
-      .sort((a, b) => a.name.localeCompare(b.name, "sv")),
-  }));
 
   const jsonLd = [
     {
@@ -178,54 +171,23 @@ export default async function ElprisIdag() {
                 {/* 4. Jämförelse */}
                 <section>
                   <h2 className={H2}>Jämför elområdena idag</h2>
-                  {/* En tabell; på mobil visas varje rad som ett block med kolumnnamnet framför värdet. */}
-                  <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl overflow-hidden">
-                    <table className="w-full text-sm">
-                      <thead className="hidden sm:table-header-group">
-                        <tr className="text-[#8fafc9] text-xs border-b border-[#1E4976] text-left">
-                          <th className="px-4 py-3 font-medium">Elområde</th>
-                          <th className="px-4 py-3 font-medium whitespace-nowrap">Snitt</th>
-                          <th className="px-4 py-3 font-medium whitespace-nowrap">Billigaste kvart</th>
-                          <th className="px-4 py-3 font-medium whitespace-nowrap">Dyraste kvart</th>
-                          <th className="px-4 py-3 font-medium whitespace-nowrap">Billigaste timme</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {AREAS.map((area) => {
-                          const q = data.quarters[area];
-                          const { min, max } = quarterExtremes(q);
-                          const ch = cheapestHour(data.areas[area]);
-                          const cells: [string, string][] = [
-                            ["Snitt", `${ore1(quarterAverage(q))} öre`],
-                            ["Billigaste kvart", `${ore1(min.ore)} öre kl ${formatClock(min.start)}`],
-                            ["Dyraste kvart", `${ore1(max.ore)} öre kl ${formatClock(max.start)}`],
-                            ["Billigaste timme", `${ore1(ch.ore_per_kwh)} öre kl ${ch.label}`],
-                          ];
-                          return (
-                            <tr
-                              key={area}
-                              className="block sm:table-row px-4 py-3 sm:p-0 border-b border-[#1E4976]/50 last:border-0"
-                            >
-                              <td className="block sm:table-cell sm:px-4 sm:py-3 mb-1 sm:mb-0">
-                                <Link href={`/elomrade/${area.toLowerCase()}`} className={LINK}>
-                                  {area}
-                                </Link>
-                              </td>
-                              {cells.map(([label, value], i) => (
-                                <td
-                                  key={label}
-                                  data-label={label}
-                                  className={`flex justify-between gap-4 py-0.5 sm:table-cell sm:px-4 sm:py-3 whitespace-nowrap tabular-nums before:content-[attr(data-label)] before:text-[#8fafc9] sm:before:content-none ${i === 0 ? "font-semibold" : ""}`}
-                                >
-                                  {value}
-                                </td>
-                              ))}
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                  <AreaCompareTable
+                    columns={["Snitt", "Billigaste kvart", "Dyraste kvart", "Billigaste timme"]}
+                    rows={AREAS.map((area) => {
+                      const q = data.quarters[area];
+                      const { min, max } = quarterExtremes(q);
+                      const ch = cheapestHour(data.areas[area]);
+                      return {
+                        area,
+                        cells: [
+                          `${ore1(quarterAverage(q))} öre`,
+                          `${ore1(min.ore)} öre kl ${formatClock(min.start)}`,
+                          `${ore1(max.ore)} öre kl ${formatClock(max.start)}`,
+                          `${ore1(ch.ore_per_kwh)} öre kl ${ch.label}`,
+                        ],
+                      };
+                    })}
+                  />
                 </section>
 
                 {/* 5. Timme för timme — alla fyra i server-HTML, valt område synligt */}
@@ -239,59 +201,7 @@ export default async function ElprisIdag() {
                         Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart
                         – diagrammet ovan visar varje kvart.
                       </p>
-                      <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl overflow-hidden max-w-3xl">
-                        <table className="w-full text-sm">
-                          <caption className="sr-only">Snittpris per timme idag i {area}</caption>
-                          <thead>
-                            <tr className="text-[#8fafc9] text-xs border-b border-[#1E4976]">
-                              <th className="text-left px-3 sm:px-5 py-2 font-medium">Timme</th>
-                              <th className="text-right px-3 sm:px-5 py-2 font-medium">Snittpris (öre/kWh)</th>
-                              <th className="text-right px-3 sm:px-5 py-2 font-medium">Nivå</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {data.areas[area].map((h) => {
-                              const current = isCurrentHour(h, nowMs);
-                              const level = priceLevel(h.ore_per_kwh);
-                              const color = PRICE_LEVEL_COLORS[level];
-                              return (
-                                <tr
-                                  key={h.startUTC}
-                                  aria-current={current ? "time" : undefined}
-                                  className={`border-b border-[#1E4976]/50 last:border-0 ${current ? "bg-white/10" : ""}`}
-                                >
-                                  <td className="px-3 sm:px-5 py-2 font-mono text-[#e2eaf4]">
-                                    <span className="flex items-center gap-2">
-                                      {current && (
-                                        <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
-                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E5FF] opacity-75" />
-                                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00E5FF]" />
-                                        </span>
-                                      )}
-                                      <span>
-                                        <span className="whitespace-nowrap">{h.label.slice(0, 11)}</span>
-                                        {h.label.slice(11)}
-                                      </span>
-                                      {current && <span className="sr-only">(pågår)</span>}
-                                    </span>
-                                  </td>
-                                  <td className="px-3 sm:px-5 py-2 text-right font-bold font-mono tabular-nums" style={{ color }}>
-                                    {ore1(h.ore_per_kwh)}
-                                  </td>
-                                  <td className="px-3 sm:px-5 py-2 text-right">
-                                    <span
-                                      className="text-xs px-2 py-0.5 rounded-full"
-                                      style={{ color, backgroundColor: `${color}18`, border: `1px solid ${color}40` }}
-                                    >
-                                      {PRICE_LEVEL_LABELS[level]}
-                                    </span>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
+                      <HourTable hours={data.areas[area]} caption={`Snittpris per timme idag i ${area}`} nowMs={nowMs} />
                     </AreaPanel>
                   ))}
                 </section>
@@ -315,15 +225,7 @@ export default async function ElprisIdag() {
                       </AreaPanel>
                     );
                   })}
-                  <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-                    Att flytta förbrukning lönar sig bara med kvarts- eller timprisavtal – med
-                    rörligt månadspris betalar du samma snittpris oavsett när.
-                  </p>
-                  <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base">
-                    <li><Link href="/guider/spara-el/tvatta-billigt" className={LINK}>Så tvättar du billigt</Link></li>
-                    <li><Link href="/guider/spara-el/ladda-elbil-billigt" className={LINK}>Ladda elbilen billigt</Link></li>
-                    <li><Link href="/guider/spara-el/varmepump-elpris" className={LINK}>Värmepump och spotpris</Link></li>
-                  </ul>
+                  <ShiftUsageLinks />
                 </section>
               </>
             )}
@@ -354,27 +256,7 @@ export default async function ElprisIdag() {
             {/* 8. Städer */}
             <section>
               <h2 className={H2}>Elpris i din stad</h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                {citiesByArea.map(({ area, cities }) => (
-                  <div key={area}>
-                    <p className="font-bold text-white mb-2">{area}</p>
-                    <ul className="space-y-1.5 text-sm">
-                      {cities.map((c) => (
-                        <li key={c.slug}>
-                          <Link href={`/elpris-idag/${c.slug}`} className="text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
-                            {c.name}
-                          </Link>
-                        </li>
-                      ))}
-                      <li className="pt-1">
-                        <Link href={`/elomrade/${area.toLowerCase()}`} className={LINK}>
-                          Om {area}
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                ))}
-              </div>
+              <CityLinksByArea />
             </section>
 
             {/* 9. Om dagens priser */}

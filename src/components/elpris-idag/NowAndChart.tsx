@@ -1,7 +1,8 @@
 "use client";
 
 // "Just nu"-kortet och kvartsdiagrammet för valt område. Kortet visar kvarten
-// som pågår och uppdateras var 30:e sekund. Första renderingen använder
+// som pågår och uppdateras var 30:e sekund (bara dagens priser — /elpris-imorgon
+// visar bara diagrammet). Första renderingen använder
 // serverns tid (serverNow) så att server-HTML och hydrering stämmer överens.
 
 import { useEffect, useState } from "react";
@@ -11,19 +12,25 @@ import { formatClock } from "@/lib/prices/quarterTicks";
 import { currentQuarter } from "@/lib/prices/todaySummary";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 import type { Area } from "@/lib/prices/today";
+import { ore1 } from "@/lib/format/ore";
 import { useArea } from "./AreaSelect";
 
 const QUARTER_MS = 15 * 60 * 1000;
 const TICK_MS = 30_000;
 
-const ore1 = (v: number) => (Math.round(v * 10) / 10 || 0).toFixed(1).replace(".", ",");
 
 export default function NowAndChart({
   quarters,
   serverNow,
+  titlePrefix = "Dagens elpris per kvart i",
+  showNow = true,
 }: {
   quarters: Record<Area, QuarterPoint[]>;
   serverNow: number;
+  /** Diagramrubrik före områdets namn. */
+  titlePrefix?: string;
+  /** Visa "Just nu"-kortet. */
+  showNow?: boolean;
 }) {
   const area = useArea();
   const [now, setNow] = useState(serverNow);
@@ -34,7 +41,7 @@ export default function NowAndChart({
     return () => window.clearInterval(id);
   }, []);
 
-  const q = currentQuarter(quarters[area], now);
+  const q = showNow ? currentQuarter(quarters[area], now) : null;
   const level = q ? priceLevel(q.ore) : null;
   const color = level ? PRICE_LEVEL_COLORS[level] : undefined;
 
@@ -64,7 +71,7 @@ export default function NowAndChart({
         quarters={quarters[area]}
         area={area}
         headingLevel="h2"
-        title={`Dagens elpris per kvart i ${area}`}
+        title={`${titlePrefix} ${area}`}
       />
     </section>
   );

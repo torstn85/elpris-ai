@@ -1,8 +1,9 @@
 "use client";
 
-// Områdesval för /elpris-idag. Allt innehåll renderas på servern för alla fyra
-// områden; klienten styr bara vilket som syns. Förval: SE3 i server-HTML,
-// sedan /api/geo — ett manuellt val har alltid företräde.
+// Områdesval för /elpris-idag och /elpris-imorgon. Allt innehåll renderas på
+// servern för alla fyra områden; klienten styr bara vilket som syns. Förval: SE3
+// i server-HTML, sedan /api/geo. #se1–#se4 i URL:en och manuellt val har
+// företräde framför geo.
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { fetchGeoArea } from "@/lib/geo/client";
@@ -20,9 +21,21 @@ export function AreaProvider({ children }: { children: ReactNode }) {
   const pickedManually = useRef(false);
 
   useEffect(() => {
+    // #se1–#se4 räknas som ett eget val; panelen med samma id rullas fram.
+    const fromHash = () => {
+      const m = /^#se([1-4])$/i.exec(window.location.hash);
+      if (!m) return;
+      const a = `SE${m[1]}` as Area;
+      pickedManually.current = true;
+      setArea(a);
+      requestAnimationFrame(() => document.getElementById(a.toLowerCase())?.scrollIntoView());
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
     fetchGeoArea().then((geo) => {
       if (geo && !pickedManually.current) setArea(geo);
     });
+    return () => window.removeEventListener("hashchange", fromHash);
   }, []);
 
   const pick = (a: Area) => {
@@ -62,8 +75,12 @@ export function AreaSelector() {
 }
 
 /** Serverrenderat innehåll för ett område — dolt (hidden) när ett annat område är valt. */
-export function AreaPanel({ area, children }: { area: Area; children: ReactNode }) {
-  return <div hidden={useArea() !== area}>{children}</div>;
+export function AreaPanel({ area, id, children }: { area: Area; id?: string; children: ReactNode }) {
+  return (
+    <div id={id} hidden={useArea() !== area}>
+      {children}
+    </div>
+  );
 }
 
 /** Valt område som text, t.ex. i en rubrik. */
