@@ -102,7 +102,7 @@ function change(tomorrow: number, today: number): string {
   if (today <= 0) return "–";
   const pct = ((tomorrow - today) / today) * 100;
   if (Math.abs(pct) < 3) return "ungefär samma";
-  return `${Math.round(Math.abs(pct))} % ${pct < 0 ? "billigare" : "dyrare"}`;
+  return `${Math.round(Math.abs(pct))}\u00A0% ${pct < 0 ? "billigare" : "dyrare"}`;
 }
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────

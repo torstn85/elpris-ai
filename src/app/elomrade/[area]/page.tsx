@@ -89,7 +89,7 @@ const AREA_CONTENT: Record<AreaKey, AreaContent> = {
   },
   se3: {
     intro:
-      "SE3 är Sveriges folkrikaste elområde och inkluderar Stockholm, Göteborg och stora delar av Mellansverige. Här bor drygt 60% av Sveriges befolkning.",
+      "SE3 är Sveriges folkrikaste elområde och inkluderar Stockholm, Göteborg och stora delar av Mellansverige. Här bor drygt 60\u00A0% av Sveriges befolkning.",
     why_price:
       "SE3 förbrukar mer el än vad som produceras lokalt och är beroende av import från norr och utlandet. Det gör priserna mer känsliga för väder, exportkapacitet och europeiska gaspriser.",
     production:

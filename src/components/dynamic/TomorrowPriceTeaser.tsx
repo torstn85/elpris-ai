@@ -172,13 +172,13 @@ export default function TomorrowPriceTeaser({ area }: Props) {
     } else if (pct > 0) {
       diffNode = (
         <span className="text-sm text-[#EF4444] font-semibold">
-          <span aria-hidden="true">↑</span> {rounded}% högre än idag
+          <span aria-hidden="true">↑</span> {rounded}{"\u00A0"}% högre än idag
         </span>
       );
     } else {
       diffNode = (
         <span className="text-sm text-[#22C55E] font-semibold">
-          <span aria-hidden="true">↓</span> {rounded}% lägre än idag
+          <span aria-hidden="true">↓</span> {rounded}{"\u00A0"}% lägre än idag
         </span>
       );
     }

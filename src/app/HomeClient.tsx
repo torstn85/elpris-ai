@@ -404,7 +404,7 @@ export default function HomeClient() {
               <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">spotpris</Link>
               {" "}exklusive moms och nätavgifter — det vill säga den del av elpriset som faktiskt
               varierar över dygnet och som du kan påverka genom när du använder el. För att
-              få din fulla kostnad lägger du till moms (25%), elnätsavgift, energiskatt och
+              få din fulla kostnad lägger du till moms (25{"\u00A0"}%), elnätsavgift, energiskatt och
               eventuellt påslag från ditt{" "}
               <Link href="/guider/elavtal/byta-elavtal-guide" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elavtal</Link>.
             </p>

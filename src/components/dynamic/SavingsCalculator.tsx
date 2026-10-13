@@ -49,7 +49,7 @@ const TYPE_CONFIG = {
     min: 1000,
     max: 80000,
     step: 500,
-    note: '40% antas kunna styras till billiga timmar',
+    note: '40\u00A0% antas kunna styras till billiga timmar',
     toYearlyKwh: (v: number) => v * 0.4,
   },
 } as const;
