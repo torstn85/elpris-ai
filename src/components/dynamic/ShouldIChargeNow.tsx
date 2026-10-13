@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { isCurrentHour, isFutureHour, type HourEntry } from '@/lib/prices/hourly';
+
+const HOUR_MS = 60 * 60 * 1000;
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -11,6 +14,27 @@ interface Props {
 interface HourPrice {
   hour: number;
   price: number;
+  /** Unik start (UTC) — 02 kan förekomma två gånger natten till normaltid. */
+  startUTC: string;
+  endUTC: string;
+  label: string;
+  dst?: HourEntry['dst'];
+}
+
+/** Från API-formatet till komponentens. */
+function toHourPrice(item: HourEntry): HourPrice {
+  return { hour: item.hour, price: item.ore_per_kwh, startUTC: item.startUTC, endUTC: item.endUTC, label: item.label, dst: item.dst };
+}
+
+/** Starttiden som "kl"-text: "02:00", eller "02:00 (sommartid)" när timmen finns två gånger. */
+function startClock(h: HourPrice): string {
+  const suffix = h.dst === 'summer' ? ' (sommartid)' : h.dst === 'winter' ? ' (normaltid)' : '';
+  return `${h.label.slice(0, 5)}${suffix}`;
+}
+
+/** Hela timmar mellan två timstarter (verklig tid, även på dygn med 23/25 timmar). */
+function hoursBetween(from: HourPrice, to: HourPrice): number {
+  return Math.round((Date.parse(to.startUTC) - Date.parse(from.startUTC)) / HOUR_MS);
 }
 
 type Decision = 'JA' | 'VÄNTA' | 'OK';
@@ -18,6 +42,7 @@ type Decision = 'JA' | 'VÄNTA' | 'OK';
 interface ChargeResult {
   decision: Decision;
   currentPrice: number;
+  currentHour: HourPrice;
   nextCheapHour: HourPrice | null;
 }
 
@@ -33,17 +58,6 @@ function getBackgroundLevel(price: number): Decision {
   return 'VÄNTA';
 }
 
-function getCurrentStockholmHour(): number {
-  return parseInt(
-    new Intl.DateTimeFormat('sv-SE', {
-      timeZone: 'Europe/Stockholm',
-      hour: 'numeric',
-      hour12: false,
-    }).format(new Date()),
-    10
-  );
-}
-
 function lastSlotTime(): string {
   const now = new Date();
   const fmt = (opts: Intl.DateTimeFormatOptions) =>
@@ -56,26 +70,27 @@ function lastSlotTime(): string {
 
 function analyze(hours: HourPrice[]): ChargeResult | null {
   if (hours.length === 0) return null;
-  const currentHour = getCurrentStockholmHour();
-  const current = hours.find((h) => h.hour === currentHour);
+  // På tid, inte klocktimme — 02 kan förekomma två gånger natten till normaltid.
+  const nowMs = Date.now();
+  const current = hours.find((h) => isCurrentHour(h, nowMs));
   if (!current) return null;
 
   const sorted = [...hours].sort((a, b) => a.price - b.price);
-  const cheapest6 = new Set(sorted.slice(0, 6).map((h) => h.hour));
-  const mostExpensive6 = new Set(sorted.slice(-6).map((h) => h.hour));
+  const cheapest6 = new Set(sorted.slice(0, 6).map((h) => h.startUTC));
+  const mostExpensive6 = new Set(sorted.slice(-6).map((h) => h.startUTC));
 
-  const futureHours = hours.filter((h) => h.hour > currentHour);
+  const futureHours = hours.filter((h) => isFutureHour(h, nowMs));
   const nextCheapHour =
     futureHours.length > 0
       ? futureHours.reduce((min, h) => (h.price < min.price ? h : min))
       : null;
 
   let decision: Decision;
-  if (cheapest6.has(currentHour)) decision = 'JA';
-  else if (mostExpensive6.has(currentHour)) decision = 'VÄNTA';
+  if (cheapest6.has(current.startUTC)) decision = 'JA';
+  else if (mostExpensive6.has(current.startUTC)) decision = 'VÄNTA';
   else decision = 'OK';
 
-  return { decision, currentPrice: current.price, nextCheapHour };
+  return { decision, currentPrice: current.price, currentHour: current, nextCheapHour };
 }
 
 const CONFIG = {
@@ -131,12 +146,8 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
 
         if (todayRes.status === 'fulfilled' && todayRes.value.ok) {
           const json = await todayRes.value.json();
-          const areaData: Array<{ hour: number; ore_per_kwh: number }> =
-            json.areas?.[selectedArea] || [];
-          const hours: HourPrice[] = areaData.map((item) => ({
-            hour: item.hour,
-            price: item.ore_per_kwh,
-          }));
+          const areaData: HourEntry[] = json.areas?.[selectedArea] || [];
+          const hours: HourPrice[] = areaData.map(toHourPrice);
           if (!cancelled) {
             setTodayHours(hours);
             setResult(analyze(hours));
@@ -149,12 +160,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
         if (tomorrowRes.status === 'fulfilled' && tomorrowRes.value.ok) {
           const tj = await tomorrowRes.value.json();
           if (tj.available !== false && tj.areas?.[selectedArea]?.length > 0) {
-            const tmHours: HourPrice[] = tj.areas[selectedArea].map(
-              (item: { hour: number; ore_per_kwh: number }) => ({
-                hour: item.hour,
-                price: item.ore_per_kwh,
-              })
-            );
+            const tmHours: HourPrice[] = (tj.areas[selectedArea] as HourEntry[]).map(toHourPrice);
             const cheapest = tmHours.reduce((min, h) => (h.price < min.price ? h : min));
             if (!cancelled) {
               setTomorrowHours(tmHours);
@@ -219,7 +225,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
 
   const hoursUntilCheap =
     result.nextCheapHour !== null
-      ? result.nextCheapHour.hour - getCurrentStockholmHour()
+      ? hoursBetween(result.currentHour, result.nextCheapHour)
       : null;
 
   const showTomorrow =
@@ -233,7 +239,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
     <p className="text-slate-300">
       Eller imorgon kl{' '}
       <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
-        {String(tomorrowCheap.hour).padStart(2, '0')}:00
+        {startClock(tomorrowCheap)}
       </span>{' '}
       då priset är{' '}
       <span className="font-semibold" style={{ color: priceColor(tomorrowCheap.price) }}>
@@ -243,18 +249,17 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
   ) : null;
 
   // ── Best alternative ≥3h ahead (JA-mode only) ─────────────────────────────
-  const currentHour = getCurrentStockholmHour();
-  let bestAlternative: { hour: number; price: number; isToday: boolean } | null = null;
+  // Minst 3 timmar fram i verklig tid, räknat från innevarande timmes start.
+  const nowHour = result.currentHour;
+  let bestAlternative: (HourPrice & { isToday: boolean }) | null = null;
 
   if (result.decision === 'JA') {
     const todayCandidates = todayHours
-      .filter((h) => h.hour >= currentHour + 3)
+      .filter((h) => hoursBetween(nowHour, h) >= 3)
       .map((h) => ({ ...h, isToday: true }));
 
-    // Tomorrow hour H is (24 - currentHour + H) hours away; need >= 3 → H >= currentHour - 21
-    const tmMinHour = Math.max(0, currentHour - 21);
     const tomorrowCandidates = tomorrowHours
-      .filter((h) => h.hour >= tmMinHour)
+      .filter((h) => hoursBetween(nowHour, h) >= 3)
       .map((h) => ({ ...h, isToday: false }));
 
     const all = [...todayCandidates, ...tomorrowCandidates];
@@ -269,8 +274,8 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
         <>
           Alternativt: vänta{' '}
           <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
-            {bestAlternative.hour - currentHour}{' '}
-            {bestAlternative.hour - currentHour === 1 ? 'timme' : 'timmar'}
+            {hoursBetween(nowHour, bestAlternative)}{' '}
+            {hoursBetween(nowHour, bestAlternative) === 1 ? 'timme' : 'timmar'}
           </span>{' '}
           då elpriset är{' '}
           <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
@@ -281,7 +286,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
         <>
           Alternativt imorgon kl{' '}
           <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
-            {String(bestAlternative.hour).padStart(2, '0')}:00
+            {startClock(bestAlternative)}
           </span>{' '}
           —{' '}
           <span className="font-semibold" style={{ color: priceColor(bestAlternative.price) }}>
@@ -334,7 +339,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
                   </span>{' '}
                   — kl{' '}
                   <span className="font-semibold" style={{ color: nextPriceClr }}>
-                    {String(result.nextCheapHour.hour).padStart(2, '0')}:00
+                    {startClock(result.nextCheapHour)}
                   </span>{' '}
                   sjunker priset till{' '}
                   <span className="font-semibold" style={{ color: nextPriceClr }}>
@@ -363,7 +368,7 @@ export default function ShouldIChargeNow({ area: areaProp = 'SE3' }: Props) {
             <p className="text-slate-300">
               Priset är varken billigast eller dyrast just nu. Det blir billigare kl{' '}
               <span className="font-semibold" style={{ color: nextPriceClr }}>
-                {String(result.nextCheapHour.hour).padStart(2, '0')}:00
+                {startClock(result.nextCheapHour)}
               </span>{' '}
               (
               <span className="font-semibold" style={{ color: nextPriceClr }}>

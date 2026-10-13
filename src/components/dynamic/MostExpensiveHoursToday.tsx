@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { HourEntry } from '@/lib/prices/hourly';
+
+/** Det komponenten behöver av en timme: unik start (nyckel), etikett och pris. */
+type HourInput = Pick<HourEntry, 'startUTC' | 'label' | 'ore_per_kwh'>;
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -8,20 +12,21 @@ interface Props {
   area?: Area;
   count?: number;
   /** Server-side seed: today's hourly entries for `area`, renders in HTML before hydration. */
-  initialData?: Array<{ hour: number; ore_per_kwh: number }> | null;
+  initialData?: HourInput[] | null;
 }
 
 interface HourPrice {
-  hour: number;
+  key: string;
+  label: string;
   price: number;
 }
 
 function mostExpensive(
-  areaData: Array<{ hour: number; ore_per_kwh: number }>,
+  areaData: HourInput[],
   count: number,
 ): HourPrice[] {
   return areaData
-    .map((item) => ({ hour: item.hour, price: item.ore_per_kwh }))
+    .map((item) => ({ key: item.startUTC, label: item.label, price: item.ore_per_kwh }))
     .sort((a, b) => b.price - a.price)
     .slice(0, count);
 }
@@ -47,8 +52,8 @@ export default function MostExpensiveHoursToday({
         if (!res.ok) throw new Error('Fel');
         const json = await res.json();
 
-        // Faktiskt format: { areas: { SE3: [{ hour, time_start, ore_per_kwh }] } }
-        const areaData: Array<{ hour: number; ore_per_kwh: number }> =
+        // Format: { areas: { SE3: [{ hour, startUTC, label, ore_per_kwh, … }] } }
+        const areaData: HourInput[] =
           json.areas?.[area] || [];
 
         if (!cancelled) {
@@ -65,12 +70,6 @@ export default function MostExpensiveHoursToday({
     fetchData();
     return () => { cancelled = true; };
   }, [area, count]);
-
-  const formatHourRange = (hour: number): string => {
-    const start = String(hour).padStart(2, '0');
-    const end = String((hour + 1) % 24).padStart(2, '0');
-    return `${start}:00–${end}:00`;
-  };
 
   return (
     <div className="my-6 rounded-2xl bg-gradient-to-br from-red-950 to-slate-900 p-6 ring-1 ring-red-900">
@@ -97,13 +96,13 @@ export default function MostExpensiveHoursToday({
         <ul className="space-y-2">
           {hours.map((h, i) => (
             <li
-              key={h.hour}
+              key={h.key}
               className="flex items-center justify-between bg-[#0A2540]/60 rounded-lg px-4 py-3"
             >
               <span className="flex items-center gap-3">
                 <span className="text-xs font-bold text-red-400 w-5">#{i + 1}</span>
                 <span className="text-base font-semibold text-white">
-                  {formatHourRange(h.hour)}
+                  {h.label}
                 </span>
               </span>
               <span className="text-lg font-bold text-red-400">

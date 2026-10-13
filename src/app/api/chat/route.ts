@@ -211,6 +211,14 @@ ${knowledgeBlock}`;
   return withSite + ragRules;
 }
 
+/**
+ * Timmar till modellen: klocktimme, etikett och pris. Etiketten skiljer de två
+ * 02-timmarna natten till normaltid åt ("02:00–03:00 (sommartid)/(normaltid)").
+ */
+function toolHours(hours: Array<{ hour: number; label: string; ore_per_kwh: number }> | undefined) {
+  return (hours ?? []).map((h) => ({ hour: h.hour, label: h.label, ore_per_kwh: h.ore_per_kwh }));
+}
+
 const TOOLS: Anthropic.Tool[] = [
   {
     name: 'calculate_cost',
@@ -316,7 +324,7 @@ async function executeTool(
       const data = await res.json();
       return JSON.stringify({
         area: input.area,
-        hourly: data.areas?.[input.area] ?? [],
+        hourly: toolHours(data.areas?.[input.area]),
       });
     }
 
@@ -330,7 +338,7 @@ async function executeTool(
       return JSON.stringify({
         area: input.area,
         date: data.date,
-        hourly: data.areas?.[input.area] ?? [],
+        hourly: toolHours(data.areas?.[input.area]),
       });
     }
 

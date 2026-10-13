@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { stockholmHour, stockholmDateString, parseStockholmHour, currentSlotStartISO } from "@/lib/time";
+import { stockholmDateString, currentSlotStartISO } from "@/lib/time";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -68,12 +68,14 @@ async function fetchAreaHour(area: Area, dateStr: string): Promise<number> {
   if (!res.ok) throw new Error(`Failed to fetch ${area}: ${res.status}`);
   const data: RawEntry[] = await res.json();
 
-  const hour = stockholmHour();
+  // Den kvart som pågår just nu, på tid (inte klocktimme — 02 kan finnas två
+  // gånger natten till normaltid).
+  const now = Date.now();
+  const entry = data.find(
+    (e) => Date.parse(e.time_start) <= now && now < Date.parse(e.time_end),
+  );
 
-  // Find the entry whose time_start corresponds to the current Stockholm hour
-  const entry = data.find((e) => parseStockholmHour(e.time_start) === hour);
-
-  if (!entry) throw new Error(`No entry for hour ${hour} in ${area}`);
+  if (!entry) throw new Error(`No current slot in ${area}`);
   return Math.round(entry.SEK_per_kWh * 10000) / 100;
 }
 

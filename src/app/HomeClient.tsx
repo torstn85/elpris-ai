@@ -72,10 +72,12 @@ function cheapestWindow(
       bestStart = i;
     }
   }
-  const start = hours[bestStart].hour;
-  const end = hours[bestStart + windowSize - 1].hour + 1;
+  // Etikett från timmarnas egna etiketter: första timmens start, sista timmens slut
+  // ("21:00–00:00"). Fönstret är alltid tre faktiska timmar i följd.
+  const start = hours[bestStart].label.slice(0, 5);
+  const end = hours[bestStart + windowSize - 1].label.slice(6, 11);
   return {
-    label: `${String(start).padStart(2, "0")}:00–${String(end).padStart(2, "0")}:00`,
+    label: `${start}–${end}`,
     avg: Math.round(best * 10) / 10,
   };
 }

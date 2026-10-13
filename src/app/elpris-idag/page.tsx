@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import { stockholmHour } from "@/lib/time";
+import { isCurrentHour } from "@/lib/prices/hourly";
 import { loadTodayPrices, type HourEntry } from "@/lib/prices/today";
 import { formatSwedishDay } from "@/lib/format/date";
 
@@ -97,7 +97,7 @@ function fmt(price: number): string {
 
 export default async function ElprisIdag() {
   const areas = await fetchTodayPrices();
-  const now = stockholmHour();
+  const nowMs = Date.now();
   const todayLabel = formatSwedishDay(new Date());
 
   const jsonLd = {
@@ -288,10 +288,10 @@ export default async function ElprisIdag() {
                         </thead>
                         <tbody>
                           {entries.map((entry) => {
-                            const isCurrent = entry.hour === now;
+                            const isCurrent = isCurrentHour(entry, nowMs);
                             return (
                               <tr
-                                key={entry.hour}
+                                key={entry.startUTC}
                                 className={`border-b border-[#1E4976]/50 last:border-0 transition-colors ${
                                   isCurrent ? "bg-white/5" : "hover:bg-white/[0.02]"
                                 }`}
@@ -303,8 +303,7 @@ export default async function ElprisIdag() {
                                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00E5FF]" />
                                     </span>
                                   )}
-                                  {String(entry.hour).padStart(2, "0")}:00–
-                                  {String(entry.hour + 1).padStart(2, "0")}:00
+                                  {entry.label}
                                 </td>
                                 <td className="px-5 py-2.5 text-right font-bold font-mono tabular-nums">
                                   <span style={{ color: priceColor(entry.ore_per_kwh) }}>

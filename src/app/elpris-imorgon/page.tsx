@@ -217,12 +217,11 @@ export default async function ElprisImorgon() {
                           <tbody>
                             {entries.map((entry) => (
                               <tr
-                                key={entry.hour}
+                                key={entry.startUTC}
                                 className="border-b border-[#1E4976]/50 last:border-0 hover:bg-white/[0.02] transition-colors"
                               >
                                 <td className="px-5 py-2.5 font-mono text-[#e2eaf4]">
-                                  {String(entry.hour).padStart(2, "0")}:00–
-                                  {String(entry.hour + 1).padStart(2, "0")}:00
+                                  {entry.label}
                                 </td>
                                 <td className="px-5 py-2.5 text-right font-bold font-mono tabular-nums">
                                   <span style={{ color: priceColor(entry.ore_per_kwh) }}>

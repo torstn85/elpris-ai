@@ -11,6 +11,8 @@ interface Props {
 interface HourEntry {
   hour: number;
   ore_per_kwh: number;
+  /** "14:00–15:00" eller "02:00–03:00 (sommartid)" från /api/prices/today. */
+  label: string;
 }
 
 interface Analysis {
@@ -22,10 +24,9 @@ interface Analysis {
   curveDesc: string;
 }
 
-function fmt(h: number): string {
-  const start = String(h).padStart(2, '0');
-  const end = String((h + 1) % 24).padStart(2, '0');
-  return `${start}–${end}`;
+/** Kort form av timmens etikett: "14–15", "02–03 (sommartid)". */
+function fmt(h: HourEntry): string {
+  return h.label.replace(/:00/g, '');
 }
 
 function priceColor(price: number): string {
@@ -85,11 +86,11 @@ export default function DailyPriceAnalysis({ area }: Props) {
         const res = await fetch('/api/prices/today');
         if (!res.ok) return;
         const json = await res.json();
-        const areaData: Array<{ hour: number; ore_per_kwh: number }> =
-          json.areas?.[area] || [];
+        const areaData: HourEntry[] = json.areas?.[area] || [];
         const hours: HourEntry[] = areaData.map((item) => ({
           hour: item.hour,
           ore_per_kwh: item.ore_per_kwh,
+          label: item.label,
         }));
         if (!cancelled) setResult(analyze(hours));
       } catch {
@@ -122,10 +123,10 @@ export default function DailyPriceAnalysis({ area }: Props) {
           {area}, vilket är{' '}
           <strong style={{ color: levelColor }}>{level}</strong> för säsongen.
           Billigaste timmen är{' '}
-          <strong className="text-[#22C55E]">kl {fmt(cheap.hour)}</strong>{' '}
+          <strong className="text-[#22C55E]">kl {fmt(cheap)}</strong>{' '}
           (<span className="text-[#22C55E]">{cheap.ore_per_kwh.toFixed(1)} öre</span>),
           dyraste är{' '}
-          <strong className="text-[#EF4444]">kl {fmt(expensive.hour)}</strong>{' '}
+          <strong className="text-[#EF4444]">kl {fmt(expensive)}</strong>{' '}
           (<span className="text-[#EF4444]">{expensive.ore_per_kwh.toFixed(1)} öre</span>).
           {' '}{curveDesc}
         </p>

@@ -7,8 +7,9 @@ import PriceGraph from '@/components/dynamic/PriceGraph';
 import CheapestHoursToday from '@/components/dynamic/CheapestHoursToday';
 import MostExpensiveHoursToday from '@/components/dynamic/MostExpensiveHoursToday';
 import { CITIES, type City } from '@/lib/cities';
-import { getTodayQuarters, loadTodayPrices } from '@/lib/prices/today';
-import { stockholmHour, stockholmSlotLabel, formatMonthYear } from '@/lib/time';
+import { loadTodayPrices } from '@/lib/prices/today';
+import { isCurrentHour } from '@/lib/prices/hourly';
+import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -109,13 +110,14 @@ export default async function StadPage({ params }: PageProps) {
 
   // SSR: hämta dagens priser för stadens elområde så pristalen finns i HTML
   // redan vid första render. Klientkomponenterna tar sen över med live-uppdatering.
-  const [today, quarters] = await Promise.all([
-    loadTodayPrices(),
-    getTodayQuarters(city.area),
-  ]);
+  // Timmar och kvartar ur samma laddning (en databasfråga).
+  const today = await loadTodayPrices();
   const areaHours = today?.areas[city.area] ?? null;
+  const quarters = today?.quarters[city.area] ?? null;
+  // Aktuell timme på tid, inte klocktimme — 02 finns två gånger natten till normaltid.
+  const nowMs = Date.now();
   const currentPrice =
-    areaHours?.find((h) => h.hour === stockholmHour())?.ore_per_kwh ?? null;
+    areaHours?.find((h) => isCurrentHour(h, nowMs))?.ore_per_kwh ?? null;
 
   // Server-side tidsstämpel för prisdatan (aktuellt 15-min-slot, Stockholm).
   // Renderas i HTML både under H1 och i spotpris-boxen (slotLabel = bara tiden).
