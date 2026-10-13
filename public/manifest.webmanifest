@@ -1,0 +1,36 @@
+{
+  "name": "elpris.ai",
+  "short_name": "elpris.ai",
+  "description": "Elpriset per kvart för SE1–SE4 – idag, imorgon och i din stad.",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "background_color": "#0A2540",
+  "theme_color": "#0A2540",
+  "lang": "sv-SE",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import ConsentManager from "@/components/ConsentManager";
 import Footer from "@/components/Footer";
@@ -36,9 +36,14 @@ export const metadata: Metadata = {
   // Ingen canonical, og:url eller beskrivning här — varje sida sätter sina egna
   // via pageMeta() (src/lib/seo.ts). Ärvd canonical gjorde sidor till kopior av
   // startsidan i Googles ögon.
-  icons: {
-    icon: "/favicon.png",
-  },
+  // Favicon, icon.svg och apple-icon.png sköts av filkonventionen i src/app
+  // (genereras av scripts/gen-icons.mjs).
+  manifest: "/manifest.webmanifest",
+};
+
+/** Adressfältets färg på mobilen — samma som manifestets theme_color. */
+export const viewport: Viewport = {
+  themeColor: "#0A2540",
 };
 
 export default function RootLayout({

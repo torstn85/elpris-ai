@@ -224,7 +224,7 @@ export default function HomeClient() {
             "@type": "Organization",
             name: "elpris.ai",
             url: "https://www.elpris.ai",
-            logo: "https://www.elpris.ai/favicon.png",
+            logo: "https://www.elpris.ai/logo-512.png",
             description:
               "Sveriges destination för realtidspriser på el och AI-driven energirådgivning.",
             sameAs: [],
