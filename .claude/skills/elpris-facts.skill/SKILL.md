@@ -61,6 +61,7 @@ Skriv ALDRIG exakta kr-belopp för Grön teknik-besparing. Installatörens offer
 - Fram till dess väljer **varje elnätsbolag själv** om det tar ut effektavgift.
 - Skriv ALDRIG "brett införda", "de flesta elnätsbolag" eller "obligatoriskt" om effekttariffer.
 - Källa: Energimarknadsbyrån, "Effekttariffer"
+- Godkänd formulering: "Allt fler nätbolag tar ut en effektavgift – kolla din nätfaktura." Effekttoppen mäts av nätbolaget, ofta per timme.
 
 ## Batterilager — Boverkets 20 kWh-regel
 
@@ -81,6 +82,7 @@ Spotpriset **sätts en gång per dygn** i day-ahead-auktionen på Nord Pool — 
 **KRITISK distinktion:** 15 minuter är prisets **upplösning**, inte hur ofta priset räknas om. Hela nästa dygn fastställs i en enda auktion.
 
 ❌ FEL: "priset sätts / bestäms / uppdateras var 15:e minut på Nord Pool"
+- "Priset sätts per kvart" är korrekt (varje pris gäller i 15 minuter). Förbjudet är "uppdateras var 15:e minut" och "sätts var 15:e minut".
 ✅ KORREKT (prisbildning): "priset sätts en gång per dygn i day-ahead-auktionen och anges i 15-minutersintervall"
 ✅ KORREKT (data): "priserna på sajten uppdateras var 15:e minut" — beskriver datahämtning/visning, inte prisbildning
 
