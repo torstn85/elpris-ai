@@ -13,7 +13,7 @@ import { formatClock } from '@/lib/prices/quarterTicks';
 import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
 import { formatSwedishDay } from '@/lib/format/date';
 import { ore1 } from '@/lib/format/ore';
-import { pageMeta } from '@/lib/seo';
+import { ORG_LOGO, pageMeta } from '@/lib/seo';
 import { ogCityUrl } from '@/lib/og/images';
 import { stockholmISODate } from '@/lib/time';
 import HourTable from '@/components/prices/HourTable';
@@ -184,6 +184,7 @@ export default async function StadPage({ params }: PageProps) {
       '@type': 'Organization',
       name: 'elpris.ai',
       url: 'https://www.elpris.ai',
+      logo: ORG_LOGO,
     },
     mainEntityOfPage: {
       '@type': 'WebPage',

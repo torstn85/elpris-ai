@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
-import { pageMeta } from "@/lib/seo";
+import { ORG_LOGO, pageMeta } from "@/lib/seo";
 import PageReading from "@/components/layout/PageReading";
 
 export const metadata: Metadata = pageMeta({
@@ -24,6 +24,7 @@ const JSON_LD = {
     "@type": "Organization",
     name: "elpris.ai",
     url: "https://www.elpris.ai",
+    logo: ORG_LOGO,
     email: "info@elpris.ai",
   },
 };

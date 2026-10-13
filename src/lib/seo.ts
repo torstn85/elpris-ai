@@ -14,6 +14,14 @@ export function absoluteUrl(path: string): string {
   return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
 }
 
+/** Logotypen i JSON-LD (Organization.logo, publisher.logo). Google kräver minst 112×112. */
+export const ORG_LOGO = {
+  "@type": "ImageObject",
+  url: absoluteUrl("/logo-512.png"),
+  width: 512,
+  height: 512,
+};
+
 export interface OgImage {
   /** Absolut adress till bilden (1200×630). */
   url: string;

@@ -16,7 +16,7 @@ import NavBar from '@/components/NavBar';
 import { formatMonthYear } from '@/lib/time';
 import { CATEGORY_LABELS } from '@/lib/guideCategories';
 import PageReading from "@/components/layout/PageReading";
-import { ogImageFields } from '@/lib/seo';
+import { ORG_LOGO, ogImageFields } from '@/lib/seo';
 import { ogGuideUrl } from '@/lib/og/images';
 
 const CONTENT_DIR = path.join(process.cwd(), 'src/content/guider');
@@ -101,6 +101,7 @@ export default function ArticlePage({ params }: PageProps) {
       '@type': 'Organization',
       name: 'elpris.ai',
       url: 'https://www.elpris.ai',
+      logo: ORG_LOGO,
     },
     mainEntityOfPage: {
       '@type': 'WebPage',

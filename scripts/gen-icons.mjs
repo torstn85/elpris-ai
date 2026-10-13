@@ -121,3 +121,38 @@ write(
 );
 
 console.log(out.map((l) => "  " + l).join("\n"));
+
+// ── LogoMark: icon-small som inline-SVG i header och sidfot ─────────────────
+// Genererad, inte handskriven, så att headern och faviconen inte glider isär.
+// Inline i stället för <img>: inget extra anrop och ingen layoutförskjutning.
+{
+  const body = iconSmall
+    .replace(/^[\s\S]*?<svg[^>]*>/, "")
+    .replace(/<\/svg>\s*$/, "")
+    .replace(/([a-z]+)-([a-z])([a-z]*)=/g, (_, a, b, c) => `${a}${b.toUpperCase()}${c}=`)
+    .replace(/\/>/g, " />")
+    .trim()
+    .split("\n")
+    .map((l) => "      " + l.trim())
+    .join("\n");
+  write(
+    "src/components/LogoMark.tsx",
+    `// GENERERAD FIL — ändra inte för hand. Källa: src/assets/icon-small.svg
+// Kör: node scripts/gen-icons.mjs
+
+/**
+ * Logotypmärket (icon-small, samma som faviconen) bredvid ordmärket.
+ * Dekorativt: ordmärket bär namnet, så märket är aria-hidden — annars läser
+ * skärmläsaren upp namnet två gånger.
+ */
+export default function LogoMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false" className={className}>
+${body}
+    </svg>
+  );
+}
+`,
+  );
+  console.log("  src/components/LogoMark.tsx");
+}

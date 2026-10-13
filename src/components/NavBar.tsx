@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import LogoMark from '@/components/LogoMark';
 
 const LINKS = [
   { href: '/elpris-idag', label: 'Elpris idag' },
@@ -39,8 +40,11 @@ export default function NavBar() {
   return (
     <nav className="border-b border-[#1E4976] relative">
       <div className="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <Link href="/" className="font-extrabold text-xl tracking-tight text-white">
-          elpris<span className="text-[#00E5FF]">.ai</span>
+        <Link href="/" className="flex items-center gap-2 font-extrabold text-xl tracking-tight text-white">
+          <LogoMark className="h-7 w-7 shrink-0" />
+          <span>
+            elpris<span className="text-[#00E5FF]">.ai</span>
+          </span>
         </Link>
 
         {/* Desktop menu — oförändrad styling */}

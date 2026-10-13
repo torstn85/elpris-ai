@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoMark from '@/components/LogoMark';
 import CookiebotRenewButton from './CookiebotRenewButton';
 import { CITIES } from '@/lib/cities';
 
@@ -25,8 +26,11 @@ export default function Footer({ id, className = '' }: FooterProps) {
 
           {/* Col 1: Om elpris.ai */}
           <div>
-            <Link href="/" className="font-extrabold text-base text-white">
-              elpris<span className="text-[#00E5FF]">.ai</span>
+            <Link href="/" className="inline-flex items-center gap-2 font-extrabold text-base text-white">
+              <LogoMark className="h-7 w-7 shrink-0" />
+              <span>
+                elpris<span className="text-[#00E5FF]">.ai</span>
+              </span>
             </Link>
             <p className="text-xs text-[#8fafc9] mt-2 mb-4">
               Elpriset per kvart – begripligt och lite roligare.

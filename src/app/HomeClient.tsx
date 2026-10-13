@@ -11,6 +11,7 @@ import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { fetchGeoArea } from "@/lib/geo/client";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
 import PageWide from "@/components/layout/PageWide";
+import { ORG_LOGO } from "@/lib/seo";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -203,6 +204,7 @@ export default function HomeClient() {
               "@type": "Organization",
               name: "elpris.ai",
               url: "https://www.elpris.ai",
+              logo: ORG_LOGO,
             },
             potentialAction: {
               "@type": "SearchAction",
@@ -224,7 +226,7 @@ export default function HomeClient() {
             "@type": "Organization",
             name: "elpris.ai",
             url: "https://www.elpris.ai",
-            logo: "https://www.elpris.ai/logo-512.png",
+            logo: ORG_LOGO,
             description:
               "Sveriges destination för realtidspriser på el och AI-driven energirådgivning.",
             sameAs: [],
