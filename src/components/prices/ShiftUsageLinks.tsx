@@ -14,6 +14,7 @@ export default function ShiftUsageLinks() {
       </p>
       <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base">
         <li><Link href="/guider/spara-el/tvatta-billigt" className={LINK}>Så tvättar du billigt</Link></li>
+        <li><Link href="/guider/spara-el/torktumla-billigt" className={LINK}>Så torktumlar du billigt</Link></li>
         <li><Link href="/guider/spara-el/ladda-elbil-billigt" className={LINK}>Ladda elbilen billigt</Link></li>
         <li><Link href="/guider/spara-el/varmepump-elpris" className={LINK}>Värmepump och spotpris</Link></li>
       </ul>

@@ -76,7 +76,8 @@ export default function CheapestWindowView({
   serverNow,
 }: {
   hours: number;
-  kwh: number;
+  /** null = okänd förbrukning: ingen kWh-uppgift och ingen besparingsrad. */
+  kwh: number | null;
   activity: string;
   initial: WindowData;
   serverNow: number;
@@ -143,7 +144,7 @@ export default function CheapestWindowView({
   const rest = cheap && cheapStatus === "har redan varit" ? cheapestWindow(hours, now, size) : null;
   const tomorrowHours = data.tomorrow?.[area] ?? [];
   const tomorrowCheap = dayWindow(tomorrowHours, size, "cheapest");
-  const saving = cheap && dear ? (kwh * (dear.avg - cheap.avg)) / 100 * 1.25 : null;
+  const saving = cheap && dear && kwh !== null ? (kwh * (dear.avg - cheap.avg)) / 100 * 1.25 : null;
 
   return (
     <section className="my-8 rounded-2xl bg-[#0F3460] border border-[#1E4976] p-5 sm:p-6">
@@ -171,7 +172,7 @@ export default function CheapestWindowView({
         </div>
       </div>
       <p className="text-sm text-[#8fafc9] mb-3">
-        {size} timmar i följd · {decimal(kwh)} kWh per pass
+        {size} timmar i följd{kwh !== null ? ` · ${decimal(kwh)} kWh per pass` : ""}
         {data.todayDate ? ` · ${dayLabel(data.todayDate)}` : ""}
       </p>
 

@@ -225,7 +225,10 @@ export default function ArticlePage({ params }: PageProps) {
             <MDXRemote
               source={content}
               components={mdxComponents}
-              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+              // blockJS: false så att talprops som <CheapestWindowToday kwh={2.5} /> når
+              // komponenterna (next-mdx-remote 6 tar annars bort alla {…}-uttryck).
+              // blockDangerousJS är kvar på: bara ofarliga uttryck tillåts.
+              options={{ blockJS: false, mdxOptions: { remarkPlugins: [remarkGfm] } }}
             />
           </div>
 
