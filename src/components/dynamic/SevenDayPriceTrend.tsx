@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { formatSwedishDay } from '@/lib/format/date';
+import { ore1 } from '@/lib/format/ore';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -48,7 +50,7 @@ const CustomTooltip = ({
     <div className="rounded-lg bg-[#0F3460] px-3 py-2 ring-1 ring-[#1E4976] shadow-xl">
       <p className="text-xs text-slate-400">{label}</p>
       <p className="text-sm font-bold text-white">
-        {payload[0].value.toFixed(1)}{' '}
+        {ore1(payload[0].value)}{' '}
         <span className="text-slate-400 font-normal">öre/kWh</span>
       </p>
     </div>
@@ -114,8 +116,10 @@ export default function SevenDayPriceTrend({ area = 'SE3' }: Props) {
   const first = days[0].price;
   const last = days[days.length - 1].price;
   const pct = ((last - first) / first) * 100;
-  const weekAvg =
-    Math.round((days.reduce((s, d) => s + d.price, 0) / days.length) * 10) / 10;
+  const weekAvg = days.reduce((s, d) => s + d.price, 0) / days.length;
+  // Jämförelsedagen utskriven, t.ex. "jämfört med tisdag 6 oktober".
+  const firstDay = formatSwedishDay(new Date(`${days[0].date}T12:00:00Z`));
+  const since = `jämfört med ${firstDay.charAt(0).toLowerCase()}${firstDay.slice(1)}`;
 
   let trendLabel: string;
   let trendColor: string;
@@ -123,10 +127,10 @@ export default function SevenDayPriceTrend({ area = 'SE3' }: Props) {
     trendLabel = '→ Priset är stabilt den senaste veckan';
     trendColor = 'text-slate-300';
   } else if (pct > 0) {
-    trendLabel = `↑ ${Math.abs(pct).toFixed(0)}% högre än för en vecka sedan`;
+    trendLabel = `↑ ${Math.abs(pct).toFixed(0)}\u00A0% högre ${since}`;
     trendColor = 'text-red-400';
   } else {
-    trendLabel = `↓ ${Math.abs(pct).toFixed(0)}% lägre än för en vecka sedan`;
+    trendLabel = `↓ ${Math.abs(pct).toFixed(0)}\u00A0% lägre ${since}`;
     trendColor = 'text-green-400';
   }
 
@@ -160,6 +164,7 @@ export default function SevenDayPriceTrend({ area = 'SE3' }: Props) {
             axisLine={{ stroke: '#334155' }}
           />
           <YAxis
+            tickFormatter={(v: number) => v.toLocaleString('sv-SE')}
             tick={{ fill: '#94a3b8', fontSize: 11 }}
             tickLine={false}
             axisLine={false}
@@ -176,7 +181,7 @@ export default function SevenDayPriceTrend({ area = 'SE3' }: Props) {
       {/* Weekly average */}
       <p className="mt-3 text-xs text-slate-400 text-right">
         Veckans snitt:{' '}
-        <span className="font-semibold text-white">{weekAvg} öre/kWh</span>
+        <span className="font-semibold text-white">{ore1(weekAvg)} öre/kWh</span>
       </p>
     </div>
   );
