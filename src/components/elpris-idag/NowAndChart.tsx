@@ -1,6 +1,7 @@
 "use client";
 
-// "Just nu"-kortet och kvartsdiagrammet för valt område. Kortet visar kvarten
+// "Just nu"-kortet och kvartsdiagrammet för valt område (eller ett låst område
+// via prop area, som på /elomrade/seX). Kortet visar kvarten
 // som pågår och uppdateras var 30:e sekund (bara dagens priser — /elpris-imorgon
 // visar bara diagrammet). Första renderingen använder
 // serverns tid (serverNow) så att server-HTML och hydrering stämmer överens.
@@ -23,16 +24,23 @@ export default function NowAndChart({
   quarters,
   serverNow,
   titlePrefix = "Dagens elpris per kvart i",
+  title,
   showNow = true,
+  area: lockedArea,
 }: {
   quarters: Record<Area, QuarterPoint[]>;
   serverNow: number;
   /** Diagramrubrik före områdets namn. */
   titlePrefix?: string;
+  /** Hela diagramrubriken; ersätter "{titlePrefix} {område}". */
+  title?: string;
   /** Visa "Just nu"-kortet. */
   showNow?: boolean;
+  /** Lås till ett område (t.ex. /elomrade/se1) i stället för AreaProvider-valet. */
+  area?: Area;
 }) {
-  const area = useArea();
+  const selectedArea = useArea();
+  const area = lockedArea ?? selectedArea;
   const [now, setNow] = useState(serverNow);
 
   useEffect(() => {
@@ -71,7 +79,7 @@ export default function NowAndChart({
         quarters={quarters[area]}
         area={area}
         headingLevel="h2"
-        title={`${titlePrefix} ${area}`}
+        title={title ?? `${titlePrefix} ${area}`}
       />
     </section>
   );
