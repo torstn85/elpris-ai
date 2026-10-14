@@ -1,5 +1,5 @@
 // GENERERAD FIL — ändra inte för hand.
-// Kör: npx tsx scripts/analysis/cheapest-hours.ts 2026-04-13 --write
+// Kör: npx tsx scripts/analysis/cheapest-hours.ts 2026-04-13 --to 2026-10-12 --write
 //
 // Medianskillnad per dygn mellan dygnets dyraste och billigaste fönster om N
 // timmar i följd (1–4), per elområde. Fönster räknas i hela timmar på

@@ -13,9 +13,12 @@
 // Dygn som inte har 92, 96 eller 100 kvartar hoppas över.
 //
 // Användning:
-//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum]           (standard 2026-04-13, till och med i går)
-//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] --write   skriver även src/lib/prices/windowSpreadStats.ts
-//                                                                     (medianskillnad per fönsterlängd, över midnatt)
+//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] [--to till-datum]
+//       från-datum standard 2026-04-13, till-datum standard i går (båda YYYY-MM-DD, inklusive)
+//   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] --to till-datum --write
+//       skriver även src/lib/prices/windowSpreadStats.ts (medianskillnad per
+//       fönsterlängd, över midnatt). --write kräver --to, så att perioden i
+//       filen inte flyttar sig av sig själv när skriptet körs en annan dag.
 
 import fs from "fs";
 import path from "path";
@@ -160,10 +163,31 @@ async function main() {
   if (!url || !key) throw new Error("Saknar NEXT_PUBLIC_SUPABASE_URL eller SUPABASE_SECRET_KEY");
   const supabase = createClient(url, key);
 
-  const fromDate = process.argv[2] ?? "2026-04-13";
-  const toDate = addDays(stockholmISODate(), -1);
-  // Dagens priser hämtas bara som påfyllnad för fönster över midnatt från i går.
-  const lookahead = stockholmISODate();
+  const args = process.argv.slice(2);
+  const toIndex = args.indexOf("--to");
+  const toArg = toIndex >= 0 ? args[toIndex + 1] : undefined;
+  // Från-datum: första argumentet som varken är en flagga eller värdet till --to.
+  const fromArg = args.find((a, i) => !a.startsWith("--") && (toIndex < 0 || i !== toIndex + 1));
+  const write = args.includes("--write");
+  const ISO = /^\d{4}-\d{2}-\d{2}$/;
+  if (toIndex >= 0 && !(toArg && ISO.test(toArg))) throw new Error("--to kräver ett datum (YYYY-MM-DD)");
+  if (write && toIndex < 0) throw new Error("--write kräver --to YYYY-MM-DD, t.ex. --to 2026-10-12");
+  const fromDate = fromArg ?? "2026-04-13";
+  if (!ISO.test(fromDate)) throw new Error(`Ogiltigt från-datum: ${fromDate} (YYYY-MM-DD)`);
+  const toDate = toArg ?? addDays(stockholmISODate(), -1);
+  if (toDate >= stockholmISODate()) throw new Error(`--to måste vara senast i går (${addDays(stockholmISODate(), -1)})`);
+  if (toDate < fromDate) throw new Error(`--to (${toDate}) ligger före från-datum (${fromDate})`);
+  const MONTH_LONG = ["", "januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
+  const monthName = (iso: string) => MONTH_LONG[Number(iso.slice(5, 7))];
+  // T.ex. "april–oktober 2026", "maj 2026" eller "november 2026–mars 2027".
+  const periodLabel =
+    fromDate.slice(0, 7) === toDate.slice(0, 7)
+      ? `${monthName(fromDate)} ${fromDate.slice(0, 4)}`
+      : fromDate.slice(0, 4) === toDate.slice(0, 4)
+        ? `${monthName(fromDate)}–${monthName(toDate)} ${toDate.slice(0, 4)}`
+        : `${monthName(fromDate)} ${fromDate.slice(0, 4)}–${monthName(toDate)} ${toDate.slice(0, 4)}`;
+  // Dygnet efter till-datum hämtas bara som påfyllnad för fönster över midnatt.
+  const lookahead = addDays(toDate, 1);
 
   const rows = await fetchAllPages<Row>((a, b) =>
     supabase
@@ -215,7 +239,7 @@ async function main() {
 
   const line = "═".repeat(78);
   console.log(line);
-  console.log(`OBS: perioden täcker BARA ${fromDate} – ${toDate}, alltså april–oktober 2026.`);
+  console.log(`OBS: perioden täcker BARA ${fromDate} – ${toDate}, alltså ${periodLabel}.`);
   console.log("Inga slutsatser om vintern kan dras ur den här datan.");
   console.log("Priser: spotpris, öre/kWh exkl. moms. Timmar = svensk klocktid, timsnitt av kvartarna.");
   console.log(line);
@@ -319,17 +343,16 @@ async function main() {
       `  ${a}: vardag ${f1(mean(wd.map((x) => x.avg)))} (${wd.length} d) · lördag ${f1(mean(sat.map((x) => x.avg)))} (${sat.length} d) · söndag ${f1(mean(sun.map((x) => x.avg)))} (${sun.length} d)`,
     );
   }
-  console.log(`\n${line}\nOBS igen: bara april–oktober 2026. Vintern saknas i underlaget.\n${line}`);
+  console.log(`\n${line}\nOBS igen: bara ${periodLabel}. Vintern saknas i underlaget.\n${line}`);
 
-  if (process.argv.includes("--write")) {
+  if (write) {
     const firstMonth = Math.min(...months(days.get("SE3")!));
     const lastMonth = Math.max(...months(days.get("SE3")!));
-    const MONTH_LONG = ["", "januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
     const label = `${MONTH_LONG[firstMonth]}–${MONTH_LONG[lastMonth]} ${toDate.slice(0, 4)}`;
     const median = (n: WinLen, a: Area) => Math.round(percentile(spreadOf(days.get(a)!, n, "x"), 0.5) * 10) / 10;
     const body = WIN_LENGTHS.map((n) => `  ${n}: { ${AREAS.map((a) => `${a}: ${median(n, a)}`).join(", ")} },`).join("\n");
     const out = `// GENERERAD FIL — ändra inte för hand.
-// Kör: npx tsx scripts/analysis/cheapest-hours.ts ${fromDate} --write
+// Kör: npx tsx scripts/analysis/cheapest-hours.ts ${fromDate} --to ${toDate} --write
 //
 // Medianskillnad per dygn mellan dygnets dyraste och billigaste fönster om N
 // timmar i följd (1–4), per elområde. Fönster räknas i hela timmar på
