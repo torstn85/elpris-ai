@@ -86,6 +86,7 @@ export default function CheapestWindowView({
   hours: size,
   kwh,
   activity,
+  unit,
   initial,
   serverNow,
 }: {
@@ -93,6 +94,8 @@ export default function CheapestWindowView({
   /** null = okänd förbrukning: ingen kWh-uppgift och ingen besparingsrad. */
   kwh: number | null;
   activity: string;
+  /** Singular för ett tillfälle, t.ex. "pass" eller "laddning". */
+  unit: string;
   initial: WindowData;
   serverNow: number;
 }) {
@@ -193,7 +196,7 @@ export default function CheapestWindowView({
         </div>
       </div>
       <p className="text-sm text-[#8fafc9] mb-3">
-        {size} timmar i följd{kwh !== null ? ` · ${decimal(kwh)} kWh per pass` : ""}
+        {size} timmar i följd{kwh !== null ? ` · ${decimal(kwh)} kWh per ${unit}` : ""}
         {data.todayDate ? ` · ${dayLabel(data.todayDate)}` : ""}
       </p>
 

@@ -13,6 +13,7 @@ export default async function CheapestWindowToday({
   hours: hoursProp = 2,
   kwh: kwhProp,
   activity,
+  unit = "pass",
 }: {
   /** Antal timmar i följd, t.ex. 2. Tal eller text ("2"). */
   hours?: number | string;
@@ -20,6 +21,10 @@ export default async function CheapestWindowToday({
   kwh?: number | string;
   /** Aktiviteten i infinitiv, t.ex. "torktumla". */
   activity: string;
+  /** Vad ett tillfälle heter, singular ("20 kWh per laddning"). Standard "pass". */
+  unit?: string;
+  /** Plural av unit. Används inte i rutan, men tas emot så att samma props fungerar som i ActivitySavings. */
+  unitPlural?: string;
 }) {
   // Tål både tal och text från MDX. Ogiltigt kWh → ingen besparingsrad.
   const parsedHours = Math.round(Number(hoursProp));
@@ -32,6 +37,7 @@ export default async function CheapestWindowToday({
       hours={hours}
       kwh={kwh}
       activity={activity}
+      unit={unit}
       serverNow={Date.now()}
       initial={{
         todayDate: today?.date ?? null,

@@ -1,5 +1,6 @@
 // Räknare för en aktivitet i "billigast att X"-guiderna, t.ex.
 // <ActivitySavings activity="torktumla" kwh={2.5} hours={2} defaultPerWeek={3} /> i MDX.
+// unit/unitPlural byter "pass" mot t.ex. unit="laddning" unitPlural="laddningar".
 //
 // Per år räknas på medianskillnaden mellan dygnets dyraste och billigaste fönster
 // (egen prisdata, src/lib/prices/windowSpreadStats.ts). "Idag" räknas på dagens
@@ -13,6 +14,8 @@ export default async function ActivitySavings({
   kwh: kwhProp,
   hours: hoursProp = 2,
   defaultPerWeek: perWeekProp = 3,
+  unit = "pass",
+  unitPlural,
 }: {
   /** Aktiviteten i infinitiv, t.ex. "torktumla". */
   activity: string;
@@ -22,6 +25,10 @@ export default async function ActivitySavings({
   hours?: number | string;
   /** Startvärde för antal pass per vecka. */
   defaultPerWeek?: number | string;
+  /** Vad ett tillfälle heter, singular, t.ex. "laddning". Standard "pass". */
+  unit?: string;
+  /** Plural av unit, t.ex. "laddningar". Standard samma som unit. */
+  unitPlural?: string;
 }) {
   const kwh = Number(kwhProp);
   const hours = Math.min(4, Math.max(1, Math.round(Number(hoursProp)) || 2)) as 1 | 2 | 3 | 4;
@@ -34,6 +41,8 @@ export default async function ActivitySavings({
       kwh={kwh}
       hours={hours}
       defaultPerWeek={perWeek}
+      unit={unit}
+      unitPlural={unitPlural ?? unit}
       initial={{ todayDate: today?.date ?? null, today: today?.areas ?? null }}
     />
   );

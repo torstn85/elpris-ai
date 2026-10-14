@@ -22,12 +22,17 @@ export default function ActivitySavingsView({
   kwh,
   hours,
   defaultPerWeek,
+  unit,
+  unitPlural,
   initial,
 }: {
   activity: string;
   kwh: number;
   hours: WindowHours;
   defaultPerWeek: number;
+  /** Singular och plural för ett tillfälle, t.ex. "pass"/"pass" eller "laddning"/"laddningar". */
+  unit: string;
+  unitPlural: string;
   initial: { todayDate: string | null; today: Record<Area, HourEntry[]> | null };
 }) {
   const [area, setArea] = useState<Area>("SE3");
@@ -97,19 +102,19 @@ export default function ActivitySavingsView({
         </div>
       </div>
       <p className="text-sm text-[#8fafc9] mb-4">
-        Om du flyttar passet från dygnets dyraste till billigaste fönster ({hours} timmar, {decimal(kwh)} kWh per pass)
+        Om du flyttar från dygnets dyraste till billigaste fönster ({hours} timmar, {decimal(kwh)} kWh per {unit})
       </p>
 
       <div className="flex flex-wrap items-center gap-3 mb-5">
-        <span id="pass-per-vecka" className="text-sm text-[#e2eaf4]">
-          Pass per vecka
+        <span id="per-vecka" className="text-sm text-[#e2eaf4]">
+          {unitPlural.charAt(0).toUpperCase() + unitPlural.slice(1)} per vecka
         </span>
-        <div className="flex items-center gap-2" role="group" aria-labelledby="pass-per-vecka">
+        <div className="flex items-center gap-2" role="group" aria-labelledby="per-vecka">
           <button
             type="button"
             onClick={() => step(-1)}
             disabled={perWeek <= MIN_PER_WEEK}
-            aria-label="Färre pass"
+            aria-label={`Färre ${unitPlural}`}
             className="h-9 w-9 rounded-lg bg-[#0A2540] text-white font-bold disabled:opacity-40"
           >
             −
@@ -121,7 +126,7 @@ export default function ActivitySavingsView({
             type="button"
             onClick={() => step(1)}
             disabled={perWeek >= MAX_PER_WEEK}
-            aria-label="Fler pass"
+            aria-label={`Fler ${unitPlural}`}
             className="h-9 w-9 rounded-lg bg-[#0A2540] text-white font-bold disabled:opacity-40"
           >
             +
@@ -134,11 +139,11 @@ export default function ActivitySavingsView({
           <p className="text-xs text-[#8fafc9]">Per år</p>
           <p className="text-2xl font-extrabold text-[#22C55E] tabular-nums">≈ {krInt(perYear)} kr</p>
           <p className="mt-1 text-xs text-[#8fafc9]">
-            {decimal(kwh)} kWh × {ore1(median)} öre × 1,25 × {perWeek} pass × 52 veckor
+            {decimal(kwh)} kWh × {ore1(median)} öre × 1,25 × {perWeek} {perWeek === 1 ? unit : unitPlural} × 52 veckor
           </p>
         </div>
         <div className="rounded-xl bg-[#0A2540] px-4 py-3">
-          <p className="text-xs text-[#8fafc9]">Idag, per pass</p>
+          <p className="text-xs text-[#8fafc9]">Idag, per {unit}</p>
           <p className="text-2xl font-extrabold text-white tabular-nums">
             {todayPerPass !== null ? `≈ ${kr2(todayPerPass)} kr` : "–"}
           </p>
