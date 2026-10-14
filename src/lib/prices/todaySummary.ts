@@ -121,7 +121,11 @@ export interface WindowAdvice {
   goodNow: boolean;
   /** Snitt för fönstret som börjar med pågående timme (öre/kWh). */
   nowAvg: number;
-  /** Billigaste fönster som återstår (startar nu eller senare, idag eller imorgon). */
+  /**
+   * Fönstret att vänta på: det NÄRMASTE kvarvarande fönstret (idag eller imorgon)
+   * som ligger inom tröskeln från det billigaste kvarvarande. Är det nu-fönstret
+   * blir goodNow true.
+   */
   best: { start: string; startUTC: string; avg: number; tomorrow: boolean };
   /** Millisekunder från nu till bästa fönstrets start (0 om det börjar nu). */
   waitMs: number;
@@ -134,6 +138,9 @@ export interface WindowAdvice {
  * lönar det sig att vänta? Relativt dagens priser, utan fast öretröskel:
  *
  *   bra läge  ⇔  nuSnitt ≤ bästaKvarvarande + threshold × dagensSpridning
+ *
+ * Annars föreslås det närmaste fönstret som uppfyller samma villkor — ett
+ * nästan lika billigt fönster idag går före det billigaste imorgon.
  *
  * där dagensSpridning = dyraste − billigaste fönster om `size` timmar över hela
  * dygnet. Kvarvarande fönster får starta från pågående timme och framåt, och
@@ -163,9 +170,18 @@ export function windowAdvice(
   const cheap = dayWindow(today, size, "cheapest");
   const dear = dayWindow(today, size, "dearest");
   const daySpread = cheap && dear ? dear.avg - cheap.avg : 0;
+  const limit = best.avg + threshold * daySpread;
+  // Närmaste fönster inom tröskeln (nu-fönstret först); best uppfyller alltid villkoret.
+  for (let k = i; k <= best.index; k++) {
+    const avg = k === i ? nowAvg : mean(all.slice(k, k + size));
+    if (avg <= limit) {
+      best = { index: k, avg };
+      break;
+    }
+  }
   const startHour = all[best.index];
   return {
-    goodNow: nowAvg <= best.avg + threshold * daySpread,
+    goodNow: best.index === i,
     nowAvg,
     best: { start: formatClock(startHour.startUTC), startUTC: startHour.startUTC, avg: best.avg, tomorrow: best.index >= today.length },
     waitMs: Math.max(0, Date.parse(startHour.startUTC) - nowMs),

@@ -33,11 +33,11 @@ const TICK_MS = 30_000;
 export const ADVICE_THRESHOLD = 0.1;
 const HOUR_MS = 60 * 60 * 1000;
 
-/** "vänta under en timme" / "vänta ca 1 timme" / "vänta ca 5 timmar". */
-function waitText(ms: number): string {
-  if (ms < HOUR_MS) return "vänta under en timme";
+/** "under en timme" / "ca 1 timme" / "ca 5 timmar". */
+function hoursText(ms: number): string {
+  if (ms < HOUR_MS) return "under en timme";
   const n = Math.round(ms / HOUR_MS);
-  return `vänta ca ${n} ${n === 1 ? "timme" : "timmar"}`;
+  return `ca ${n} ${n === 1 ? "timme" : "timmar"}`;
 }
 const TOMORROW_POLL_MS = 60_000;
 const PUBLISH_POLL_FROM_MIN = 13 * 60 + 10;
@@ -161,6 +161,10 @@ export default function CheapestWindowView({
   const saving = cheap && dear && kwh !== null ? (kwh * (dear.avg - cheap.avg)) / 100 * 1.25 : null;
   const advice = windowAdvice(hours, tomorrowHours, size, now, ADVICE_THRESHOLD);
   const waitSaving = advice && kwh !== null ? (kwh * (advice.nowAvg - advice.best.avg)) / 100 * 1.25 : null;
+  // Ligger bästa fönstret imorgon: visa också dagens billigaste kvarvarande som
+  // alternativ, eller "Eller nu" när nu ligger inom tröskeln från det.
+  const todayAlt = advice && !advice.goodNow && advice.best.tomorrow ? windowAdvice(hours, [], size, now, ADVICE_THRESHOLD) : null;
+  const todayAltSaving = todayAlt && kwh !== null ? (kwh * (todayAlt.nowAvg - todayAlt.best.avg)) / 100 * 1.25 : null;
 
   // not-prose: guidernas typografistilar ska inte ändra komponentens rubrik och avstånd.
   return (
@@ -204,9 +208,23 @@ export default function CheapestWindowView({
             <>Bra läge att {activity} nu</>
           ) : (
             <>
-              Billigare {advice.best.tomorrow ? "imorgon " : ""}kl {advice.best.start} – {waitText(advice.waitMs)}
+              Billigare {advice.best.tomorrow ? "imorgon " : ""}kl {advice.best.start} – vänta {hoursText(advice.waitMs)}
               {waitSaving !== null && (
                 <span className="font-normal text-[#8fafc9]"> (sparar ≈ {kr2(waitSaving)} kr)</span>
+              )}
+              {todayAlt && (
+                <span className="block mt-1 text-sm">
+                  {todayAlt.goodNow ? (
+                    <>Eller nu</>
+                  ) : (
+                    <>
+                      Eller idag kl {todayAlt.best.start} – om {hoursText(todayAlt.waitMs)}
+                      {todayAltSaving !== null && (
+                        <span className="font-normal text-[#8fafc9]"> (sparar ≈ {kr2(todayAltSaving)} kr)</span>
+                      )}
+                    </>
+                  )}
+                </span>
               )}
             </>
           )}
