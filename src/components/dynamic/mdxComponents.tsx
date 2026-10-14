@@ -9,9 +9,6 @@ import CheapestHoursToday from './CheapestHoursToday';
 import MostExpensiveHoursToday from './MostExpensiveHoursToday';
 import PriceComparisonByArea from './PriceComparisonByArea';
 import AdSlot from './AdSlot';
-import ShouldIWashNow from './ShouldIWashNow';
-import ShouldIChargeNow from './ShouldIChargeNow';
-import SavingsCalculator from './SavingsCalculator';
 import SevenDayPriceTrend from './SevenDayPriceTrend';
 import FaqAccordion from './FaqAccordion';
 import TomorrowPriceTeaser from './TomorrowPriceTeaser';
@@ -25,9 +22,6 @@ export const mdxComponents = {
   MostExpensiveHoursToday,
   PriceComparisonByArea,
   AdSlot,
-  ShouldIWashNow,
-  ShouldIChargeNow,
-  SavingsCalculator,
   SevenDayPriceTrend,
   FaqAccordion,
   TomorrowPriceTeaser,
