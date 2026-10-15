@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import NavBar from "@/components/NavBar";
 import SwedenMap from "@/components/SwedenMap";
+import AreaLinks from "@/components/elomrade/AreaLinks";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
 import NowAndChart from "@/components/elpris-idag/NowAndChart";
 import HourTable from "@/components/prices/HourTable";
 import PageWide from "@/components/layout/PageWide";
-import { ELOMRADEN, ELOMRADE_KEYS, BORDER_NOTE, MAP_NOTE, areaLabel } from "@/content/elomrade";
+import { ELOMRADEN, BORDER_NOTE, MAP_NOTE, areaLabel } from "@/content/elomrade";
 import { CITIES } from "@/lib/cities";
 import { formatSwedishDay } from "@/lib/format/date";
 import { ore1 } from "@/lib/format/ore";
@@ -147,28 +148,7 @@ export default async function ElomradePage({ params }: PageProps) {
               {c.region} · {data ? dayLabel(data.date) : formatSwedishDay(fetchedAt)} · Priserna sattes i går i
               day-ahead-auktionen
             </p>
-            <nav aria-label="Välj elområde" className="grid grid-cols-2 gap-2 mt-2 sm:flex sm:flex-wrap">
-              {ELOMRADE_KEYS.map((key) => {
-                const o = ELOMRADEN[key];
-                return (
-                  <Link
-                    key={key}
-                    href={`/elomrade/${key}`}
-                    aria-current={key === area ? "page" : undefined}
-                    className={`px-3 sm:px-4 py-2 rounded-xl font-semibold text-sm text-center leading-snug transition-all duration-150 ${
-                      key === area
-                        ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
-                        : "bg-[#0F3460] border border-[#1E4976] text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white"
-                    }`}
-                  >
-                    {/* Mobil: staden på egen rad (2×2), från sm: "Elområde 1 · Luleå" på en rad. */}
-                    <span>Elområde {o.number}</span>
-                    <span className="hidden sm:inline"> · </span>
-                    <span className="block sm:inline">{o.selectorCity}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+            <AreaLinks current={area} className="mt-2" />
           </section>
 
           {/* 4. Prisblock, låst till området */}
