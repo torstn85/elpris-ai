@@ -4,7 +4,7 @@
 // (öre/kWh exkl. moms). Dygn som inte har 92, 96 eller 100 kvartar hoppas över.
 //
 // Användning:
-//   npx tsx scripts/analysis/daily-spread.ts [från-datum] [--monthly]   (standard 2026-04-13, till och med i går)
+//   npx tsx scripts/analysis/daily-spread.ts [från-datum] [--monthly]   (standard 2026-04-14, till och med i går)
 //   --monthly  skriver även median av dygnssnittet per månad och område
 
 import fs from "fs";
@@ -67,7 +67,7 @@ async function main() {
 
   const args = process.argv.slice(2);
   const monthly = args.includes("--monthly");
-  const fromDate = args.find((a) => !a.startsWith("--")) ?? "2026-04-13";
+  const fromDate = args.find((a) => !a.startsWith("--")) ?? "2026-04-14";
   const toDate = addDays(stockholmISODate(), -1);
   const from = stockholmDayUTCRange(fromDate).from;
   const to = stockholmDayUTCRange(toDate).to;

@@ -114,7 +114,7 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 ## Dygnsspridning per elområde (egen data)
 
 - Dygnsspridning = dygnets dyraste kvart minus billigaste kvart (spotpris, öre/kWh exkl. moms).
-- Källa: elpris.ai:s egen prisdata (tabellen spot_prices), 13 april–12 oktober 2026, 182 dygn per område. Räknas fram med npx tsx scripts/analysis/daily-spread.ts.
+- Källa: elpris.ai:s egen prisdata (tabellen spot_prices), 14 april–12 oktober 2026, 182 dygn per område. Räknas fram med npx tsx scripts/analysis/daily-spread.ts.
 - Median för dygnsspridningen: SE1 57 öre, SE2 62 öre, SE3 112 öre, SE4 160 öre.
 - SE4 hade större spridning än SE3 172 av 182 dygn och högre dygnssnitt 176 av 182 dygn.
 - Datan täcker bara sommarhalvåret 2026. Skriv inte "historiskt" och dra inga slutsatser om vintern utifrån den.
@@ -127,7 +127,7 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 
 ## Billigaste och dyraste tider per elområde (egen data)
 
-- Källa: elpris.ai:s egen prisdata (spot_prices), 13 april–12 oktober 2026, 182 dygn per område. Räknas fram med npx tsx scripts/analysis/cheapest-hours.ts. Fönster räknas i hela timmar på kvartspriserna och får fortsätta in i nästa dygn.
+- Källa: elpris.ai:s egen prisdata (spot_prices), 14 april–12 oktober 2026, 182 dygn per område. Räknas fram med npx tsx scripts/analysis/cheapest-hours.ts. Fönster räknas i hela timmar på kvartspriserna och får fortsätta in i nästa dygn.
 - Datan täcker bara april–oktober 2026. Inga slutsatser om vintern.
 - Billigaste tvåtimmarsfönstret startade (andel dygn, natt 00–05 / mitt på dagen 10–15 / kväll 20–23): SE1 39/29/29 %, SE2 37/29/31 %, SE3 19/64/13 %, SE4 15/75/8 %.
 - I SE3 och SE4 startade det billigaste fönstret mitt på dagen de allra flesta dygn i april–juni; från augusti blev natt och sen kväll allt vanligare. I SE1 och SE2 var natt och sen kväll (start runt kl 23) vanligast; mitt på dagen var vanligast bara i april.

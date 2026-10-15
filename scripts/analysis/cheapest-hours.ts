@@ -14,7 +14,7 @@
 //
 // Användning:
 //   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] [--to till-datum]
-//       från-datum standard 2026-04-13, till-datum standard i går (båda YYYY-MM-DD, inklusive)
+//       från-datum standard 2026-04-14, till-datum standard i går (båda YYYY-MM-DD, inklusive)
 //   npx tsx scripts/analysis/cheapest-hours.ts [från-datum] --to till-datum --write
 //       skriver även src/lib/prices/windowSpreadStats.ts (medianskillnad per
 //       fönsterlängd, över midnatt). --write kräver --to, så att perioden i
@@ -172,7 +172,7 @@ async function main() {
   const ISO = /^\d{4}-\d{2}-\d{2}$/;
   if (toIndex >= 0 && !(toArg && ISO.test(toArg))) throw new Error("--to kräver ett datum (YYYY-MM-DD)");
   if (write && toIndex < 0) throw new Error("--write kräver --to YYYY-MM-DD, t.ex. --to 2026-10-12");
-  const fromDate = fromArg ?? "2026-04-13";
+  const fromDate = fromArg ?? "2026-04-14";
   if (!ISO.test(fromDate)) throw new Error(`Ogiltigt från-datum: ${fromDate} (YYYY-MM-DD)`);
   const toDate = toArg ?? addDays(stockholmISODate(), -1);
   if (toDate >= stockholmISODate()) throw new Error(`--to måste vara senast i går (${addDays(stockholmISODate(), -1)})`);

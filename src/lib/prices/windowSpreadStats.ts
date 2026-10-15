@@ -1,5 +1,5 @@
 // GENERERAD FIL — ändra inte för hand.
-// Kör: npx tsx scripts/analysis/cheapest-hours.ts 2026-04-13 --to 2026-10-12 --write
+// Kör: npx tsx scripts/analysis/cheapest-hours.ts 2026-04-14 --to 2026-10-12 --write
 //
 // Medianskillnad per dygn mellan dygnets dyraste och billigaste fönster om N
 // timmar i följd (1–4), per elområde. Fönster räknas i hela timmar på
@@ -10,7 +10,7 @@ export type SpreadArea = "SE1" | "SE2" | "SE3" | "SE4";
 export type WindowHours = 1 | 2 | 3 | 4;
 
 export const WINDOW_SPREAD_PERIOD = {
-  from: "2026-04-13",
+  from: "2026-04-14",
   to: "2026-10-12",
   /** Till källraden, t.ex. "april–oktober 2026". */
   label: "april–oktober 2026",
