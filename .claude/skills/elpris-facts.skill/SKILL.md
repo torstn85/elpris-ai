@@ -137,6 +137,11 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 - Skriv ALDRIG fasta klockslag som regel ("billigast 00–06 och 12–14", "dyrast 07–09 och 17–20"). Använd egen data med källa och period, eller hänvisa till dagens priser.
 - Elduellens kWh-antaganden (src/lib/elduellen/activities.ts) är standard för räkneexempel: kondenstork 2,5 kWh, värmepumpstork 1,2 kWh, tvätt 40 °C 0,6 kWh, tvätt 60 °C 1,0 kWh, diskmaskin eco 0,9 kWh, bastu ca 10 kWh. Avviker en guide: ange varför.
 
+## Energieffektivisering – bidrag och tekniska fakta
+
+- Bidrag för energieffektivisering i småhus (Villaeffekten): 30 % av materialkostnaden, högst 60 000 kr per småhus inkl. utbetalning 2023–2025. Värdeår före 1990, ej fjärrvärme, ägaren bor permanent. Omfattar bl.a. tilläggsisolering, tätning, tilläggsglasning, byte av fönster och dörrar, värmeåtervinning i ventilation, byte till vattenburet system, pelletspanna och värmepump (bergvärme och luft/vatten – inte vanlig luft/luft). Ansökan hos länsstyrelsen, i mån av medel, åtgärden påbörjad 17 oktober 2025 eller senare, utbetalning när åtgärden är klar. Kan kombineras med ROT men inte för samma kostnad. Källa: regeringen.se (frågor och svar om bidraget), Boverket.
+- Varmvatten: beredaren bör hålla minst 60 °C för att undvika legionella (Boverkets byggregler BBR 6:62, Folkhälsomyndigheten).
+
 ## Elnätsbolag — alltid öppen formulering
 
 Vi vet INTE alltid om de nätbolag vi hittar via elomraden.se är de enda i kommunen. Nätmarknaden förändras också. Därför använder vi alltid öppen formulering:
