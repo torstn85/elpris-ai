@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { HourEntry } from '@/lib/prices/hourly';
+import { ore1 } from '@/lib/format/ore';
 
 /** Det komponenten behöver av en timme: unik start (nyckel), etikett och pris. */
 type HourInput = Pick<HourEntry, 'startUTC' | 'label' | 'ore_per_kwh'>;
@@ -108,7 +109,7 @@ export default function CheapestHoursToday({
                 </span>
               </span>
               <span className="text-lg font-bold text-green-400">
-                {h.price.toFixed(1)} <span className="text-xs text-slate-400 font-normal">öre/kWh</span>
+                {ore1(h.price)} <span className="text-xs text-slate-400 font-normal">öre/kWh</span>
               </span>
             </li>
           ))}

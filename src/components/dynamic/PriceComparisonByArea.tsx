@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ore1 } from '@/lib/format/ore';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -112,7 +113,7 @@ export default function PriceComparisonByArea({ highlightArea = 'SE3' }: Props) 
                 </div>
                 <p className="text-xs text-slate-500 mb-2">{p.city}</p>
                 <p className={`text-2xl font-bold ${getPriceColor(p.price_ore_kwh)}`}>
-                  {p.price_ore_kwh.toFixed(1)}
+                  {ore1(p.price_ore_kwh)}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1">öre/kWh</p>
               </div>

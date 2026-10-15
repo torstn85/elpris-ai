@@ -12,7 +12,7 @@ import { isCurrentHour } from '@/lib/prices/hourly';
 import { formatClock } from '@/lib/prices/quarterTicks';
 import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
 import { formatSwedishDay } from '@/lib/format/date';
-import { ore1 } from '@/lib/format/ore';
+import { integer, ore1 } from '@/lib/format/ore';
 import { ORG_LOGO, pageMeta } from '@/lib/seo';
 import { ogCityUrl } from '@/lib/og/images';
 import { stockholmISODate } from '@/lib/time';
@@ -59,7 +59,7 @@ function buildDescription(
     return `Se dagens elpris i ${name} timme för timme och per kvart – spotpris för ${area}, billigaste timmarna och tips för att spara.`;
   }
   const day = formatSwedishDay(new Date(`${today.date}T12:00:00Z`));
-  const avg = Math.round(quarterAverage(today.quarters[area]));
+  const avg = integer(quarterAverage(today.quarters[area]));
   const cheap = cheapestHour(today.areas[area]);
   return `Elpriset i ${name} idag ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg} öre/kWh i ${area}, billigast kl ${cheap.label}. Se spotpriset timme för timme och per kvart.`;
 }

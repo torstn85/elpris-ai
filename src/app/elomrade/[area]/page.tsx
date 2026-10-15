@@ -12,7 +12,7 @@ import PageWide from "@/components/layout/PageWide";
 import { ELOMRADEN, BORDER_NOTE, MAP_NOTE, areaLabel } from "@/content/elomrade";
 import { CITIES } from "@/lib/cities";
 import { formatSwedishDay } from "@/lib/format/date";
-import { ore1 } from "@/lib/format/ore";
+import { integer, ore1 } from "@/lib/format/ore";
 import { loadTodayPrices } from "@/lib/prices/today";
 import { loadTomorrowPrices } from "@/lib/prices/tomorrow";
 import { cheapestHour, cheapestWindow, quarterAverage } from "@/lib/prices/todaySummary";
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   let description = `Elpriset i ${label} idag – spotpris per kvart och timme för timme, och vad som påverkar priset i ${c.regionInSentence}.`;
   if (data) {
     const day = dayLabel(data.date);
-    const avg = Math.round(quarterAverage(data.quarters[c.area]));
+    const avg = integer(quarterAverage(data.quarters[c.area]));
     const cheap = cheapestHour(data.areas[c.area]);
     // Datumet står mitt i meningen — gemen veckodag.
     description = `Elpriset i ${label} idag ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg} öre/kWh, billigast kl ${cheap.label}. Spotpris per kvart och timme för timme.`;

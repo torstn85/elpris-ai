@@ -12,7 +12,7 @@ import CityLinksByArea from "@/components/prices/CityLinksByArea";
 import HourTable from "@/components/prices/HourTable";
 import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
 import { formatSwedishDay } from "@/lib/format/date";
-import { ore1 } from "@/lib/format/ore";
+import { integer, ore1 } from "@/lib/format/ore";
 import { formatClock } from "@/lib/prices/quarterTicks";
 import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
 import { loadTomorrowPrices, tomorrowISODate } from "@/lib/prices/tomorrow";
@@ -112,7 +112,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { data } = await getTomorrow();
   let description = BEFORE_DESCRIPTION;
   if (data) {
-    const avg = (a: Area) => Math.round(quarterAverage(data.quarters[a]));
+    const avg = (a: Area) => integer(quarterAverage(data.quarters[a]));
     const day = dayLabel(data.date);
     description = `Elpriset imorgon ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg("SE3")} öre/kWh i SE3, ${avg("SE4")} i SE4, ${avg("SE2")} i SE2 och ${avg("SE1")} i SE1. Se morgondagens pris timme för timme och per kvart.`;
   }

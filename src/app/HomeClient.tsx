@@ -10,6 +10,7 @@ import type { CurrentPriceResponse } from "./api/prices/current/route";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { fetchGeoArea } from "@/lib/geo/client";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
+import { ore1 } from "@/lib/format/ore";
 import PageWide from "@/components/layout/PageWide";
 import { ORG_LOGO } from "@/lib/seo";
 
@@ -280,7 +281,7 @@ export default function HomeClient() {
                   }}
                 >
                   {currentPrice !== null
-                    ? currentPrice.toFixed(1).replace(".", ",")
+                    ? ore1(currentPrice)
                     : "–"}
                 </span>
                 <span className="text-[#8fafc9] text-xl md:text-2xl font-medium tracking-wide">
@@ -451,7 +452,7 @@ export default function HomeClient() {
                 value={cheap ? cheap.label : "–"}
                 detail={
                   cheap
-                    ? `${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh i snitt`
+                    ? `${ore1(cheap.avg)} öre/kWh i snitt`
                     : "Laddar..."
                 }
                 accent="#22C55E"
@@ -464,7 +465,7 @@ export default function HomeClient() {
                 value={cheap ? cheap.label : "–"}
                 detail={
                   cheap
-                    ? `Snittpriser ${cheap.avg.toFixed(1).replace(".", ",")} öre/kWh`
+                    ? `Snittpriser ${ore1(cheap.avg)} öre/kWh`
                     : "Laddar..."
                 }
                 accent={priceAccentColor(cheap?.avg ?? null)}
@@ -490,7 +491,7 @@ export default function HomeClient() {
                 }
                 value={
                   currentPrice !== null
-                    ? `${currentPrice.toFixed(1).replace(".", ",")} öre`
+                    ? `${ore1(currentPrice)} öre`
                     : "–"
                 }
                 detail={

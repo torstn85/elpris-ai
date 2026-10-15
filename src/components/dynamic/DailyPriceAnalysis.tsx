@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ore1 } from '@/lib/format/ore';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -119,15 +120,15 @@ export default function DailyPriceAnalysis({ area }: Props) {
         </h2>
         <p className="text-base text-[#8fafc9] leading-relaxed">
           Idag är dygnssnittet{' '}
-          <strong style={{ color: avgColor }}>{avg.toFixed(1)} öre/kWh</strong> i{' '}
+          <strong style={{ color: avgColor }}>{ore1(avg)} öre/kWh</strong> i{' '}
           {area}, vilket är{' '}
           <strong style={{ color: levelColor }}>{level}</strong> för säsongen.
           Billigaste timmen är{' '}
           <strong className="text-[#22C55E]">kl {fmt(cheap)}</strong>{' '}
-          (<span className="text-[#22C55E]">{cheap.ore_per_kwh.toFixed(1)} öre</span>),
+          (<span className="text-[#22C55E]">{ore1(cheap.ore_per_kwh)} öre</span>),
           dyraste är{' '}
           <strong className="text-[#EF4444]">kl {fmt(expensive)}</strong>{' '}
-          (<span className="text-[#EF4444]">{expensive.ore_per_kwh.toFixed(1)} öre</span>).
+          (<span className="text-[#EF4444]">{ore1(expensive.ore_per_kwh)} öre</span>).
           {' '}{curveDesc}
         </p>
       </div>

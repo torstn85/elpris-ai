@@ -24,6 +24,7 @@ import {
   type PriceLevel,
 } from "@/lib/prices/priceLevel";
 import { buildHourTicks, buildPriceTicks, formatClock } from "@/lib/prices/quarterTicks";
+import { integer, ore1 } from "@/lib/format/ore";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 
 export { buildHourTicks, buildPriceTicks };
@@ -39,9 +40,6 @@ const LEGEND: { level: PriceLevel; text: string }[] = [
   { level: "normal", text: "Normalt 51–99 öre" },
   { level: "expensive", text: "Dyrt ≥ 100 öre" },
 ];
-
-/** En decimal med decimalkomma, som startsidans livepris. -0,04 visas som 0,0. */
-const ore1 = (v: number) => (Math.round(v * 10) / 10 || 0).toFixed(1).replace(".", ",");
 
 const SWEDISH_DATE = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" });
 const swedishDate = (ms: number) => SWEDISH_DATE.format(new Date(ms));
@@ -279,6 +277,7 @@ export default function QuarterPriceChart({
                     interval={0}
                     allowDataOverflow
                     tick={{ fill: "#8fafc9", fontSize: 11 }}
+                    tickFormatter={integer}
                     axisLine={false}
                     tickLine={false}
                   />

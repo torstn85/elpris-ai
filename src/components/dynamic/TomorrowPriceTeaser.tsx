@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { fetchGeoArea } from '@/lib/geo/client';
+import { ore1 } from '@/lib/format/ore';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -193,7 +194,7 @@ export default function TomorrowPriceTeaser({ area }: Props) {
           className={`text-5xl font-bold ${priceColor(tomorrowAvg)}`}
           aria-label="Snittpris för imorgon"
         >
-          {tomorrowAvg.toFixed(1)}
+          {ore1(tomorrowAvg)}
         </span>
         <span className="text-base text-slate-400 font-medium">
           öre/kWh i snitt
