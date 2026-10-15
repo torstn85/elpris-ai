@@ -4,7 +4,8 @@
 // (öre/kWh exkl. moms). Dygn som inte har 92, 96 eller 100 kvartar hoppas över.
 //
 // Användning:
-//   npx tsx scripts/analysis/daily-spread.ts [från-datum]   (standard 2026-04-13, till och med i går)
+//   npx tsx scripts/analysis/daily-spread.ts [från-datum] [--monthly]   (standard 2026-04-13, till och med i går)
+//   --monthly  skriver även median av dygnssnittet per månad och område
 
 import fs from "fs";
 import path from "path";
@@ -64,7 +65,9 @@ async function main() {
   if (!url || !key) throw new Error("Saknar NEXT_PUBLIC_SUPABASE_URL eller SUPABASE_SECRET_KEY");
   const supabase = createClient(url, key);
 
-  const fromDate = process.argv[2] ?? "2026-04-13";
+  const args = process.argv.slice(2);
+  const monthly = args.includes("--monthly");
+  const fromDate = args.find((a) => !a.startsWith("--")) ?? "2026-04-13";
   const toDate = addDays(stockholmISODate(), -1);
   const from = stockholmDayUTCRange(fromDate).from;
   const to = stockholmDayUTCRange(toDate).to;
@@ -138,6 +141,19 @@ async function main() {
     });
     const n = days.get("SE3")!.filter((x) => x.date.startsWith(mo)).length;
     console.log(`  ${mo}   ${cells.join("")}   (${n})`);
+  }
+
+  if (monthly) {
+    console.log("\n═══ Dygnssnitt per månad (median, öre/kWh exkl. moms) ═══");
+    console.log("  Månad     " + AREAS.map((a) => a.padStart(8)).join("") + "   (antal dygn, första–sista)");
+    for (const mo of months) {
+      const cells = AREAS.map((a) => {
+        const v = days.get(a)!.filter((x) => x.date.startsWith(mo)).map((x) => x.avg);
+        return (v.length ? f1(median(v)) : "–").padStart(8);
+      });
+      const d = days.get("SE3")!.filter((x) => x.date.startsWith(mo)).map((x) => x.date);
+      console.log(`  ${mo}   ${cells.join("")}   (${d.length}, ${d[0]}–${d.at(-1)})`);
+    }
   }
 
   console.log("\n═══ SE4 jämfört med SE3 ═══");
