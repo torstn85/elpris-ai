@@ -53,7 +53,7 @@ export const CITIES: Record<string, City> = {
   falkenberg: {
     slug: 'falkenberg',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-10-05',
+    updatedAt: '2026-10-15',
     name: 'Falkenberg',
     area: 'SE4',
     region: 'Hallands län',
@@ -70,7 +70,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'Hur mycket kan jag spara genom att flytta elförbrukning?',
         answer:
-          'Det beror på hur mycket förbrukning du kan flytta och hur stor prisskillnaden är mellan dygnets dyra och billiga timmar. I SE4, där Falkenberg ligger, är skillnaden mellan dygnets dyraste och billigaste kvartar ofta större än längre norrut, eftersom priset här påverkas mer av det europeiska elnätet. Genom att flytta tvätt, disk och elbilsladdning från dyra timmar (ofta kvällar kl 17–20) till lågpristimmar (nätter eller mitt på dagen) sänker du kostnaden — förutsatt att du har kvarts- eller timpris. Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar. Mest gör flytten för villaägare med värmepump och elbil, eftersom de har mest förbrukning att flytta. Din egen besparing räknar du ut som flyttade kWh × prisskillnaden mellan den dyra och den billiga tiden.',
+          'Det beror på hur mycket förbrukning du kan flytta och hur stor prisskillnaden är mellan dygnets dyra och billiga timmar. I SE4, där Falkenberg ligger, är skillnaden mellan dygnets dyraste och billigaste kvartar ofta större än längre norrut, eftersom priset här påverkas mer av det europeiska elnätet. Genom att flytta tvätt, disk och elbilsladdning från dyra till billiga timmar sänker du kostnaden, förutsatt att du har kvarts- eller timpris. Under april–oktober 2026 var kvällen oftast dygnets dyraste tid i SE4 och mitt på dagen oftast den billigaste (elpris.ai:s egen prisdata). Med rörligt månadspris betalar du ett snittpris oavsett när du förbrukar. Mest gör flytten för villaägare med värmepump och elbil, eftersom de har mest förbrukning att flytta. Din egen besparing räknar du ut som flyttade kWh × prisskillnaden mellan den dyra och den billiga tiden.',
       },
     ],
   },
@@ -124,12 +124,12 @@ export const CITIES: Record<string, City> = {
   halmstad: {
     slug: 'halmstad',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-10-05',
+    updatedAt: '2026-10-15',
     name: 'Halmstad',
     area: 'SE4',
     region: 'Hallands län',
     uniqueIntro:
-      'Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har ofta högre spotpris än Stockholm och Göteborg — skillnaden är störst när överföringen söderut är fullt belastad. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Kvällarna kl 17–20 är ofta betydligt dyrare än natten — och i SE4, där prisspridningen över dygnet ofta är större, svider den skillnaden mer än norrut.',
+      'Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har ofta högre spotpris än Stockholm och Göteborg — skillnaden är störst när överföringen söderut är fullt belastad. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Under april–oktober 2026 var kvällen oftast dygnets dyraste tid i SE4, vanligast kl 19–21, medan den billigaste timmen oftast låg mitt på dagen (elpris.ai:s egen prisdata). Skillnaden mellan dygnets billigaste och dyraste kvartar är oftast störst i SE4.',
     commonGridCompanies:
       'Bland de större nätbolagen i Halmstad finns Halmstads Energi och Miljö Nät (HEM) och Vattenfall Eldistribution, beroende på var i kommunen du bor. Nätavgiften du betalar bestäms av ditt nätbolag och kommer utöver spotpriset du ser här.',
     uniqueFaqs: [
