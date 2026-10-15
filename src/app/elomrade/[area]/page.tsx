@@ -1,374 +1,279 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 import NavBar from "@/components/NavBar";
 import SwedenMap from "@/components/SwedenMap";
 import FaqAccordion from "@/components/dynamic/FaqAccordion";
-import { CITIES } from "@/lib/cities";
-import { pageMeta } from "@/lib/seo";
+import NowAndChart from "@/components/elpris-idag/NowAndChart";
+import HourTable from "@/components/prices/HourTable";
 import PageWide from "@/components/layout/PageWide";
+import { ELOMRADEN, ELOMRADE_KEYS, BORDER_NOTE, MAP_NOTE, areaLabel } from "@/content/elomrade";
+import { CITIES } from "@/lib/cities";
+import { formatSwedishDay } from "@/lib/format/date";
+import { ore1 } from "@/lib/format/ore";
+import { loadTodayPrices } from "@/lib/prices/today";
+import { loadTomorrowPrices } from "@/lib/prices/tomorrow";
+import { cheapestHour, cheapestWindow, quarterAverage } from "@/lib/prices/todaySummary";
+import { pageMeta } from "@/lib/seo";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Dagens priser i server-HTML, som /elpris-idag.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-type AreaKey = "se1" | "se2" | "se3" | "se4";
+type PageProps = { params: Promise<{ area: string }> };
 
-interface FaqItem {
-  question: string;
-  answer: string;
-}
+const LINK = "font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150";
+const H2 = "font-bold text-2xl md:text-3xl text-white mb-6";
+const BOX = "bg-[#0F3460] border border-[#1E4976] rounded-2xl";
 
-interface AreaContent {
-  intro: string;
-  why_price: string;
-  production: string;
-  counties: string[];
-  faq: FaqItem[];
-}
+// En laddning per förfrågan, delad av generateMetadata och sidan.
+const getToday = cache(async () => ({ data: await loadTodayPrices(), fetchedAt: new Date() }));
 
-// ─── Area metadata ────────────────────────────────────────────────────────────
+/** Dagens datum i data som "Tisdag 13 oktober". */
+const dayLabel = (isoDate: string) => formatSwedishDay(new Date(`${isoDate}T12:00:00Z`));
 
-const AREA_META = {
-  se1: { name: "SE1", city: "Luleå",    region: "Norra Sverige" },
-  se2: { name: "SE2", city: "Sundsvall", region: "Norra mellansverige" },
-  se3: { name: "SE3", city: "Stockholm", region: "Södra mellansverige" },
-  se4: { name: "SE4", city: "Malmö",    region: "Södra Sverige" },
-} as const;
-
-// ─── Evergreen content ────────────────────────────────────────────────────────
-
-const AREA_CONTENT: Record<AreaKey, AreaContent> = {
-  se1: {
-    intro:
-      "SE1 är Sveriges nordligaste elområde och omfattar Norrbottens och Västerbottens län. Området har Sveriges lägsta elpriser tack vare enorm vattenkraftproduktion och låg befolkningstäthet.",
-    why_price:
-      "SE1 producerar långt mer el än vad området förbrukar, vilket ger ett konstant överskott. Överföringskapaciteten söderut är begränsad, vilket håller priserna nere lokalt.",
-    production:
-      "Vattenkraft dominerar helt – älvar som Lule älv och Ume älv är bland Europas kraftigaste.",
-    counties: ["Norrbottens län", "Västerbottens län"],
-    faq: [
-      {
-        question: "Varför är elpriset lägst i SE1?",
-        answer: "SE1 har Sveriges största vattenkraftproduktion och exporterar el söderut. Överföringskapaciteten är begränsad vilket skapar ett lokalt prisöverskott.",
-      },
-      {
-        question: "Vilka städer ingår i SE1?",
-        answer: "Luleå, Umeå, Skellefteå, Kiruna och Gällivare är de största städerna i elområde SE1.",
-      },
-      {
-        question: "Hur ofta är priset negativt i SE1?",
-        answer: "Negativt elpris förekommer i SE1 under perioder med hög vattenkraftproduktion och låg förbrukning, särskilt under vår och höst.",
-      },
-    ],
-  },
-  se2: {
-    intro:
-      "SE2 omfattar Jämtlands, Västernorrlands, Dalarnas och Gävleborgs län. Området är en viktig transitzon för el som produceras i norr och ska förbrukas i söder.",
-    why_price:
-      "SE2 har också stor vattenkraftproduktion men ligger geografiskt mellan det elrika norr och det elfattiga söder. Priserna är låga men något högre än SE1.",
-    production:
-      "Vattenkraft är dominerande med älvar som Indalsälven och Ljungan. Vindkraft växer snabbt i fjällområdena.",
-    counties: [
-      "Jämtlands län",
-      "Västernorrlands län",
-      "Dalarnas län",
-      "Gävleborgs län",
-    ],
-    faq: [
-      {
-        question: "Vad ingår i elområde SE2?",
-        answer: "SE2 omfattar mellersta Norrland och inkluderar städer som Sundsvall, Östersund, Falun och Gävle.",
-      },
-      {
-        question: "Varför är SE2 billigare än SE3?",
-        answer: "SE2 har mer vattenkraftproduktion per capita än SE3 och är fysiskt närmare de stora kraftverken i norr.",
-      },
-      {
-        question: "Hur påverkar vindkraft priset i SE2?",
-        answer: "Ökad vindkraftsutbyggnad i SE2 pressar priserna nedåt, särskilt under blåsiga perioder.",
-      },
-    ],
-  },
-  se3: {
-    intro:
-      "SE3 är Sveriges folkrikaste elområde och inkluderar Stockholm, Göteborg och stora delar av Mellansverige. Här bor drygt 60\u00A0% av Sveriges befolkning.",
-    why_price:
-      "SE3 förbrukar mer el än vad som produceras lokalt och är beroende av import från norr och utlandet. Det gör priserna mer känsliga för väder, exportkapacitet och europeiska gaspriser.",
-    production:
-      "Kärnkraft från Ringhals och Forsmark är basen. Vindkraft och solenergi växer kraftigt. Vattenkraften är begränsad jämfört med norr.",
-    counties: [
-      "Stockholms län",
-      "Uppsala län",
-      "Västra Götalands län",
-      "Örebro län",
-      "Västmanlands län",
-      "Södermanlands län",
-      "Östergötlands län",
-      "Värmlands län",
-      "Jönköpings län",
-      "Gotlands län",
-    ],
-    faq: [
-      {
-        question: "Varför är elpriset högre i SE3 än i norra Sverige?",
-        answer: "SE3 importerar el från norr och utlandet för att täcka sitt underskott. Överföringskapaciteten är begränsad och europeiska energipriser påverkar mer direkt.",
-      },
-      {
-        question: "Ingår Gotland i SE3?",
-        answer: "Ja, Gotland tillhör elområde SE3 men är anslutet via en separat likströmskabel till fastlandet.",
-      },
-      {
-        question: "Hur påverkar kärnkraften elpriset i SE3?",
-        answer: "Kärnkraftverken Ringhals och Forsmark levererar stabil baskraft som dämpar prissvängningar. Planerade revisioner kan tillfälligt höja priserna.",
-      },
-    ],
-  },
-  se4: {
-    intro:
-      "SE4 är Sveriges sydligaste elområde och omfattar Skåne, Blekinge, Halland och södra Småland. Området har starka kopplingar till de europeiska och danska elnäten.",
-    why_price:
-      "SE4 importerar el från Danmark och Polen via flera elkablar. Priserna påverkas starkt av vindkraft i Danmark och kontinentens gaspriser, vilket ger stora svängningar.",
-    production:
-      "Vindkraft dominerar allt mer i SE4. Kärnkraftverket Barsebäck är nedlagt. Bioenergi och viss vattenkraft kompletterar.",
-    counties: [
-      "Skåne län",
-      "Blekinge län",
-      "Hallands län",
-      "Kronobergs län",
-      "Kalmar län",
-    ],
-    faq: [
-      {
-        question: "Varför är SE4 ofta dyrast i Sverige?",
-        answer: "SE4 är starkt kopplat till det europeiska elnätet där gas- och kolkraft sätter marginalpriset. När Europa är dyrare smittar det av sig på SE4.",
-      },
-      {
-        question: "Vilka länder påverkar elpriset i SE4?",
-        answer: "Danmark, Tyskland och Polen påverkar SE4 mest via direkta elkablar. Hög vindkraft i Danmark kan ge låga priser, medan gasbrister i Europa driver upp dem.",
-      },
-      {
-        question: "Vad hände när Barsebäck stängdes?",
-        answer: "Nedläggningen av Barsebäck kärnkraftverk ökade SE4:s importberoende och bidrog till att priserna i söder ibland överstiger resten av Sverige.",
-      },
-    ],
-  },
-};
-
-// ─── Static params ────────────────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  return ["se1", "se2", "se3", "se4"].map((area) => ({ area }));
+function getContent(area: string) {
+  return ELOMRADEN[area as keyof typeof ELOMRADEN] ?? null;
 }
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ area: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { area } = await params;
-  const meta = AREA_META[area as AreaKey];
-  if (!meta) return {};
+  const c = getContent(area);
+  if (!c) return {};
+  const { data } = await getToday();
+  const label = areaLabel(c, false);
+  let description = `Elpriset i ${label} idag – spotpris per kvart och timme för timme, och vad som påverkar priset i ${c.regionInSentence}.`;
+  if (data) {
+    const day = dayLabel(data.date);
+    const avg = Math.round(quarterAverage(data.quarters[c.area]));
+    const cheap = cheapestHour(data.areas[c.area]);
+    // Datumet står mitt i meningen — gemen veckodag.
+    description = `Elpriset i ${label} idag ${day.charAt(0).toLowerCase() + day.slice(1)}: snitt ${avg} öre/kWh, billigast kl ${cheap.label}. Spotpris per kvart och timme för timme.`;
+  }
   return pageMeta({
     path: `/elomrade/${area}`,
-    title: `Elpris ${meta.name} — Spotpris ${meta.city} & ${meta.region}`,
-    description: `Se aktuellt elpris för elområde ${meta.name} (${meta.city}, ${meta.region}). Timpriser idag och imorgon i öre/kWh.`,
+    title: `Elpris ${label} idag – timme för timme`,
+    description,
   });
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Sida ─────────────────────────────────────────────────────────────────────
 
-export default async function ElprisArea({
-  params,
-}: {
-  params: Promise<{ area: string }>;
-}) {
+export default async function ElomradePage({ params }: PageProps) {
   const { area } = await params;
-  const meta = AREA_META[area as AreaKey];
-  const content = AREA_CONTENT[area as AreaKey];
+  const c = getContent(area);
+  if (!c) notFound();
 
-  if (!meta || !content) {
-    return (
-      <main className="min-h-screen bg-[#0A2540] text-white flex items-center justify-center">
-        <p className="text-[#8fafc9]">Okänt elområde.</p>
-      </main>
-    );
-  }
+  const [{ data, fetchedAt }, tomorrow] = await Promise.all([getToday(), loadTomorrowPrices()]);
+  const nowMs = fetchedAt.getTime();
+  const label = areaLabel(c);
+  const labelLower = areaLabel(c, false);
+  const pageUrl = `https://www.elpris.ai/elomrade/${area}`;
 
-  const citiesInArea = Object.values(CITIES).filter(
-    (c) => c.area === meta.name,
-  );
+  const hours = data?.areas[c.area] ?? null;
+  const rest = hours ? cheapestWindow(hours, nowMs) : null;
+  const tomorrowHours = tomorrow?.areas[c.area] ?? null;
+  const tomorrowAvg = tomorrowHours?.length
+    ? tomorrowHours.reduce((s, h) => s + h.ore_per_kwh, 0) / tomorrowHours.length
+    : null;
+  const cities = Object.values(CITIES)
+    .filter((city) => city.area === c.area)
+    .sort((a, b) => a.name.localeCompare(b.name, "sv"));
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.elpris.ai" },
-      { "@type": "ListItem", position: 2, name: "Elområden", item: "https://www.elpris.ai/elomrade/se3" },
-      { "@type": "ListItem", position: 3, name: `${meta.name} – ${meta.city}`, item: `https://www.elpris.ai/elomrade/${area}` },
-    ],
-  };
-
-  const faqLd =
-    content.faq.length > 0
-      ? {
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: content.faq.map((f) => ({
-            "@type": "Question",
-            name: f.question,
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: f.answer,
-            },
-          })),
-        }
-      : null;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Hem", item: "https://www.elpris.ai" },
+        { "@type": "ListItem", position: 2, name: "Elområden", item: "https://www.elpris.ai/elomrade" },
+        { "@type": "ListItem", position: 3, name: label, item: pageUrl },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: c.faq.map((f) => ({
+        "@type": "Question",
+        name: f.question,
+        acceptedAnswer: { "@type": "Answer", text: f.answer },
+      })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Dataset",
+      name: `Elpriser idag i ${labelLower}`,
+      description: `Dagens spotpriser per kvart och snittpris per timme för ${labelLower}. Hämtas automatiskt via elprisetjustnu.se.`,
+      url: pageUrl,
+      keywords: ["elpris", "spotpris", "Nord Pool", c.area, `elområde ${c.number}`, "Sverige"],
+      isAccessibleForFree: true,
+      license: "https://www.elprisetjustnu.se/elpris-api",
+      creator: { "@type": "Organization", name: "elpris.ai", url: "https://www.elpris.ai" },
+      temporalCoverage: data?.date ?? fetchedAt.toISOString().split("T")[0],
+      dateModified: fetchedAt.toISOString(),
+      spatialCoverage: { "@type": "Place", name: `${label}, Sverige` },
+      variableMeasured: "Elpris (öre/kWh)",
+    },
+  ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      {faqLd && (
+      {jsonLd.map((ld) => (
         <script
+          key={ld["@type"]}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
         />
-      )}
+      ))}
 
       <main className="min-h-screen bg-[#0A2540] text-white">
         <NavBar />
 
-        <PageWide className="py-12 flex flex-col items-center">
-
-          {/* ── Header ── */}
-          <section className="w-full flex flex-col gap-3">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-[#8fafc9]">
-              <a href="/" className="hover:text-[#00E5FF] transition-colors">Hem</a>
+        <PageWide className="py-12 flex flex-col gap-12">
+          {/* 1–3. Brödsmulor, H1 + underrad, områdesväljare */}
+          <section className="flex flex-col gap-3">
+            <nav aria-label="Brödsmulor" className="flex items-center gap-2 text-xs text-[#8fafc9]">
+              <Link href="/" className="hover:text-[#00E5FF] transition-colors">Hem</Link>
               <span>/</span>
-              <a href="/elomrade" className="hover:text-[#00E5FF] transition-colors">Elområden</a>
+              <Link href="/elomrade" className="hover:text-[#00E5FF] transition-colors">Elområden</Link>
               <span>/</span>
-              <span className="text-white">{meta.name} – {meta.city}</span>
-            </div>
-
-            {/* Area selector */}
-            <div className="flex flex-row flex-wrap justify-center gap-2 mb-2 mt-2">
-              {Object.entries(AREA_META).map(([key, m]) => (
-                <Link
-                  key={key}
-                  href={`/elomrade/${key}`}
-                  className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-150 ${
-                    key === area
-                      ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
-                      : "bg-[#0F3460] border border-[#1E4976] text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white"
-                  }`}
-                >
-                  {m.name} – {m.city}
-                </Link>
-              ))}
-            </div>
-
-            {/* Map */}
-            <div className="mb-2">
-              <div className="w-full max-w-[260px] mx-auto">
-                <SwedenMap />
-              </div>
-            </div>
-
-            <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">
-              Elpris {meta.name} – {meta.city}
-            </h1>
+              <span className="text-white">{label}</span>
+            </nav>
+            <h1 className="font-extrabold text-4xl md:text-5xl tracking-tight">{c.h1}</h1>
             <p className="text-[#8fafc9] text-base md:text-lg">
-              {meta.region} · Spotpris i öre/kWh exkl. moms & nätavgift
+              {c.region} · {data ? dayLabel(data.date) : formatSwedishDay(fetchedAt)} · Priserna sattes i går i
+              day-ahead-auktionen
             </p>
+            <nav aria-label="Välj elområde" className="grid grid-cols-2 gap-2 mt-2 sm:flex sm:flex-wrap">
+              {ELOMRADE_KEYS.map((key) => {
+                const o = ELOMRADEN[key];
+                return (
+                  <Link
+                    key={key}
+                    href={`/elomrade/${key}`}
+                    aria-current={key === area ? "page" : undefined}
+                    className={`px-3 sm:px-4 py-2 rounded-xl font-semibold text-sm text-center leading-snug transition-all duration-150 ${
+                      key === area
+                        ? "bg-[#00E5FF] text-[#0A2540] shadow-lg shadow-[#00E5FF]/20"
+                        : "bg-[#0F3460] border border-[#1E4976] text-[#8fafc9] hover:border-[#00E5FF]/40 hover:text-white"
+                    }`}
+                  >
+                    {/* Mobil: staden på egen rad (2×2), från sm: "Elområde 1 · Luleå" på en rad. */}
+                    <span>Elområde {o.number}</span>
+                    <span className="hidden sm:inline"> · </span>
+                    <span className="block sm:inline">{o.selectorCity}</span>
+                  </Link>
+                );
+              })}
+            </nav>
           </section>
 
-          {/* ── Content section ── */}
-          <div className="w-full flex flex-col gap-8 mt-12">
-
-            {/* Intro + why price */}
-            <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-6 flex flex-col gap-4">
-              <p className="text-[#e2eaf4] leading-relaxed">{content.intro}</p>
-              <p className="text-[#a8c4d8] leading-relaxed">{content.why_price}</p>
+          {/* 4. Prisblock, låst till området */}
+          {data === null || hours === null ? (
+            <div className={`${BOX} p-10 text-center text-[#8fafc9]`}>
+              Prisdata är inte tillgänglig just nu. Försök igen om en stund.
             </div>
+          ) : (
+            <>
+              <NowAndChart
+                quarters={data.quarters}
+                serverNow={nowMs}
+                area={c.area}
+                title={`Dagens elpris per kvart i elområde ${c.number}`}
+              />
 
-            {/* Production + counties row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Production */}
-              <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-5 flex flex-col gap-3">
-                <p className="text-[#8fafc9] text-xs font-medium uppercase tracking-wider">
-                  Dominerande produktion
+              <section className="max-w-3xl">
+                <h2 className={H2}>Elpriset timme för timme i elområde {c.number}</h2>
+                <p className="text-sm text-[#8fafc9] leading-relaxed mb-4">
+                  Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart – diagrammet ovan visar
+                  varje kvart.
                 </p>
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">⚡</span>
-                  <p className="text-[#e2eaf4] text-sm leading-relaxed">{content.production}</p>
-                </div>
-              </div>
-
-              {/* Counties */}
-              <div className="bg-[#0F3460] border border-[#1E4976] rounded-2xl p-5 flex flex-col gap-3">
-                <p className="text-[#8fafc9] text-xs font-medium uppercase tracking-wider">
-                  Ingående län
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {content.counties.map((county) => (
-                    <span
-                      key={county}
-                      className="px-3 py-1 bg-[#0A2540] border border-[#1E4976] rounded-full text-xs text-[#e2eaf4]"
-                    >
-                      {county}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Städer i elområdet — conditional rendering */}
-            {citiesInArea.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold text-cyan-100 mb-4">
-                  Städer i {meta.name}
-                </h2>
-                <p className="text-sm text-[#8fafc9] mb-4 leading-relaxed">
-                  Spotpriset är detsamma i hela elområde {meta.name}, men på stadssidorna får du även information om de större nätbolagen, lokala förutsättningar och svar på vanliga frågor om elen där du bor.
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {citiesInArea.map((city) => (
-                    <Link
-                      key={city.slug}
-                      href={`/elpris-idag/${city.slug}`}
-                      className="bg-[#0F3460] border border-[#1E4976] rounded-2xl px-4 py-3 hover:border-[#00E5FF]/40 hover:bg-[#0F3460]/80 transition-colors"
-                    >
-                      <p className="font-semibold text-white text-sm">{city.name}</p>
-                      <p className="text-xs text-[#8fafc9] mt-0.5">{city.region}</p>
-                    </Link>
-                  ))}
-                </div>
+                <HourTable hours={hours} caption={`Snittpris per timme idag i ${labelLower}`} nowMs={nowMs} />
+                {rest && (
+                  <p className="text-lg text-white leading-relaxed mt-6">
+                    {rest.restOfDay ? `Resten av dagen i elområde ${c.number}` : `Billigast resten av dagen i elområde ${c.number}`}:{" "}
+                    <strong>
+                      {rest.start}–{rest.end}
+                    </strong>
+                    , snitt {ore1(rest.avg)} öre/kWh.
+                  </p>
+                )}
               </section>
+            </>
+          )}
+
+          {/* 5. Morgondagen */}
+          <section className={`${BOX} p-5 sm:p-6 max-w-3xl`}>
+            {tomorrowAvg === null ? (
+              <p className="text-base text-[#e2eaf4]">
+                Morgondagens elpris för {labelLower} publiceras runt kl 13:15.{" "}
+                <Link href="/elpris-imorgon" className={LINK}>→ Elpriset imorgon</Link>
+              </p>
+            ) : (
+              <p className="text-base text-[#e2eaf4]">
+                Elpriset imorgon i {labelLower}: snitt {ore1(tomorrowAvg)} öre/kWh.{" "}
+                <Link href={`/elpris-imorgon#${area}`} className={LINK}>
+                  → Se morgondagens pris timme för timme
+                </Link>
+              </p>
             )}
+          </section>
 
-            {/* FAQ */}
-            <section>
-              <h2 className="text-2xl font-bold text-cyan-100 mb-6">
-                Vanliga frågor om {meta.name}
-              </h2>
-              <FaqAccordion items={content.faq} />
-            </section>
-
-            {/* CTA */}
-            <div className="flex justify-center">
-              <Link
-                href="/elpris-idag"
-                className="px-6 py-3 bg-[#00E5FF] text-[#0A2540] font-semibold rounded-xl hover:bg-[#00c4db] transition-colors shadow-lg shadow-[#00E5FF]/20"
-              >
-                Se aktuella priser →
-              </Link>
+          {/* 6. Om området */}
+          <section className="max-w-3xl">
+            <h2 className={H2}>Om {labelLower}</h2>
+            <div className="flex flex-col gap-4 text-[#e2eaf4] leading-relaxed">
+              {c.about.map((p) => (
+                <p key={p}>{p}</p>
+              ))}
             </div>
+          </section>
 
+          {/* 7. Städer */}
+          {cities.length > 0 && (
+            <section>
+              <h2 className={H2}>Städer i elområde {c.number}</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {cities.map((city) => (
+                  <Link
+                    key={city.slug}
+                    href={`/elpris-idag/${city.slug}`}
+                    className={`${BOX} px-4 py-3 font-semibold text-white text-sm hover:border-[#00E5FF]/40 transition-colors`}
+                  >
+                    {city.name}
+                  </Link>
+                ))}
+              </div>
+              <p className="text-sm text-[#8fafc9] mt-4 leading-relaxed max-w-3xl">{BORDER_NOTE}</p>
+            </section>
+          )}
+
+          {/* 8. Kartan */}
+          <section className="flex flex-col items-center gap-2">
+            <div className="w-full max-w-[260px]">
+              <SwedenMap />
+            </div>
+            <p className="text-xs text-[#8fafc9] text-center">{MAP_NOTE}</p>
+          </section>
+
+          {/* 9. FAQ */}
+          <section className="max-w-3xl">
+            <h2 className={H2}>Vanliga frågor om elområde {c.number}</h2>
+            <FaqAccordion items={c.faq} />
+          </section>
+
+          {/* 10. Knapp */}
+          <div className="flex justify-center">
+            <Link
+              href="/elpris-idag"
+              className="px-6 py-3 bg-[#00E5FF] text-[#0A2540] font-semibold rounded-xl hover:bg-[#00c4db] transition-colors shadow-lg shadow-[#00E5FF]/20"
+            >
+              Se alla elområden idag →
+            </Link>
           </div>
-
         </PageWide>
       </main>
     </>
