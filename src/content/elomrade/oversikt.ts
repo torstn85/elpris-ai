@@ -1,7 +1,7 @@
 // Innehåll för /elomrade (översikten). Ordagrant från innehållsfilen.
 //
 // Dygnssnitt (median) per område: scripts/analysis/daily-spread.ts,
-// 13 april–12 oktober 2026, 182 dygn per område (spotpris exkl. moms).
+// 14 april–12 oktober 2026, 182 dygn per område (spotpris exkl. moms).
 
 import type { FaqItem } from "./types";
 
@@ -20,7 +20,7 @@ export const OVERSIKT = {
       { key: "se3", exampleCities: "Stockholm, Göteborg, Uppsala", dailyMedian: "69,0 öre/kWh" },
       { key: "se4", exampleCities: "Malmö, Helsingborg, Halmstad", dailyMedian: "99,5 öre/kWh" },
     ],
-    footnote: "Spotpris exkl. moms, median av dygnssnittet 13 april–12 oktober 2026. Källa: elpris.ai:s egen prisdata.",
+    footnote: "Spotpris exkl. moms, median av dygnssnittet 14 april–12 oktober 2026. Källa: elpris.ai:s egen prisdata.",
   },
 
   whichArea: "Det beror på var din elanläggning ligger. Här är städerna vi har egna sidor för:",
