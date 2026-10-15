@@ -20,7 +20,7 @@ faqs:
   - question: "Varför är elpriset olika i SE1 och SE4?"
     answer: "Sverige har fyra elområden (SE1-SE4) eftersom stamnätet inte alltid kan transportera el fritt mellan dem. SE1 och SE2 i norr har överskott från vattenkraft och vindkraft men låg befolkning, medan SE4 i söder har hög efterfrågan men ingen storskalig vattenkraft. När stamnätet har flaskhalsar kan billig el inte flöda söderut — då rasar priset i norr och stiger i söder. Det är därför SE1 kan ligga på 5 öre/kWh samtidigt som SE4 har 80 öre."
   - question: "Varför är elen dyrare på morgonen och kvällen?"
-    answer: "Mänskligt beteende skapar förutsägbara efterfrågetoppar. Mellan klockan 07-09 vaknar alla samtidigt, värmer huset, lagar frukost och åker till jobbet. Mellan 17-20 är det hemkomst, matlagning, dusch och uppvärmning. När efterfrågan är som högst måste dyrare produktion tändas, och marginalprissättningen lyfter priset för alla producenter samtidigt. Mellan 00-06 är efterfrågan minimal och priserna rasar."
+    answer: "Efterfrågan följer vardagen. På morgonen vaknar många samtidigt, värmer huset, lagar frukost och åker till jobbet. På kvällen kommer de hem, lagar mat, duschar och värmer upp. När efterfrågan är som högst måste dyrare produktion användas, och marginalprissättningen lyfter priset för alla producenter samtidigt. På natten är efterfrågan låg. Exakt när det är dyrast skiljer sig mellan elområdena: under april–oktober 2026 var dygnets dyraste timme oftast på morgonen eller tidig kväll i SE1 och SE2, och på kvällen i SE3 och SE4 (elpris.ai:s egen prisdata)."
   - question: "Varför är elpriset högre på vintern än på sommaren?"
     answer: "Vintern kombinerar tre prishöjande faktorer samtidigt: hög efterfrågan från uppvärmning (varje grad kallare ökar förbrukningen markant), kortare dagar med mer belysning och tidigare hemkomst, och ofta mindre vindkraft än under blåsigare årstider. Sommaren har mildare mönster eftersom uppvärmningsbehovet försvinner. Det är därför svenska vinterelpriser kan vara 5-10 gånger högre än sommarens — kallt, mörkt och lite vind är värsta kombinationen för plånboken."
   - question: "Hur påverkas svenska elpriser av Europa?"
@@ -53,13 +53,16 @@ Skillnaden mellan dessa två tillstånd kan vara 10-100x i öre/kWh.
 
 Mänskligt beteende skapar förutsägbara toppar och dalar i efterfrågan över dygnet:
 
-- **07-09 (morgontoppen):** Alla vaknar samtidigt, värmer upp huset, lagar frukost, åker till jobbet (laddar bilen)
-- **17-20 (kvällstoppen):** Hemkomst, matlagning, dusch, värme, TV
-- **00-06 (lågpunkten):** Industrin går på lågvarv, hushåll sover
+- **Morgon:** många vaknar samtidigt, värmer upp huset, lagar frukost och åker till jobbet
+- **Kväll:** hemkomst, matlagning, dusch, värme och TV
+- **Natt:** industrin går på lågvarv och hushållen sover
+- **Mitt på dagen:** solkraften producerar som mest under vår och sommar och pressar priset
+
+När på dygnet det faktiskt blir billigast och dyrast skiljer sig mellan elområdena – se [dygnsmönstret för elpriset](/guider/forsta-elpriset/dygnsmonster-elpris).
 
 <PriceGraph />
 
-Här ser du dygnsmönstret tydligt i dagens timpriser. De två topparna och natt-dalen återkommer nästan varje dag.
+Här ser du dagens timpriser i ditt elområde. Mönstret varierar från dag till dag och mellan elområdena.
 
 På sommaren är mönstret mildare — mindre uppvärmningsbehov gör att skillnaderna minskar. På vintern är topparna brutalare, särskilt vid kyla.
 
