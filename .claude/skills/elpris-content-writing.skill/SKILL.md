@@ -266,7 +266,7 @@ faqs:
 | Fallgrop | Korrekt hantering |
 |---|---|
 | Säljig ton | Skriv som om du förklarar för en intresserad granne |
-| Tvärsäkra påståenden om framtiden | "Sannolikt", "tenderar att", "historiskt har..." |
+| Tvärsäkra påståenden om framtiden | "Sannolikt", "tenderar att", "historiskt har..." Får bara användas med period och källa – se elpris-facts, avsnittet Prishistorik. |
 | Repetition mellan intro och första H2 | Intro ger kontext, första H2 går direkt till substans |
 | Lösa siffror utan kontext | Alltid "vid X spotpris..." eller "typiskt..." eller "i snitt..." |
 | Påklistrade länkar i botten | Inflätade naturligt i löpande text |

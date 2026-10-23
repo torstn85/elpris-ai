@@ -124,7 +124,7 @@ export const CITIES: Record<string, City> = {
   halmstad: {
     slug: 'halmstad',
     publishedAt: '2026-05-18',
-    updatedAt: '2026-10-15',
+    updatedAt: '2026-10-23',
     name: 'Halmstad',
     area: 'SE4',
     region: 'Hallands län',
@@ -141,7 +141,7 @@ export const CITIES: Record<string, City> = {
       {
         question: 'När är elen billigast i Halmstad?',
         answer:
-          'I Halmstad, liksom resten av SE4, är elen typiskt billigast nattetid mellan 02:00 och 05:00 samt mitt på dagen mellan 12:00 och 14:00 när solkraften producerar mycket. Dyrast är vardagskvällar mellan 17:00 och 20:00 när hushållens samtidiga matlagning, värme och belysning skapar efterfrågetoppar. Prisspridningen är ofta större i SE4 än norrut, vilket gör att smart styrning ger extra mycket tillbaka här.',
+          'Halmstad ligger i SE4. Under 14 april–12 oktober 2026 var dygnets billigaste timme i SE4 oftast mitt på dagen och den dyraste oftast på kvällen (elpris.ai:s egen prisdata). Mönstret skiftar med årstiden, så kolla dagens priser innan du planerar. Prisspridningen är ofta större i SE4 än norrut, vilket gör att smart styrning ger extra mycket tillbaka här.',
       },
     ],
   },

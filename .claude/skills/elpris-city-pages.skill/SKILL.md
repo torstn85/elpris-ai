@@ -71,7 +71,7 @@ Varje stad behöver dessa fält:
 4. SEO-vinkel: smart styrning extra värdefull HÄR pga prisspridning/SE4-premium (1 mening)
 
 **Exempel (Halmstad):**
-> "Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har ofta högre spotpris än Stockholm och Göteborg — skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Kvällarna kl 17–20 är ofta betydligt dyrare än natten — och i SE4, där prisspridningen över dygnet ofta är större, svider den skillnaden mer än norrut."
+> "Halmstad är Hallands största stad med drygt 108 000 invånare och fungerar som regionens centrala knutpunkt. Staden tillhör elområde SE4, Sveriges sydligaste elprisområde. Halmstad har en blandad förbrukningsprofil: tät stadsbebyggelse med fjärrvärme i centrum, eluppvärmda villor i förorter som Söndrum, Vallås och Frösakull, samt industri som bidrar till hög dagtidsförbrukning. SE4 har ofta högre spotpris än Stockholm och Göteborg — skillnaden är störst när överföringen söderut är fullt belastad; när nätet inte är trångt kan priset vara detsamma. Det innebär att smart styrning av värmepump, tvätt och elbilsladdning är extra värdefull i Halmstad. Skillnaden mellan dygnets billigaste och dyraste timmar kan vara stor – se dagens priser."
 
 ## Innehållsmall — commonGridCompanies
 
