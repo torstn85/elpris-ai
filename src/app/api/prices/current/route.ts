@@ -29,6 +29,7 @@ async function fromSupabase(): Promise<CurrentPriceResponse | null> {
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
+    .eq("resolution_minutes", 15) // pågående kvart
     .gte("delivery_period_start", `${todayPrefix}T00:00:00`)
     .lte("delivery_period_start", slotStart)
     .order("delivery_period_start", { ascending: false });

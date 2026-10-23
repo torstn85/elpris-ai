@@ -76,6 +76,7 @@ async function fromSupabase(isoDate: string): Promise<DayPrices | null> {
   const { data, error } = await supabase
     .from("spot_prices")
     .select("area, delivery_period_start, ore_per_kwh")
+    .eq("resolution_minutes", 15) // bara kvartspriser – timrader läses inte som kvartar
     .gte("delivery_period_start", from)
     .lte("delivery_period_start", to)
     .order("delivery_period_start");

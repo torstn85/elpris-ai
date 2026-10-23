@@ -76,6 +76,7 @@ async function main() {
     supabase
       .from("spot_prices")
       .select("id, area, delivery_period_start, ore_per_kwh")
+      .eq("resolution_minutes", 15) // bara kvartspriser – timdata före oktober 2025 räknas inte med
       .gte("delivery_period_start", from)
       .lte("delivery_period_start", to)
       .order("delivery_period_start")
