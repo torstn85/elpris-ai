@@ -13,7 +13,8 @@
     "test:time": "npx -y tsx scripts/check-time.ts",
     "test:quarters": "npx -y tsx scripts/check-quarters.ts",
     "test:elduellen-storage": "npx -y tsx scripts/check-elduellen-storage.ts",
-    "test:dst": "npx -y tsx scripts/check-dst-days.ts"
+    "test:dst": "npx -y tsx scripts/check-dst-days.ts",
+    "test:spotrows": "npx -y tsx scripts/check-spotrows.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

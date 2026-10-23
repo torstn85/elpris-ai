@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase, type SpotPriceRow } from "@/lib/supabase";
 import { stockholmDateString, stockholmISODate } from "@/lib/time";
 import { addDays } from "@/lib/dates";
+import { toSpotPriceRows, type ElprisetjustnuEntry } from "@/lib/prices/spotRows";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -12,17 +13,11 @@ function getTomorrowDateString(): string {
   return `${y}/${m}-${d}`;
 }
 
-interface RawEntry {
-  SEK_per_kWh: number;
-  time_start: string;
-  time_end: string;
-}
-
-async function fetchRawArea(area: Area, dateStr: string): Promise<RawEntry[]> {
+async function fetchRawArea(area: Area, dateStr: string): Promise<ElprisetjustnuEntry[]> {
   const url = `https://www.elprisetjustnu.se/api/v1/prices/${dateStr}_${area}.json`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch ${area}: ${res.status}`);
-  return res.json() as Promise<RawEntry[]>;
+  return res.json() as Promise<ElprisetjustnuEntry[]>;
 }
 
 async function upsertRows(rows: SpotPriceRow[]): Promise<number> {
@@ -36,16 +31,6 @@ async function upsertRows(rows: SpotPriceRow[]): Promise<number> {
   return count ?? rows.length;
 }
 
-function toRows(area: Area, entries: RawEntry[]): SpotPriceRow[] {
-  return entries.map((e) => ({
-    area,
-    delivery_period_start: e.time_start,
-    delivery_period_end: e.time_end,
-    sek_per_kwh: e.SEK_per_kWh,
-    ore_per_kwh: Math.round(e.SEK_per_kWh * 10000) / 100,
-  }));
-}
-
 interface AreaResult {
   area: Area;
   rows_upserted?: number;
@@ -56,7 +41,7 @@ interface AreaResult {
 async function fetchAndUpsertArea(area: Area, dateStr: string): Promise<AreaResult> {
   try {
     const entries = await fetchRawArea(area, dateStr);
-    const rows = toRows(area, entries);
+    const rows = toSpotPriceRows(area, entries);
     const count = await upsertRows(rows);
     return { area, rows_upserted: count };
   } catch (err) {
