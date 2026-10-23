@@ -165,9 +165,13 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 - Dyraste dygn: SE1 och SE2 14 dec 2022 483,2 · SE3 23 aug 2022 515,0 · SE4 22 aug 2022 577,3.
 - Billigaste dygn: 16 juli 2023, −9,6 i alla fyra områden.
 - Andel tid med negativt spotpris (SE1/SE2/SE3/SE4): 2022 0,3/0,3/0,3/0,3 % · 2023 4,9/4,9/4,9/4,2 % · 2024 7,1/8,2/7,4/7,2 % · 2025 5,9/7,7/3,9/4,3 % · 2026 t.o.m. 22 okt 0,9/1,4/1,1/1,2 %. Före oktober 2025 räknas timmar, därefter kvartar – skriv ut det.
+- Billigaste året (helår 2022–2025): i SE3 och SE4 var 2024 det billigaste året, i SE1 och SE2 2025. Källa: elpris.ai:s egen prisdata.
+- Sommaren 2022 (jun–aug) var dyrare än vintern 2021/22 (dec–feb) i SE3 och SE4, ungefär lika i SE2 (41,7 mot 41,0). Källa: elpris.ai:s egen prisdata.
+- Vintern dec–feb var dyrare än sommaren jun–aug efter i alla områden 2023–2026; 2022 bara i SE1. Källa: elpris.ai:s egen prisdata.
 
 **Regler**
 - Pristoppen var augusti–december 2022: skriv "hösten och vintern 2022", inte "vintern 2022". Orsaker anges bara med primärkälla.
+- Orsaker 2022 (källa: Energimyndigheten, Nuläget på elmarknaden december 2022, publicerad 10 januari 2023): högre priser på naturgas och utsläppsrätter var en viktig drivkraft till de högre elpriserna 2022 i både Tyskland och Norden. Första halvan av december 2022: kyla, svag vind och isbildning på vindkraftverk, isläggning i älvarna som begränsade vattenkraften, och Oskarshamn 3 avställd 9–17 december. Den 14 december 2022 var priset detsamma i hela Sverige under dygnets alla timmar. Skriv inte att gaskraft sätter priset i Sverige.
 - Kvoten vinter/sommar varierar mellan 0,6 och 3,8 beroende på år och område. Skriv aldrig en fast faktor. I SE3 och SE4 var sommaren 2022 dyrare än vintern 2021/22.
 - Skriv inte att SE1 och SE2 har samma pris i dag. Fram till augusti 2024 hade de samma pris nästan alla timmar, men från hösten 2024 har de glidit isär: sedan kvartspriserna infördes 1 oktober 2025 har de exakt samma pris i ungefär 6 % av kvartarna (7 % under 14 april–22 oktober 2026). Historiskt samma pris får nämnas med period.
 - Negativa priser: andelen per år får anges. Orsaken till att andelen är lägre 2026 anges bara med primärkälla.
