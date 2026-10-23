@@ -175,6 +175,8 @@ Sveriges tydligaste exempel på elprisgeografi som INTE följer länsgränserna.
 - Kvoten vinter/sommar varierar mellan 0,6 och 3,8 beroende på år och område. Skriv aldrig en fast faktor. I SE3 och SE4 var sommaren 2022 dyrare än vintern 2021/22.
 - Skriv inte att SE1 och SE2 har samma pris i dag. Fram till augusti 2024 hade de samma pris nästan alla timmar, men från hösten 2024 har de glidit isär: sedan kvartspriserna infördes 1 oktober 2025 har de exakt samma pris i ungefär 6 % av kvartarna (7 % under 14 april–22 oktober 2026). Historiskt samma pris får nämnas med period.
 - Negativa priser: andelen per år får anges. Orsaken till att andelen är lägre 2026 anges bara med primärkälla.
+- Negativa priser (egen data 1 nov 2021–22 okt 2026): vanligast i oktober, maj och augusti, nästan aldrig jan–feb; helg 2–3 gånger vardag; SE2 lika hög eller högre andel än SE3/SE4 alla år; inte vanligare i söder. Skriv inte 'vanligast nattetid' eller 'maj–augusti' som regel.
+- Svenska kraftnät (remissvar 21 april 2020): negativa elpriser uppstod i Sverige första gången första kvartalet 2020; SvK förordade att elcertifikat inte ska tilldelas vid negativa priser och bedömde att negativa priser kan väntas bli vanligare.
 - Innevarande år och månad märks "hittills" eller "t.o.m. {datum}" och räknas inte som dyraste eller billigaste.
 - Jämför aldrig timspridning (före oktober 2025) med kvartsspridning.
 
