@@ -4,6 +4,8 @@
 export interface FaqItem {
   question: string;
   answer: string;
+  /** Valfri länk efter svaret, t.ex. till en guide. */
+  link?: { href: string; text: string };
 }
 
 interface Props {
@@ -28,6 +30,15 @@ export default function FaqAccordion({ items }: Props) {
           </summary>
           <p className="mt-3 text-base text-[#8fafc9] leading-relaxed">
             {faq.answer}
+            {faq.link && (
+              <>
+                {" "}
+                <a href={faq.link.href} className="text-[#00E5FF] hover:underline">
+                  {faq.link.text}
+                </a>
+                .
+              </>
+            )}
           </p>
         </details>
       ))}

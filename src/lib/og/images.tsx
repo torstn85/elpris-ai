@@ -54,6 +54,7 @@ export const ogTomorrowUrl = (iso: string, published: boolean) =>
   absoluteUrl(`/og/elpris-imorgon/${iso}${published ? "" : "-vantar"}`);
 
 export const ogCityUrl = (slug: string, iso: string = stockholmISODate()) => absoluteUrl(`/og/stad/${slug}/${iso}`);
+export const OG_HISTORY_URL = absoluteUrl("/og/elpris-historik");
 
 // ─── Bilder ──────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,13 @@ export function renderStandardOg() {
       sub: "Spotpriset för SE1–SE4 timme för timme och per kvart, guider om elavtal och tips för att spara.",
       footer: SOURCE_NOTE,
     },
+    CACHE_LONG,
+  );
+}
+
+export function renderHistoryOg() {
+  return renderOgImage(
+    { heading: "Elpris historik", sub: "Månadssnitt för SE1–SE4 sedan november 2021", footer: SOURCE_NOTE },
     CACHE_LONG,
   );
 }

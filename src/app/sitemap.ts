@@ -71,6 +71,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/elpris-historik`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
     ...(process.env.NEXT_PUBLIC_GAMES_ENABLED === "true"
       ? [
           {
