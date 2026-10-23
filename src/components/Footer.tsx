@@ -64,6 +64,11 @@ export default function Footer({ id, className = '' }: FooterProps) {
                 </Link>
               </li>
               <li>
+                <Link href="/elpris-historik" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
+                  Elpris historik
+                </Link>
+              </li>
+              <li>
                 <Link href="/elomrade" className="text-sm text-[#8fafc9] hover:text-[#00E5FF] transition-colors">
                   Elområden SE1–SE4
                 </Link>

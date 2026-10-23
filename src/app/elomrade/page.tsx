@@ -114,6 +114,12 @@ export default function ElomradenPage() {
               </table>
             </div>
             <p className="text-xs text-[#8fafc9] mt-3">{OVERSIKT.table.footnote}</p>
+            <p className="text-sm text-[#e2eaf4] mt-4">
+              Se hur elpriset har varierat sedan 2021:{" "}
+              <Link href="/elpris-historik" className={LINK}>
+                Elpris historik
+              </Link>
+            </p>
           </section>
 
           {/* Vilket elområde bor jag i? */}
