@@ -370,14 +370,15 @@ export default function HomeClient() {
             </h2>
             {/* Stycke 1 */}
             <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
-              Elpriset varierar varje{" "}
+              Elpriset sätts per{" "}
               <Link href="/guider/elavtal/kvartspris-vs-timpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">kvart</Link>.
-              {" "}Sedan oktober 2025 sätts priset i 15-minutersintervaller på den nordiska elbörsen{" "}
-              <Link href="/guider/forsta-elpriset/nord-pool-forklarat" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">Nord Pool</Link>,
-              {" "}baserat på utbud och efterfrågan. När det blåser mycket, solen skiner och
-              konsumtionen är låg blir elen billig — ibland till och med{" "}
+              {" "}Sedan oktober 2025 har spotpriset 96 prisnivåer per dygn, en för varje kvart, och de
+              sätts en gång per dygn i den europeiska day-ahead-auktionen – för Norden på elbörsen{" "}
+              <Link href="/guider/forsta-elpriset/nord-pool-forklarat" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">Nord Pool</Link>.
+              {" "}När det blåser mycket, solen skiner och förbrukningen är låg blir elen billig, ibland
+              till och med{" "}
               <Link href="/guider/forsta-elpriset/negativa-elpriser" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">negativ</Link>.
-              {" "}När många använder el samtidigt och produktionen är låg stiger priset snabbt.
+              {" "}När många använder el samtidigt och produktionen är låg blir den dyr.
             </p>
             {/* Stycke 2 */}
             <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
@@ -393,8 +394,10 @@ export default function HomeClient() {
               <Link href="/elpris-idag" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elpris idag</Link>
               {" "}för alla fyra elområden, dagens dygnskurva timme för timme, samt{" "}
               <Link href="/elpris-imorgon" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elpris imorgon</Link>
-              {" "}så snart de publiceras runt kl 13:15 varje dag. Du kan också ställa frågor
-              till vår AI-assistent som hämtar färska prisdata och ger konkreta råd: när är
+              {" "}så snart de publiceras runt kl 13:15 varje dag. Vill du se längre tillbaka visar{" "}
+              <Link href="/elpris-historik" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elpris historik</Link>
+              {" "}månads- och årssnitt för alla elområden sedan november 2021. Du kan också ställa
+              frågor till vår AI-assistent som hämtar färska prisdata och ger konkreta råd: när är
               det billigast att{" "}
               <Link href="/guider/spara-el/tvatta-billigt" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">tvätta idag</Link>?
               {" "}När bör jag{" "}
@@ -405,11 +408,12 @@ export default function HomeClient() {
             <p className="text-base text-[#8fafc9] leading-relaxed mb-4">
               Priserna som visas är{" "}
               <Link href="/guider/forsta-elpriset/vad-ar-spotpris" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">spotpris</Link>
-              {" "}exklusive moms och nätavgifter — det vill säga den del av elpriset som faktiskt
-              varierar över dygnet och som du kan påverka genom när du använder el. För att
-              få din fulla kostnad lägger du till moms (25{"\u00A0"}%), elnätsavgift, energiskatt och
-              eventuellt påslag från ditt{" "}
-              <Link href="/guider/elavtal/byta-elavtal-guide" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elavtal</Link>.
+              {" "}exklusive moms och nätavgift – den del av elpriset som varierar över dygnet. Med
+              kvarts- eller timpris i ditt{" "}
+              <Link href="/guider/elavtal/byta-elavtal-guide" className="font-semibold text-[#00E5FF] hover:text-white hover:underline transition-colors duration-150">elavtal</Link>
+              {" "}kan du sänka kostnaden genom att använda el när den är billig. På elräkningen
+              tillkommer elhandlarens påslag, energiskatt och elnätsavgift, och moms (25{"\u00A0"}%) på
+              alltihop.
             </p>
           </div>
         </section>
