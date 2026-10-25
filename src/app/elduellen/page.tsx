@@ -69,7 +69,8 @@ export default async function ElduellenPage() {
       <NavBar />
       <div className="mx-auto w-full max-w-xl px-4 py-6 sm:py-10">
         {today ? (
-          <Elduellen puzzle={generatePuzzle({ date, today, tomorrow })} />
+          // key={date}: nytt dygn (router.refresh efter midnatt) ger ett nytt spel, inte gårdagens tillstånd.
+          <Elduellen key={date} puzzle={generatePuzzle({ date, today, tomorrow })} />
         ) : (
           <div className="rounded-2xl border border-muted bg-surface p-6 text-center text-[#8fafc9]">
             Dagens priser är inte tillgängliga just nu. Försök igen om en stund.

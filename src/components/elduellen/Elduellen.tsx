@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { COST_FOOTNOTE, formatCostShort } from "@/lib/elduellen/cost";
 import { formatSwedishDay } from "@/lib/format/date";
 import { track, trackWhenReady } from "@/lib/elduellen/analytics";
@@ -27,6 +28,7 @@ import {
   summaryLine,
 } from "@/lib/elduellen/present";
 import type { Duel, Option, Pick, Puzzle } from "@/lib/elduellen/types";
+import { stockholmISODate } from "@/lib/time";
 
 type Phase = "start" | "duel" | "facit" | "done" | "bonus" | "bonus-facit";
 
@@ -518,6 +520,27 @@ export default function Elduellen({ puzzle }: { puzzle: Puzzle }) {
       // Mätning får aldrig störa spelet.
     }
   }, []);
+
+  // En flik som legat öppen över midnatt, eller som återställs ur bfcache, kan
+  // visa gårdagens pussel. När sidan blir synlig igen och det svenska datumet
+  // har bytts hämtas dagens pussel: router.refresh() i vanliga fall, en hel
+  // omladdning vid bfcache. Sidan har key={date}, så spelets tillstånd börjar om.
+  const router = useRouter();
+  useEffect(() => {
+    const dayChanged = () => stockholmISODate() !== date;
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && dayChanged()) router.refresh();
+    };
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted && dayChanged()) window.location.reload();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", onPageShow);
+    };
+  }, [date, router]);
 
   // Återställ dagens progress vid första renderingen i webbläsaren.
   useEffect(() => {
