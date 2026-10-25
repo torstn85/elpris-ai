@@ -9,7 +9,7 @@ import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
 import { loadTomorrowPrices } from '@/lib/prices/tomorrow';
 import { isCurrentHour } from '@/lib/prices/hourly';
-import { formatClock } from '@/lib/prices/quarterTicks';
+import { formatClockDst } from '@/lib/prices/dstLabels';
 import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
 import { formatSwedishDay } from '@/lib/format/date';
 import { integer, ore1 } from '@/lib/format/ore';
@@ -305,8 +305,8 @@ export default async function StadPage({ params }: PageProps) {
               <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
                 {[
                   ['Snitt idag', `${ore1(quarterAverage(quarters))} öre/kWh`],
-                  ['Billigast', `${ore1(extremes.min.ore)} öre kl ${formatClock(extremes.min.start)}`],
-                  ['Dyrast', `${ore1(extremes.max.ore)} öre kl ${formatClock(extremes.max.start)}`],
+                  ['Billigast', `${ore1(extremes.min.ore)} öre kl ${formatClockDst(extremes.min.start)}`],
+                  ['Dyrast', `${ore1(extremes.max.ore)} öre kl ${formatClockDst(extremes.max.start)}`],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-[#0F3460] border border-[#1E4976] rounded-2xl px-4 py-3">
                     <dt className="text-xs text-[#8fafc9]">{label}</dt>

@@ -9,16 +9,14 @@
 import { useEffect, useState } from "react";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { PRICE_LEVEL_COLORS, PRICE_LEVEL_LABELS, priceLevel } from "@/lib/prices/priceLevel";
-import { formatClock } from "@/lib/prices/quarterTicks";
+import { quarterRangeLabel } from "@/lib/prices/dstLabels";
 import { currentQuarter } from "@/lib/prices/todaySummary";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 import type { Area } from "@/lib/prices/today";
 import { ore1 } from "@/lib/format/ore";
 import { useArea } from "./AreaSelect";
 
-const QUARTER_MS = 15 * 60 * 1000;
 const TICK_MS = 30_000;
-
 
 export default function NowAndChart({
   quarters,
@@ -63,7 +61,7 @@ export default function NowAndChart({
               {ore1(q.ore)} <span className="text-lg font-semibold text-[#8fafc9]">öre/kWh</span>
             </p>
             <p className="text-sm text-[#8fafc9] mt-1">
-              kl {formatClock(q.start)}–{formatClock(new Date(Date.parse(q.start) + QUARTER_MS).toISOString())}
+              kl {quarterRangeLabel(q.start)}
             </p>
           </div>
           <span

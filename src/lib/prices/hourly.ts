@@ -5,10 +5,11 @@
 // men de två 02-timmarna natten till normaltid får olika nycklar. Ett dygn ger
 // därför 23, 24 eller 25 timmar, i tidsordning.
 //
-// Ren modul (bara typimporter) så att även klientkomponenter kan använda
-// isCurrentHour utan att dra in databasklienten.
+// Ren modul (bara typimporter och dstLabels) så att även klientkomponenter kan
+// använda isCurrentHour utan att dra in databasklienten.
 
 import type { Quarter } from "./quarters";
+import { dstKind, dstSuffix } from "./dstLabels";
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -34,19 +35,6 @@ export interface HourEntry {
   label: string;
   /** Satt bara på en timme som förekommer två gånger samma dygn. */
   dst?: "summer" | "winter";
-}
-
-const LOCAL_HOUR = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/Stockholm",
-  hour: "2-digit",
-  hour12: false,
-});
-
-/** Svensk tids avvikelse från UTC i timmar (1 = normaltid, 2 = sommartid). */
-function stockholmOffsetHours(iso: string): number {
-  const d = new Date(iso);
-  const local = parseInt(LOCAL_HOUR.format(d), 10) % 24;
-  return (local - d.getUTCHours() + 24) % 24;
 }
 
 /** Kvartar (i tidsordning) → timsnitt i tidsordning. */
@@ -76,13 +64,11 @@ export function quartersToHours(quarters: Quarter[]): HourEntry[] {
     });
 
   // Dubbla klocktimmar (02 natten till normaltid): märk dem med sommar-/normaltid.
-  const count = new Map<number, number>();
-  for (const h of hours) count.set(h.hour, (count.get(h.hour) ?? 0) + 1);
   for (const h of hours) {
-    if ((count.get(h.hour) ?? 0) < 2) continue;
-    const summer = stockholmOffsetHours(h.startUTC) === 2;
-    h.dst = summer ? "summer" : "winter";
-    h.label = `${h.label} (${summer ? "sommartid" : "normaltid"})`;
+    const kind = dstKind(h.startUTC);
+    if (!kind) continue;
+    h.dst = kind;
+    h.label = `${h.label}${dstSuffix(h.startUTC)}`;
   }
   return hours;
 }

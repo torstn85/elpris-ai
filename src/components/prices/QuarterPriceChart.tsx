@@ -24,6 +24,7 @@ import {
   type PriceLevel,
 } from "@/lib/prices/priceLevel";
 import { buildHourTicks, buildPriceTicks, formatClock } from "@/lib/prices/quarterTicks";
+import { formatClockDst, quarterRangeLabel } from "@/lib/prices/dstLabels";
 import { integer, ore1 } from "@/lib/format/ore";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 
@@ -214,7 +215,7 @@ export default function QuarterPriceChart({
     .join(" · ");
 
   const ariaLabel = stats
-    ? `Elpris per kvart idag i ${area}: snitt ${ore1(stats.avg)} öre, lägst ${ore1(stats.min.ore)} öre kl ${formatClock(stats.min.start)}, högst ${ore1(stats.max.ore)} öre kl ${formatClock(stats.max.start)}.`
+    ? `Elpris per kvart idag i ${area}: snitt ${ore1(stats.avg)} öre, lägst ${ore1(stats.min.ore)} öre kl ${formatClockDst(stats.min.start)}, högst ${ore1(stats.max.ore)} öre kl ${formatClockDst(stats.max.start)}.`
     : undefined;
 
   const activeQ = active !== null ? quarters[active] : null;
@@ -353,8 +354,7 @@ export default function QuarterPriceChart({
                   aria-hidden
                 >
                   <p className="text-[#8fafc9] mb-0.5">
-                    {formatClock(activeQ.start)}–
-                    {formatClock(new Date(Date.parse(activeQ.start) + QUARTER_MS).toISOString())}
+                    {quarterRangeLabel(activeQ.start)}
                   </p>
                   <p className="font-semibold text-white">
                     {ore1(activeQ.ore)} <span className="text-[#00E5FF] text-xs font-normal">öre/kWh</span>
@@ -373,10 +373,10 @@ export default function QuarterPriceChart({
               <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#cfe0f0]">
                 <span>Snitt {ore1(stats.avg)} öre</span>
                 <span>
-                  Lägst {ore1(stats.min.ore)} öre kl {formatClock(stats.min.start)}
+                  Lägst {ore1(stats.min.ore)} öre kl {formatClockDst(stats.min.start)}
                 </span>
                 <span>
-                  Högst {ore1(stats.max.ore)} öre kl {formatClock(stats.max.start)}
+                  Högst {ore1(stats.max.ore)} öre kl {formatClockDst(stats.max.start)}
                 </span>
               </p>
             )}

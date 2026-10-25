@@ -11,7 +11,7 @@ import HourTable from "@/components/prices/HourTable";
 import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
 import { formatSwedishDay } from "@/lib/format/date";
 import { integer, ore1 } from "@/lib/format/ore";
-import { formatClock } from "@/lib/prices/quarterTicks";
+import { formatClockDst } from "@/lib/prices/dstLabels";
 import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
 import { loadTomorrowPrices } from "@/lib/prices/tomorrow";
 import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
@@ -184,8 +184,8 @@ export default async function ElprisIdag() {
                         area,
                         cells: [
                           `${ore1(quarterAverage(q))} öre`,
-                          `${ore1(min.ore)} öre kl ${formatClock(min.start)}`,
-                          `${ore1(max.ore)} öre kl ${formatClock(max.start)}`,
+                          `${ore1(min.ore)} öre kl ${formatClockDst(min.start)}`,
+                          `${ore1(max.ore)} öre kl ${formatClockDst(max.start)}`,
                           `${ore1(ch.ore_per_kwh)} öre kl ${ch.label}`,
                         ],
                       };
