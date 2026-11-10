@@ -4,7 +4,8 @@
 // Priset hämtas via useCurrentPrices: strax efter varje kvartsbyte och när
 // fliken visas igen. "Uppdaterad HH:MM" är kvarten som svaret gäller
 // (slot_start), inte webbläsarens klocka. Före första svaret visas serverns
-// värden (initialPrice/initialUpdatedLabel), så att HTML och hydrering stämmer.
+// värden (initialPrice/initialSlotStart: pågående kvart), så att HTML och
+// hydrering stämmer.
 
 import { useState } from 'react';
 import { ore1 } from '@/lib/format/ore';
@@ -16,10 +17,10 @@ type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 interface Props {
   area?: Area;
   showAreaSelector?: boolean;
-  /** Server-side seed: current price (öre/kWh) for `area`, renders in HTML before hydration. */
+  /** Serverns startvärde: pågående kvarts pris (öre/kWh) för `area`, i HTML före hydrering. */
   initialPrice?: number | null;
-  /** Server-side seed: "HH:MM" slot label shown as "Uppdaterad …" before hydration. */
-  initialUpdatedLabel?: string;
+  /** Serverns startvärde: pågående kvarts start (ISO), visas som "Uppdaterad HH:MM". */
+  initialSlotStart?: string;
 }
 
 interface PriceData {
@@ -35,7 +36,7 @@ export default function LivePriceWidget({
   area: initialArea = 'SE3',
   showAreaSelector = true,
   initialPrice = null,
-  initialUpdatedLabel,
+  initialSlotStart,
 }: Props) {
   const [area, setArea] = useState<Area>(initialArea);
   const current = useCurrentPrices();
@@ -45,7 +46,8 @@ export default function LivePriceWidget({
   const seeded = area === initialArea ? initialPrice : null;
   const price = typeof live === 'number' ? live : seeded;
   const data = price != null ? toPriceData(price) : null;
-  const updatedLabel = typeof live === 'number' && current.data ? formatClock(current.data.slot_start) : seeded != null ? initialUpdatedLabel : undefined;
+  const slotStart = typeof live === 'number' && current.data ? current.data.slot_start : seeded != null ? initialSlotStart : undefined;
+  const updatedLabel = slotStart ? formatClock(slotStart) : undefined;
   const loading = current.loading;
   const error = current.error ? 'Pris kunde inte hämtas just nu' : null;
 

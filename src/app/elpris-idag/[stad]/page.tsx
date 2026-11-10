@@ -8,9 +8,8 @@ import PriceGraph from '@/components/dynamic/PriceGraph';
 import { CITIES, type City } from '@/lib/cities';
 import { loadTodayPrices } from '@/lib/prices/today';
 import { loadTomorrowPrices } from '@/lib/prices/tomorrow';
-import { isCurrentHour } from '@/lib/prices/hourly';
 import { formatClockDst } from '@/lib/prices/dstLabels';
-import { cheapestHour, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
+import { cheapestHour, currentQuarter, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
 import { formatSwedishDay } from '@/lib/format/date';
 import { integer, ore1 } from '@/lib/format/ore';
 import { ORG_LOGO, pageMeta } from '@/lib/seo';
@@ -19,7 +18,7 @@ import { stockholmISODate } from '@/lib/time';
 import LiveHourTable from '@/components/prices/LiveHourTable';
 import RefreshOnDayChange from '@/components/prices/RefreshOnDayChange';
 import RestOfDayWindow from '@/components/prices/RestOfDayWindow';
-import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
+import { formatMonthYear } from '@/lib/time';
 import PageReading from "@/components/layout/PageReading";
 
 export const dynamic = 'force-dynamic';
@@ -147,11 +146,9 @@ export default async function StadPage({ params }: PageProps) {
   const tomorrowAvg = tomorrowHours
     ? tomorrowHours.reduce((sum, h) => sum + h.ore_per_kwh, 0) / tomorrowHours.length
     : null;
-  const currentPrice =
-    areaHours?.find((h) => isCurrentHour(h, nowMs))?.ore_per_kwh ?? null;
+  // Pågående kvart — samma värde som /api/prices/current ger för kvarten (inte timsnittet).
+  const nowQuarter = quarters ? currentQuarter(quarters, nowMs) : null;
 
-  // Aktuell 15-min-slot (Stockholm) — seed för LivePriceWidgets "Uppdaterad".
-  const slotLabel = stockholmSlotLabel();
   // Artikeldatum: samma härledda värden som JSON-LD datePublished/dateModified.
   const publishedAt = cityDatePublished(city);
   const modifiedAt = cityDateModified(city);
@@ -287,8 +284,8 @@ export default async function StadPage({ params }: PageProps) {
             <LivePriceWidget
               area={city.area}
               showAreaSelector={false}
-              initialPrice={currentPrice}
-              initialUpdatedLabel={slotLabel}
+              initialPrice={nowQuarter?.ore ?? null}
+              initialSlotStart={nowQuarter?.start}
             />
           </div>
 
