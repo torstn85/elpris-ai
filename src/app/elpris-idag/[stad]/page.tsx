@@ -10,13 +10,15 @@ import { loadTodayPrices } from '@/lib/prices/today';
 import { loadTomorrowPrices } from '@/lib/prices/tomorrow';
 import { isCurrentHour } from '@/lib/prices/hourly';
 import { formatClockDst } from '@/lib/prices/dstLabels';
-import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
+import { cheapestHour, quarterAverage, quarterExtremes } from '@/lib/prices/todaySummary';
 import { formatSwedishDay } from '@/lib/format/date';
 import { integer, ore1 } from '@/lib/format/ore';
 import { ORG_LOGO, pageMeta } from '@/lib/seo';
 import { ogCityUrl } from '@/lib/og/images';
 import { stockholmISODate } from '@/lib/time';
-import HourTable from '@/components/prices/HourTable';
+import LiveHourTable from '@/components/prices/LiveHourTable';
+import RefreshOnDayChange from '@/components/prices/RefreshOnDayChange';
+import RestOfDayWindow from '@/components/prices/RestOfDayWindow';
 import { stockholmSlotLabel, formatMonthYear } from '@/lib/time';
 import PageReading from "@/components/layout/PageReading";
 
@@ -141,7 +143,6 @@ export default async function StadPage({ params }: PageProps) {
   // Aktuell timme på tid, inte klocktimme — 02 finns två gånger natten till normaltid.
   const nowMs = fetchedAt.getTime();
   const extremes = quarters && quarters.length > 0 ? quarterExtremes(quarters) : null;
-  const restWindow = areaHours ? cheapestWindow(areaHours, nowMs) : null;
   const tomorrowHours = tomorrow?.areas[city.area] ?? null;
   const tomorrowAvg = tomorrowHours
     ? tomorrowHours.reduce((sum, h) => sum + h.ore_per_kwh, 0) / tomorrowHours.length
@@ -246,6 +247,8 @@ export default async function StadPage({ params }: PageProps) {
       />
 
       <div className="min-h-screen bg-[#0A2540] text-white">
+        {/* Står sidan öppen över midnatt renderas den om med det nya dygnets priser. */}
+        <RefreshOnDayChange date={today?.date ?? stockholmISODate()} />
         <NavBar />
 
         <PageReading as="main" className="py-8 sm:py-12">
@@ -328,16 +331,13 @@ export default async function StadPage({ params }: PageProps) {
                 Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart –
                 diagrammet ovan visar varje kvart.
               </p>
-              <HourTable hours={areaHours} caption={`Snittpris per timme idag i ${city.name} (${city.area})`} nowMs={nowMs} />
-              {restWindow && (
-                <p className="text-lg text-white leading-relaxed mt-6">
-                  Billigast resten av dagen i {city.name}:{' '}
-                  <strong>
-                    {restWindow.start}–{restWindow.end}
-                  </strong>
-                  , snitt {ore1(restWindow.avg)} öre/kWh.
-                </p>
-              )}
+              <LiveHourTable hours={areaHours} caption={`Snittpris per timme idag i ${city.name} (${city.area})`} serverNow={nowMs} />
+              <RestOfDayWindow
+                hours={areaHours}
+                place={city.name}
+                serverNow={nowMs}
+                className="text-lg text-white leading-relaxed mt-6"
+              />
             </section>
           )}
 

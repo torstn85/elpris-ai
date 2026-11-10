@@ -5,11 +5,11 @@
 // /api/prices/tomorrow var 60:e sekund och laddar om sidan när priserna finns.
 // Första renderingen använder serverns tid så att HTML och hydrering stämmer.
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useNow } from "@/lib/prices/useLiveClock";
 
 const PUBLISH_MIN = 13 * 60 + 15;
 const POLL_FROM_MIN = 13 * 60 + 10;
-const TICK_MS = 30_000;
 const POLL_MS = 60_000;
 /** Högst en omladdning per två minuter — om API:t och sidan tillfälligt ger olika svar blir det ingen loop. */
 const RELOAD_GUARD_MS = 2 * 60_000;
@@ -40,13 +40,7 @@ function stockholmMinutes(ms: number): number {
 }
 
 export default function TomorrowStatus({ serverNow }: { serverNow: number }) {
-  const [now, setNow] = useState(serverNow);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), TICK_MS);
-    return () => window.clearInterval(id);
-  }, []);
+  const now = useNow(serverNow);
 
   const minutes = stockholmMinutes(now);
   const polling = minutes >= POLL_FROM_MIN;

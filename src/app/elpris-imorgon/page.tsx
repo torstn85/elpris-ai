@@ -10,6 +10,7 @@ import TomorrowStatus from "@/components/elpris-imorgon/TomorrowStatus";
 import AreaCompareTable from "@/components/prices/AreaCompareTable";
 import CityLinksByArea from "@/components/prices/CityLinksByArea";
 import HourTable from "@/components/prices/HourTable";
+import RefreshOnDayChange from "@/components/prices/RefreshOnDayChange";
 import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
 import { formatSwedishDay } from "@/lib/format/date";
 import { integer, ore1 } from "@/lib/format/ore";
@@ -19,6 +20,7 @@ import { loadTomorrowPrices, tomorrowISODate } from "@/lib/prices/tomorrow";
 import { cheapestWindow, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
 import { pageMeta } from "@/lib/seo";
 import { ogTomorrowUrl } from "@/lib/og/images";
+import { stockholmISODate } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -183,6 +185,8 @@ export default async function ElprisImorgon() {
       ))}
 
       <main className="min-h-screen bg-[#0A2540] text-white">
+        {/* Efter midnatt är "imorgon" i dag — sidan renderas om för det nya dygnet. */}
+        <RefreshOnDayChange date={today?.date ?? stockholmISODate()} />
         <NavBar />
 
         <AreaProvider>

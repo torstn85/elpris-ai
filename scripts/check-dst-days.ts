@@ -17,6 +17,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { toQuarters, toQuarterPoints } from '../src/lib/prices/quarters';
 import { quartersToHours, type HourEntry } from '../src/lib/prices/hourly';
+import { currentQuarter } from '../src/lib/prices/todaySummary';
+import { msToNextQuarter, swedishDate } from '../src/lib/prices/liveClock';
 
 const AREAS = ['SE1', 'SE2', 'SE3', 'SE4'] as const;
 const DAYS = [
@@ -59,6 +61,24 @@ async function main() {
       } else {
         assert.ok(!hourly.SE3.some((h) => h.hour === 2), '02 ska saknas');
       }
+
+      // Klientklockan (useNow): kvartsbytet räknat på epoch-tid ska träffa varje
+      // kvartsstart i dygnets lista, även runt omställningen, och svenskt datum
+      // ska vara dygnets för alla kvartar.
+      const points = toQuarterPoints(areas.SE3);
+      const midnight = Date.parse(points[points.length - 1].start) + 15 * 60_000;
+      for (let i = 0; i < points.length; i++) {
+        const start = Date.parse(points[i].start);
+        const end = i + 1 < points.length ? Date.parse(points[i + 1].start) : midnight;
+        assert.equal(end - start, 15 * 60_000, `kvart ${points[i].start}: 15 min lång`);
+        for (const offset of [0, 1, 7 * 60_000, 15 * 60_000 - 1]) {
+          assert.equal(start + offset + msToNextQuarter(start + offset), end, `nästa kvartsbyte från ${points[i].start} + ${offset} ms`);
+          assert.equal(currentQuarter(points, start + offset)?.start, points[i].start, `pågående kvart vid ${points[i].start} + ${offset} ms`);
+        }
+        assert.equal(swedishDate(start), d.date, `svenskt datum för ${points[i].start}`);
+      }
+      assert.notEqual(swedishDate(midnight), d.date, 'midnatt hör till nästa dygn');
+      console.log(`  Klientklockan: ${points.length} kvartsbyten på epoch-tid och svenskt datum stämmer ✓`);
 
       // Svarets form som /api/prices/today skulle ge för dygnet.
       const shape = {

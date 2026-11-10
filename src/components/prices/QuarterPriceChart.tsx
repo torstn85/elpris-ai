@@ -27,6 +27,7 @@ import { buildHourTicks, buildPriceTicks, formatClock } from "@/lib/prices/quart
 import { formatClockDst, quarterRangeLabel } from "@/lib/prices/dstLabels";
 import { integer, ore1 } from "@/lib/format/ore";
 import type { QuarterPoint } from "@/lib/prices/quarters";
+import { useNow } from "@/lib/prices/useLiveClock";
 
 export { buildHourTicks, buildPriceTicks };
 
@@ -34,7 +35,6 @@ const QUARTER_MS = 15 * 60 * 1000;
 const CHART_HEIGHT = 220;
 /** Bredd (px) från vilken axeln får etikett var 3:e timme i stället för var 6:e. */
 const WIDE_PX = 640;
-const NOW_TICK_MS = 30_000;
 
 const LEGEND: { level: PriceLevel; text: string }[] = [
   { level: "cheap", text: "Billigt ≤ 50 öre" },
@@ -106,6 +106,7 @@ export default function QuarterPriceChart({
   title = "Dagens elpris per kvart",
   showStats = true,
   loading = false,
+  nowMs,
 }: {
   quarters: QuarterPoint[];
   area: string;
@@ -118,6 +119,8 @@ export default function QuarterPriceChart({
   showStats?: boolean;
   /** Visa laddningsyta i stället för tomt läge medan datan hämtas. */
   loading?: boolean;
+  /** Klockan från föräldern (useNow). Utelämnad: diagrammet har egen klocka, som sätts först i webbläsaren. */
+  nowMs?: number | null;
 }) {
   const Heading = headingLevel;
   const gradientId = `qpc-${useId().replace(/:/g, "")}`;
@@ -125,18 +128,12 @@ export default function QuarterPriceChart({
   const [wide, setWide] = useState(false);
   const [plot, setPlot] = useState<Plot | null>(null);
   const [active, setActive] = useState<number | null>(null);
-  const [now, setNow] = useState<number | null>(null);
+  const ownNow = useNow(null);
+  const now = nowMs !== undefined ? nowMs : ownNow;
   const hideTimer = useRef<number | null>(null);
 
   const n = quarters.length;
   const hasData = n > 0;
-
-  // Klockan sätts först i webbläsaren (ingen hydreringsskillnad) och tickar var 30:e sekund.
-  useEffect(() => {
-    setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), NOW_TICK_MS);
-    return () => window.clearInterval(id);
-  }, []);
 
   useEffect(() => {
     const el = containerRef.current;

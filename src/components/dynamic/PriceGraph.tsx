@@ -3,9 +3,10 @@
 // Tunt skal runt QuarterPriceChart för stadssidor och guider (MDX: <PriceGraph />).
 // Props-gränssnittet är bakåtkompatibelt så att MDX-filerna inte behöver ändras.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import QuarterPriceChart from '@/components/prices/QuarterPriceChart';
 import type { QuarterPoint } from '@/lib/prices/quarters';
+import { useSwedishDayChange } from '@/lib/prices/useLiveClock';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -60,18 +61,9 @@ export default function PriceGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchQuarters]);
 
-  // Midnattsbyte: hämta igen när svenskt datum ändras medan sidan är öppen.
-  const day = useRef<string | null>(null);
-  useEffect(() => {
-    function check() {
-      const today = swedishToday();
-      if (day.current !== null && day.current !== today) fetchQuarters();
-      day.current = today;
-    }
-    check();
-    const id = window.setInterval(check, 30_000);
-    return () => window.clearInterval(id);
-  }, [fetchQuarters]);
+  // Midnattsbyte: hämta igen när svenskt datum ändras medan sidan är öppen
+  // (0–30 s efter midnatt, direkt om fliken visas igen efter bytet).
+  useSwedishDayChange(fetchQuarters);
 
   return (
     <div className="not-prose my-8">

@@ -7,14 +7,16 @@ import { AreaName, AreaPanel, AreaProvider, AreaSelector } from "@/components/el
 import NowAndChart from "@/components/elpris-idag/NowAndChart";
 import AreaCompareTable from "@/components/prices/AreaCompareTable";
 import CityLinksByArea from "@/components/prices/CityLinksByArea";
-import HourTable from "@/components/prices/HourTable";
+import LiveHourTable from "@/components/prices/LiveHourTable";
+import RefreshOnDayChange from "@/components/prices/RefreshOnDayChange";
+import RestOfDayWindow from "@/components/prices/RestOfDayWindow";
 import ShiftUsageLinks from "@/components/prices/ShiftUsageLinks";
 import { formatSwedishDay } from "@/lib/format/date";
 import { integer, ore1 } from "@/lib/format/ore";
 import { formatClockDst } from "@/lib/prices/dstLabels";
 import { AREAS, loadTodayPrices, type Area } from "@/lib/prices/today";
 import { loadTomorrowPrices } from "@/lib/prices/tomorrow";
-import { cheapestHour, cheapestWindow, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
+import { cheapestHour, quarterAverage, quarterExtremes } from "@/lib/prices/todaySummary";
 import { pageMeta } from "@/lib/seo";
 import { ogTodayUrl } from "@/lib/og/images";
 import { stockholmISODate } from "@/lib/time";
@@ -133,6 +135,8 @@ export default async function ElprisIdag() {
       ))}
 
       <main className="min-h-screen bg-[#0A2540] text-white">
+        {/* Står sidan öppen över midnatt renderas den om med det nya dygnets priser. */}
+        <RefreshOnDayChange date={data?.date ?? stockholmISODate()} />
         <NavBar />
 
         <AreaProvider>
@@ -204,7 +208,7 @@ export default async function ElprisIdag() {
                         Varje rad är ett snitt av timmens fyra kvartspriser. Priset sätts per kvart
                         – diagrammet ovan visar varje kvart.
                       </p>
-                      <HourTable hours={data.areas[area]} caption={`Snittpris per timme idag i ${area}`} nowMs={nowMs} />
+                      <LiveHourTable hours={data.areas[area]} caption={`Snittpris per timme idag i ${area}`} serverNow={nowMs} />
                     </AreaPanel>
                   ))}
                 </section>
@@ -212,22 +216,17 @@ export default async function ElprisIdag() {
                 {/* 6. Billigast idag */}
                 <section className="max-w-3xl">
                   <h2 className={H2}>När är det billigast idag?</h2>
-                  {AREAS.map((area) => {
-                    const w = cheapestWindow(data.areas[area], nowMs);
-                    return (
-                      <AreaPanel key={area} area={area}>
-                        {w && (
-                          <p className="text-lg text-white leading-relaxed mb-4">
-                            {w.restOfDay ? `Resten av dagen i ${area}` : `Billigast resten av dagen i ${area}`}:{" "}
-                            <strong>
-                              {w.start}–{w.end}
-                            </strong>
-                            , snitt {ore1(w.avg)} öre/kWh.
-                          </p>
-                        )}
-                      </AreaPanel>
-                    );
-                  })}
+                  {AREAS.map((area) => (
+                    <AreaPanel key={area} area={area}>
+                      <RestOfDayWindow
+                        hours={data.areas[area]}
+                        place={area}
+                        serverNow={nowMs}
+                        markRestOfDay
+                        className="text-lg text-white leading-relaxed mb-4"
+                      />
+                    </AreaPanel>
+                  ))}
                   <ShiftUsageLinks />
                 </section>
               </>

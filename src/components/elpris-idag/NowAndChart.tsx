@@ -2,11 +2,11 @@
 
 // "Just nu"-kortet och kvartsdiagrammet för valt område (eller ett låst område
 // via prop area, som på /elomrade/seX). Kortet visar kvarten
-// som pågår och uppdateras var 30:e sekund (bara dagens priser — /elpris-imorgon
-// visar bara diagrammet). Första renderingen använder
-// serverns tid (serverNow) så att server-HTML och hydrering stämmer överens.
+// som pågår och uppdateras strax efter varje kvartsbyte och när fliken visas
+// igen (useNow; bara dagens priser — /elpris-imorgon visar bara diagrammet).
+// Första renderingen använder serverns tid (serverNow) så att server-HTML och
+// hydrering stämmer överens.
 
-import { useEffect, useState } from "react";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { PRICE_LEVEL_COLORS, PRICE_LEVEL_LABELS, priceLevel } from "@/lib/prices/priceLevel";
 import { quarterRangeLabel } from "@/lib/prices/dstLabels";
@@ -14,9 +14,8 @@ import { currentQuarter } from "@/lib/prices/todaySummary";
 import type { QuarterPoint } from "@/lib/prices/quarters";
 import type { Area } from "@/lib/prices/today";
 import { ore1 } from "@/lib/format/ore";
+import { useNow } from "@/lib/prices/useLiveClock";
 import { useArea } from "./AreaSelect";
-
-const TICK_MS = 30_000;
 
 export default function NowAndChart({
   quarters,
@@ -39,13 +38,7 @@ export default function NowAndChart({
 }) {
   const selectedArea = useArea();
   const area = lockedArea ?? selectedArea;
-  const [now, setNow] = useState(serverNow);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const id = window.setInterval(() => setNow(Date.now()), TICK_MS);
-    return () => window.clearInterval(id);
-  }, []);
+  const now = useNow(serverNow);
 
   const q = showNow ? currentQuarter(quarters[area], now) : null;
   const level = q ? priceLevel(q.ore) : null;
@@ -78,6 +71,7 @@ export default function NowAndChart({
         area={area}
         headingLevel="h2"
         title={title ?? `${titlePrefix} ${area}`}
+        nowMs={now}
       />
     </section>
   );
