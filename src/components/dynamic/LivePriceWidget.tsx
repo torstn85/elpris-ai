@@ -1,7 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+// "Spotpris just nu" för stadssidor och guider (MDX: <LivePriceWidget />).
+// Priset hämtas via useCurrentPrices: strax efter varje kvartsbyte och när
+// fliken visas igen. "Uppdaterad HH:MM" är kvarten som svaret gäller
+// (slot_start), inte webbläsarens klocka. Före första svaret visas serverns
+// värden (initialPrice/initialUpdatedLabel), så att HTML och hydrering stämmer.
+
+import { useState } from 'react';
 import { ore1 } from '@/lib/format/ore';
+import { formatClock } from '@/lib/prices/quarterTicks';
+import { useCurrentPrices } from '@/lib/prices/useCurrentPrices';
 
 type Area = 'SE1' | 'SE2' | 'SE3' | 'SE4';
 
@@ -17,17 +25,10 @@ interface Props {
 interface PriceData {
   price_ore_kwh: number;
   price_with_vat: number;
-  time_start: string;
-  area: Area;
 }
 
-function toPriceData(price: number, area: Area): PriceData {
-  return {
-    price_ore_kwh: price,
-    price_with_vat: Math.round(price * 1.25 * 10) / 10,
-    time_start: '',
-    area,
-  };
+function toPriceData(price: number): PriceData {
+  return { price_ore_kwh: price, price_with_vat: Math.round(price * 1.25 * 10) / 10 };
 }
 
 export default function LivePriceWidget({
@@ -37,49 +38,16 @@ export default function LivePriceWidget({
   initialUpdatedLabel,
 }: Props) {
   const [area, setArea] = useState<Area>(initialArea);
-  const [data, setData] = useState<PriceData | null>(
-    initialPrice != null ? toPriceData(initialPrice, initialArea) : null,
-  );
-  const [loading, setLoading] = useState(initialPrice == null);
-  const [error, setError] = useState<string | null>(null);
-  const [lastFetch, setLastFetch] = useState<Date | null>(null);
+  const current = useCurrentPrices();
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchPrice() {
-      try {
-        setLoading(true);
-        const res = await fetch('/api/prices/current');
-        if (!res.ok) throw new Error('Kunde inte hämta priset');
-        const json = await res.json();
-        const price_ore_kwh: number = json[area];
-        if (!cancelled) {
-          setData({
-            price_ore_kwh,
-            price_with_vat: Math.round(price_ore_kwh * 1.25 * 10) / 10,
-            time_start: json.slot_start,
-            area,
-          });
-          setLastFetch(new Date());
-          setError(null);
-        }
-      } catch {
-        if (!cancelled) {
-          setError('Pris kunde inte hämtas just nu');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 5 * 60 * 1000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [area]);
+  // Hämtat svar i första hand; serverns seed tills dess (bara för förvalt område).
+  const live = current.data?.[area];
+  const seeded = area === initialArea ? initialPrice : null;
+  const price = typeof live === 'number' ? live : seeded;
+  const data = price != null ? toPriceData(price) : null;
+  const updatedLabel = typeof live === 'number' && current.data ? formatClock(current.data.slot_start) : seeded != null ? initialUpdatedLabel : undefined;
+  const loading = current.loading;
+  const error = current.error ? 'Pris kunde inte hämtas just nu' : null;
 
   const getPriceColor = (price: number): string => {
     if (price <= 50) return 'text-green-400';
@@ -92,16 +60,6 @@ export default function LivePriceWidget({
     if (price <= 50) return 'Billigt';
     if (price < 100) return 'Normalt';
     return 'Dyrt';
-  };
-
-  const lastSlotTime = (): string => {
-    const now = new Date();
-    const fmt = (opts: Intl.DateTimeFormatOptions) =>
-      parseInt(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', ...opts }).format(now), 10);
-    const hour = fmt({ hour: 'numeric', hour12: false });
-    const minute = fmt({ minute: 'numeric' });
-    const slotMinute = Math.floor(minute / 15) * 15;
-    return `${String(hour).padStart(2, '0')}:${String(slotMinute).padStart(2, '0')}`;
   };
 
   return (
@@ -170,9 +128,9 @@ export default function LivePriceWidget({
             </span>
           </div>
 
-          {(lastFetch || initialUpdatedLabel) && (
+          {updatedLabel && (
             <p className="mt-3 text-xs text-slate-500">
-              Uppdaterad {lastFetch ? lastSlotTime() : initialUpdatedLabel}
+              Uppdaterad {updatedLabel}
             </p>
           )}
         </>

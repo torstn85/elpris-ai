@@ -6,13 +6,15 @@ import NavBar from "@/components/NavBar";
 import Chatbot from "@/components/dynamic/Chatbot";
 import DailyPriceAnalysis from "@/components/dynamic/DailyPriceAnalysis";
 import type { HourEntry, PricesResponse } from "./api/prices/today/route";
-import type { CurrentPriceResponse } from "./api/prices/current/route";
 import QuarterPriceChart from "@/components/prices/QuarterPriceChart";
 import { fetchGeoArea } from "@/lib/geo/client";
 import { PRICE_LEVEL_COLORS, priceLevel } from "@/lib/prices/priceLevel";
 import { ore1 } from "@/lib/format/ore";
 import PageWide from "@/components/layout/PageWide";
 import { ORG_LOGO } from "@/lib/seo";
+import { msToNextQuarter } from "@/lib/prices/liveClock";
+import { useNow, useSwedishDayChange } from "@/lib/prices/useLiveClock";
+import { useCurrentPrices } from "@/lib/prices/useCurrentPrices";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -99,10 +101,12 @@ export default function HomeClient() {
   const [prices, setPrices] = useState<PricesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPriceData, setCurrentPriceData] = useState<CurrentPriceResponse | null>(null);
-  const [currentLoading, setCurrentLoading] = useState(true);
   const [selectedArea, setSelectedArea] = useState<"SE1" | "SE2" | "SE3" | "SE4">("SE3");
-  const [minutesLeft, setMinutesLeft] = useState<number>(0);
+  // Just nu-priset hämtas om strax efter varje kvartsbyte och när fliken visas igen.
+  const { data: currentPriceData, loading: currentLoading } = useCurrentPrices();
+  // Klockan sätts först i webbläsaren (null vid serverrendering och hydrering).
+  const now = useNow(null);
+  const minutesLeft = now === null ? 0 : Math.ceil(msToNextQuarter(now) / 60_000);
 
   const fetchToday = useCallback(() => {
     fetch("/api/prices/today")
@@ -125,24 +129,9 @@ export default function HomeClient() {
     fetchToday();
   }, [fetchToday]);
 
-  // Tick countdown to next 15-min slot. Samma timer upptäcker midnatt (svenskt
-  // datum byts) och hämtar då dagens priser igen.
-  const swedishDay = useRef<string | null>(null);
-  useEffect(() => {
-    function compute() {
-      const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm" }).format(new Date());
-      if (swedishDay.current !== null && swedishDay.current !== day) fetchToday();
-      swedishDay.current = day;
-      const minute = parseInt(
-        new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Stockholm", minute: "numeric" }).format(new Date()),
-        10
-      );
-      setMinutesLeft(15 - (minute % 15));
-    }
-    compute();
-    const id = setInterval(compute, 30_000);
-    return () => clearInterval(id);
-  }, [fetchToday]);
+  // Midnatt: hämta dagens priser igen 0–30 s efter dygnsbytet, eller direkt
+  // när fliken visas igen efter bytet.
+  useSwedishDayChange(fetchToday);
 
   // Förval av elområde via /api/geo (Vercels geo-headers). SE3 vid fel.
   // Ett manuellt val har alltid företräde, även om svaret kommer senare.
@@ -151,27 +140,6 @@ export default function HomeClient() {
     fetchGeoArea().then((area) => {
       if (area && !pickedManually.current) setSelectedArea(area);
     });
-  }, []);
-
-  useEffect(() => {
-    function fetchCurrent() {
-      fetch("/api/prices/current")
-        .then((r) => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          return r.json() as Promise<CurrentPriceResponse>;
-        })
-        .then((data) => {
-          setCurrentPriceData(data);
-          setCurrentLoading(false);
-        })
-        .catch(() => {
-          setCurrentLoading(false);
-        });
-    }
-
-    fetchCurrent();
-    const id = setInterval(fetchCurrent, 60_000);
-    return () => clearInterval(id);
   }, []);
 
   const areaData = prices?.areas[selectedArea] ?? [];
