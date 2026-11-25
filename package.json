@@ -17,7 +17,8 @@
     "test:spotrows": "npx -y tsx scripts/check-spotrows.ts",
     "test:dstlabels": "npx -y tsx scripts/check-dst-labels.ts",
     "test:live-refresh": "npx -y tsx scripts/check-live-refresh.ts",
-    "test:api-v1": "npx -y tsx scripts/check-api-v1.ts"
+    "test:api-v1": "npx -y tsx scripts/check-api-v1.ts",
+    "test:complete-days": "npx -y tsx scripts/check-complete-days.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

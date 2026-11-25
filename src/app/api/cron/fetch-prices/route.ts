@@ -1,9 +1,11 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { supabase, type SpotPriceRow } from "@/lib/supabase";
-import { stockholmDateString, stockholmISODate } from "@/lib/time";
+import { stockholmISODate } from "@/lib/time";
 import { addDays } from "@/lib/dates";
+import { fetchAllPages } from "@/lib/supabasePaging";
 import { toSpotPriceRows, type ElprisetjustnuEntry } from "@/lib/prices/spotRows";
+import { completeAreas, dayBoundsMs, type PeriodRow } from "@/lib/prices/completeDays";
 
 // Aldrig statisk: utan detta försöker next build förrendera routen och köra
 // hämtningen. Ingen Data Cache för fetch (elprisetjustnu och Supabase).
@@ -14,10 +16,30 @@ export const fetchCache = "force-no-store";
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
 
-/** Morgondagen som elprisetjustnu-sökväg "YYYY/MM-DD": svenskt datum + ett kalenderdygn. */
-function getTomorrowDateString(): string {
-  const [y, m, d] = addDays(stockholmISODate(), 1).split("-");
+/** Svenskt datum "YYYY-MM-DD" → elprisetjustnu-sökväg "YYYY/MM-DD". */
+function toPath(isoDate: string): string {
+  const [y, m, d] = isoDate.split("-");
   return `${y}/${m}-${d}`;
+}
+
+/**
+ * Områden per dygn som redan är fullständiga i spot_prices. En fråga för alla
+ * dygnen (högst 2 dygn × 4 områden × 100 kvartar = 800 rader).
+ */
+async function loadCompleteAreas(isoDates: string[]): Promise<Map<string, Set<string>>> {
+  const fromMs = dayBoundsMs(isoDates[0]).startMs;
+  const toMs = dayBoundsMs(isoDates[isoDates.length - 1]).endMs;
+  const rows = await fetchAllPages<PeriodRow>((a, b) =>
+    supabase
+      .from("spot_prices")
+      .select("area, delivery_period_start, delivery_period_end")
+      .gte("delivery_period_start", new Date(fromMs).toISOString())
+      .lt("delivery_period_start", new Date(toMs).toISOString())
+      .order("delivery_period_start")
+      .order("id")
+      .range(a, b),
+  );
+  return new Map(isoDates.map((d) => [d, completeAreas(rows, d)]));
 }
 
 async function fetchRawArea(area: Area, dateStr: string): Promise<ElprisetjustnuEntry[]> {
@@ -78,9 +100,26 @@ function authorize(request: Request): NextResponse | null {
   return null;
 }
 
+interface DayResult {
+  date: string; // "YYYY/MM-DD" som tidigare
+  rows_upserted: number;
+  areas_ok: Area[];
+  /** Redan fullständiga i databasen — inte hämtade. */
+  areas_skipped: Area[];
+  areas_failed: { area: Area; error?: string }[];
+}
+
+/**
+ * Hämtar dagens dygn och, efter 13:15 svensk tid, morgondagens — men bara de
+ * områden som inte redan är fullständiga i spot_prices. Är allt fullständigt
+ * görs inga anrop till elprisetjustnu (skipped: true). ?force=1 hämtar allt.
+ * Kan inte databasen läsas hämtas allt, som före överhoppningen.
+ */
 export async function GET(request: Request) {
   const denied = authorize(request);
   if (denied) return denied;
+
+  const force = new URL(request.url).searchParams.get("force") === "1";
 
   try {
     const now = new Date();
@@ -90,62 +129,62 @@ export async function GET(request: Request) {
     const stockholmMinute = fmt({ minute: "numeric" });
     const afterDayAhead = stockholmHour > 13 || (stockholmHour === 13 && stockholmMinute >= 15);
 
-    // ── Today — fetch all four areas in parallel, tolerate individual failures ──
-    const dateStr = stockholmDateString();
-    const todayResults = await Promise.all(AREAS.map((area) => fetchAndUpsertArea(area, dateStr)));
-    const todayOk = todayResults.filter((r) => !r.error);
-    const todayFailed = todayResults.filter((r) => r.error);
+    const today = stockholmISODate();
+    const dates = afterDayAhead ? [today, addDays(today, 1)] : [today];
 
-    if (todayOk.length > 0) {
-      console.log(`[fetch-prices] Today ${dateStr}: ${todayOk.length}/4 areas ok, ${todayFailed.length} failed`);
-    }
-    if (todayFailed.length > 0) {
-      console.error(`[fetch-prices] Today failed areas: ${todayFailed.map((r) => `${r.area}(${r.error})`).join(", ")}`);
-    }
-
-    // ── Tomorrow — only after 13:15 Stockholm time ─────────────────────────────
-    let tomorrowResults: AreaResult[] | null = null;
-    if (afterDayAhead) {
-      const tomorrowStr = getTomorrowDateString();
-      tomorrowResults = await Promise.all(AREAS.map((area) => fetchAndUpsertArea(area, tomorrowStr)));
-      const tmOk = tomorrowResults.filter((r) => !r.error);
-      const tmFailed = tomorrowResults.filter((r) => r.error);
-      if (tmOk.length > 0) {
-        console.log(`[fetch-prices] Tomorrow ${tomorrowStr}: ${tmOk.length}/4 areas ok, ${tmFailed.length} failed`);
-      }
-      if (tmFailed.length > 0) {
-        console.error(`[fetch-prices] Tomorrow failed areas: ${tmFailed.map((r) => `${r.area}(${r.error})`).join(", ")}`);
+    let complete = new Map<string, Set<string>>();
+    if (!force) {
+      try {
+        complete = await loadCompleteAreas(dates);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        console.error(`[fetch-prices] could not read existing rows, fetching all: ${message}`);
       }
     }
 
-    // Return 500 only if ALL four today-areas failed
-    if (todayOk.length === 0) {
+    const [todayResult, tomorrowResult] = await Promise.all(
+      dates.map(async (iso): Promise<DayResult> => {
+        const done = complete.get(iso) ?? new Set<string>();
+        const skipped = AREAS.filter((a) => done.has(a));
+        const missing = AREAS.filter((a) => !done.has(a));
+        const path = toPath(iso);
+        const results = await Promise.all(missing.map((area) => fetchAndUpsertArea(area, path)));
+        const ok = results.filter((r) => !r.error);
+        const failed = results.filter((r) => r.error);
+        if (missing.length > 0) {
+          console.log(
+            `[fetch-prices] ${path}: fetched ${ok.length}/${missing.length}` +
+              (skipped.length ? `, skipped ${skipped.join("+")} (complete)` : "") +
+              (failed.length ? `, failed ${failed.map((r) => `${r.area}(${r.error})`).join(", ")}` : ""),
+          );
+        }
+        return {
+          date: path,
+          rows_upserted: ok.reduce((s, r) => s + (r.rows_upserted ?? 0), 0),
+          areas_ok: ok.map((r) => r.area),
+          areas_skipped: skipped,
+          areas_failed: failed.map((r) => ({ area: r.area, error: r.error })),
+        };
+      }),
+    );
+
+    const fetchedNothing = [todayResult, tomorrowResult].every((d) => !d || d.areas_ok.length + d.areas_failed.length === 0);
+    if (fetchedNothing) console.log(`[fetch-prices] skipped: ${dates.join(" + ")} already complete`);
+
+    // 500 bara om inget område har dagens dygn — varken hämtat nu eller redan i databasen.
+    if (todayResult.areas_ok.length + todayResult.areas_skipped.length === 0) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "All four areas failed for today",
-          today: { date: dateStr, failed: todayFailed },
-        },
-        { status: 500 }
+        { ok: false, error: "All four areas failed for today", today: todayResult },
+        { status: 500 },
       );
     }
 
     return NextResponse.json({
       ok: true,
-      today: {
-        date: dateStr,
-        rows_upserted: todayOk.reduce((s, r) => s + (r.rows_upserted ?? 0), 0),
-        areas_ok: todayOk.map((r) => r.area),
-        areas_failed: todayFailed.map((r) => ({ area: r.area, error: r.error })),
-      },
-      tomorrow: tomorrowResults
-        ? {
-            date: getTomorrowDateString(),
-            rows_upserted: tomorrowResults.filter((r) => !r.error).reduce((s, r) => s + (r.rows_upserted ?? 0), 0),
-            areas_ok: tomorrowResults.filter((r) => !r.error).map((r) => r.area),
-            areas_failed: tomorrowResults.filter((r) => r.error).map((r) => ({ area: r.area, error: r.error })),
-          }
-        : null,
+      skipped: fetchedNothing,
+      forced: force,
+      today: todayResult,
+      tomorrow: tomorrowResult ?? null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
