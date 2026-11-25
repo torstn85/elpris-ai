@@ -26,7 +26,7 @@ export interface HourEntry {
   hour: number;
   /** Timmens första kvart (ISO, UTC). Kvar för bakåtkompatibilitet — samma som startUTC. */
   time_start: string;
-  /** Snitt av timmens kvartar, öre/kWh exkl. moms, en decimal. */
+  /** Snitt av timmens kvartar, öre/kWh exkl. moms, en decimal (se `decimals`). */
   ore_per_kwh: number;
   /** Timmens start och slut (ISO, UTC). startUTC är unik — använd som React-nyckel. */
   startUTC: string;
@@ -37,8 +37,12 @@ export interface HourEntry {
   dst?: "summer" | "winter";
 }
 
-/** Kvartar (i tidsordning) → timsnitt i tidsordning. */
-export function quartersToHours(quarters: Quarter[]): HourEntry[] {
+/**
+ * Kvartar (i tidsordning) → timsnitt i tidsordning. `decimals` styr avrundningen
+ * av snittet: sajten visar en decimal, /api/v1/spot-prices levererar två.
+ */
+export function quartersToHours(quarters: Quarter[], decimals = 1): HourEntry[] {
+  const factor = 10 ** decimals;
   const groups = new Map<string, Quarter[]>();
   for (const q of quarters) {
     const key = q.startUTC.slice(0, 13); // "YYYY-MM-DDTHH" i UTC
@@ -56,7 +60,7 @@ export function quartersToHours(quarters: Quarter[]): HourEntry[] {
       return {
         hour: items[0].hour,
         time_start: items[0].startUTC,
-        ore_per_kwh: Math.round(mean * 10) / 10,
+        ore_per_kwh: Math.round(mean * factor) / factor,
         startUTC,
         endUTC,
         label: clockLabel(items[0].hour),
