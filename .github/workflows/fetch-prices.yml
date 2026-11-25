@@ -10,12 +10,15 @@ on:
 
 jobs:
   fetch:
+    # Inte vid keepalive-tiden (7 4 * * * gäller bara upstash-keepalive).
+    if: github.event.schedule != '7 4 * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Call fetch-prices API
         run: |
           curl --fail --silent --show-error \
-            -X GET "${{ secrets.PRODUCTION_URL }}/api/cron/fetch-prices"
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.PRODUCTION_URL }}/api/cron/fetch-prices"
 
   upstash-keepalive:
     if: github.event.schedule == '7 4 * * *' || github.event_name == 'workflow_dispatch'

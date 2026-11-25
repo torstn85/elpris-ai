@@ -1,8 +1,15 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { supabase, type SpotPriceRow } from "@/lib/supabase";
 import { stockholmDateString, stockholmISODate } from "@/lib/time";
 import { addDays } from "@/lib/dates";
 import { toSpotPriceRows, type ElprisetjustnuEntry } from "@/lib/prices/spotRows";
+
+// Aldrig statisk: utan detta försöker next build förrendera routen och köra
+// hämtningen. Ingen Data Cache för fetch (elprisetjustnu och Supabase).
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 const AREAS = ["SE1", "SE2", "SE3", "SE4"] as const;
 type Area = (typeof AREAS)[number];
@@ -51,7 +58,30 @@ async function fetchAndUpsertArea(area: Area, dateStr: string): Promise<AreaResu
   }
 }
 
-export async function GET() {
+const sha256 = (s: string) => createHash("sha256").update(s, "utf8").digest();
+
+/**
+ * Anropas av GitHub Actions (.github/workflows/fetch-prices.yml) med
+ * Authorization: Bearer <CRON_SECRET>. Jämför SHA-256 av värdena med
+ * timingSafeEqual (samma längd oavsett indata). Hemligheten loggas aldrig.
+ */
+function authorize(request: Request): NextResponse | null {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.error("[fetch-prices] CRON_SECRET saknas i miljön — alla anrop nekas");
+    return NextResponse.json({ ok: false, error: "Server misconfigured" }, { status: 500 });
+  }
+  const header = request.headers.get("authorization") ?? "";
+  if (!timingSafeEqual(sha256(header), sha256(`Bearer ${secret}`))) {
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  }
+  return null;
+}
+
+export async function GET(request: Request) {
+  const denied = authorize(request);
+  if (denied) return denied;
+
   try {
     const now = new Date();
     const fmt = (opts: Intl.DateTimeFormatOptions) =>
